@@ -1,0 +1,7 @@
+{
+  "name": "WealthVue",
+  "description": "A universal portfolio tracker that uses AI to track and value your entire net worth across any asset type.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}

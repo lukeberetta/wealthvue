@@ -1,0 +1,72 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Playfair Display", ui-serif, Georgia, serif;
+  
+  --color-bg: #F5F3EF;
+  --color-surface: #FFFFFF;
+  --color-surface-2: #EDE9E3;
+  --color-accent: #C96442;
+  --color-accent-light: #F0E6E0;
+  --color-text-1: #1A1612;
+  --color-text-2: #6B6560;
+  --color-text-3: #9C9490;
+  --color-border: #E8E4DF;
+  --color-positive: #4A7C59;
+  --color-negative: #B5534A;
+}
+
+@layer base {
+  body {
+    @apply bg-bg text-text-1 font-sans antialiased;
+    line-height: 1.65;
+  }
+  
+  h1, h2, h3, h4, .font-serif {
+    @apply font-serif;
+  }
+
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-surface rounded-lg border border-border shadow-sm;
+  }
+  
+  .btn-primary {
+    @apply bg-accent text-white px-8 py-3.5 rounded-full font-medium transition-all hover:opacity-90 hover:shadow-md disabled:opacity-50;
+  }
+  
+  .btn-secondary {
+    @apply border border-border text-text-2 px-8 py-3.5 rounded-full font-medium transition-all hover:bg-surface-2 disabled:opacity-50;
+  }
+  
+  .btn-ghost {
+    @apply text-text-2 px-4 py-2 rounded-lg font-medium transition-colors hover:bg-surface-2 disabled:opacity-50;
+  }
+
+  .fade-up {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+  }
+
+  .fade-up.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes float {
+  0% { transform: translateY(0) rotate(1deg); }
+  50% { transform: translateY(-8px) rotate(1deg); }
+  100% { transform: translateY(0) rotate(1deg); }
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
