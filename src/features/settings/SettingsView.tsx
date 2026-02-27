@@ -8,9 +8,19 @@ interface SettingsViewProps {
     user: User | null;
     onSignOut: () => void;
     onBack: () => void;
+    onUpdateUser: (user: User) => void;
 }
 
-export const SettingsView = ({ user, onSignOut, onBack }: SettingsViewProps) => {
+export const SettingsView = ({ user, onSignOut, onBack, onUpdateUser }: SettingsViewProps) => {
+    const handleCurrencyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        if (user) {
+            onUpdateUser({
+                ...user,
+                defaultCurrency: e.target.value
+            });
+        }
+    };
+
     return (
         <div className="max-w-3xl mx-auto w-full py-8 space-y-8">
             <div className="flex items-center gap-4 mb-8">
@@ -37,7 +47,11 @@ export const SettingsView = ({ user, onSignOut, onBack }: SettingsViewProps) => 
                         </div>
                         <div className="space-y-1">
                             <label className="text-[10px] uppercase font-bold text-text-secondary">Default Currency</label>
-                            <select className="w-full bg-nav border border-border rounded p-2 text-sm" defaultValue={user?.defaultCurrency}>
+                            <select
+                                className="w-full bg-nav border border-border rounded p-2 text-sm"
+                                defaultValue={user?.defaultCurrency}
+                                onChange={handleCurrencyChange}
+                            >
                                 <option value="USD">USD - US Dollar</option>
                                 <option value="ZAR">ZAR - SA Rand</option>
                                 <option value="EUR">EUR - Euro</option>

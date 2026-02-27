@@ -83,7 +83,7 @@ async function callAIWithRotation(
   throw lastError;
 }
 
-export async function parseTextToAsset(text: string, preferredCurrency: string = "USD"): Promise<ParsedAsset | null> {
+export async function parseTextToAsset(text: string, preferredCurrency: string = "ZAR"): Promise<ParsedAsset | null> {
   const systemInstruction = `You are a financial asset parser. The user will describe an asset in plain language. 
 SEARCH for the current market price of any ticker symbols or assets mentioned (it is early 2026). 
 Extract structured data and estimate its current market value based on your search results. 
@@ -106,7 +106,8 @@ Respond ONLY with valid raw JSON in this exact format:
 }
 IMPORTANT: The "source" field MUST only contain institutional names like "Robinhood", "Binance", or "Chase" if explicitly mentioned by the user. 
 DO NOT put website names found during price searching (like "Motley Fool" or "Yahoo Finance") in the "source" field. Put those in "aiRationale" instead.
-Never include any text outside the JSON object. All currency fields MUST be valid ISO 4217 codes.`;
+Never include any text outside the JSON object. All currency fields MUST be valid ISO 4217 codes. 
+IMPORTANT: Valuations should be in ${preferredCurrency}. ${preferredCurrency === 'ZAR' ? 'Make sure to search for the South African market value (e.g., AutoTrader.co.za for cars).' : ''}`;
 
   try {
     const response = await callAIWithRotation(text, systemInstruction);
@@ -118,7 +119,7 @@ Never include any text outside the JSON object. All currency fields MUST be vali
   }
 }
 
-export async function parseScreenshotToAssets(base64Image: string, preferredCurrency: string = "USD"): Promise<ParsedAsset[]> {
+export async function parseScreenshotToAssets(base64Image: string, preferredCurrency: string = "ZAR"): Promise<ParsedAsset[]> {
   const systemInstruction = `You are a financial portfolio parser. Extract ALL visible assets from the screenshot.
 For any asset found, SEARCH for its current real-time market price (early 2026) to ensure accuracy.
 Return assets as a JSON array. Each element follows this format:
@@ -162,7 +163,7 @@ Respond ONLY with a valid JSON array. No markdown, no explanation. All currency 
   }
 }
 
-export async function reestimateAssetValue(asset: { name: string; assetType: string; description: string }, preferredCurrency: string = "USD"): Promise<{
+export async function reestimateAssetValue(asset: { name: string; assetType: string; description: string }, preferredCurrency: string = "ZAR"): Promise<{
   unitPrice: number;
   unitPriceCurrency: string;
   totalValue: number;

@@ -8,7 +8,7 @@ import { parseTextToAsset, parseScreenshotToAssets } from "../../../services/gem
 export const useDashboard = (user: User | null, isDemo: boolean) => {
     const [assets, setAssets] = useState<Asset[]>([]);
     const [navHistory, setNavHistory] = useState<NAVHistoryEntry[]>([]);
-    const [displayCurrency, setDisplayCurrency] = useState(user?.defaultCurrency || "USD");
+    const [displayCurrency, setDisplayCurrency] = useState(user?.defaultCurrency || "ZAR");
     const [fxRates, setFxRates] = useState<{ [key: string]: number }>({ USD: 1 });
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -44,7 +44,7 @@ export const useDashboard = (user: User | null, isDemo: boolean) => {
                     const totalNAV = loadedAssets.reduce((acc, asset) => {
                         return acc + convertCurrency(asset.totalValue, asset.totalValueCurrency, "USD", rates.rates);
                     }, 0);
-                    const newHistory = [...loadedHistory, { date: today, totalNAV, displayCurrency: "USD" }];
+                    const newHistory = [...loadedHistory, { date: today, totalNAV, displayCurrency: "ZAR" }];
                     setNavHistory(newHistory);
                     storage.saveNAVHistory(newHistory);
                 }

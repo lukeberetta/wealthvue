@@ -31,7 +31,7 @@ export default function App() {
       displayName: "Alex Morgan",
       email: "alex@example.com",
       photoURL: "https://api.dicebear.com/7.x/avataaars/svg?seed=Alex",
-      defaultCurrency: "USD",
+      defaultCurrency: "ZAR",
       plan: "trial",
       trialStartDate: new Date().toISOString(),
       trialEndsAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
@@ -59,6 +59,11 @@ export default function App() {
     navigate('/');
   };
 
+  const handleUpdateUser = (updatedUser: User) => {
+    setUser(updatedUser);
+    storage.saveUser(updatedUser);
+  };
+
   return (
     <div className="min-h-screen">
       <AnimatePresence mode="wait">
@@ -84,6 +89,7 @@ export default function App() {
                   isDemo={isDemo}
                   onSignOut={handleSignOut}
                   onGoHome={handleGoHome}
+                  onUpdateUser={handleUpdateUser}
                 />
               }
             />

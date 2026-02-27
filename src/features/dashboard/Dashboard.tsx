@@ -27,9 +27,10 @@ interface DashboardProps {
     isDemo: boolean;
     onSignOut: () => void;
     onGoHome: () => void;
+    onUpdateUser: (user: User) => void;
 }
 
-export const Dashboard = ({ user, isDemo, onSignOut, onGoHome }: DashboardProps) => {
+export const Dashboard = ({ user, isDemo, onSignOut, onGoHome, onUpdateUser }: DashboardProps) => {
     const {
         assets,
         navHistory,
@@ -83,7 +84,15 @@ export const Dashboard = ({ user, isDemo, onSignOut, onGoHome }: DashboardProps)
     if (currentView === 'settings') {
         return (
             <div className="min-h-screen flex flex-col bg-bg">
-                <SettingsView user={user} onSignOut={onSignOut} onBack={() => setCurrentView('dashboard')} />
+                <SettingsView
+                    user={user}
+                    onSignOut={onSignOut}
+                    onBack={() => setCurrentView('dashboard')}
+                    onUpdateUser={(updated) => {
+                        onUpdateUser(updated);
+                        setDisplayCurrency(updated.defaultCurrency);
+                    }}
+                />
             </div>
         );
     }
