@@ -3,11 +3,14 @@ import { Briefcase, Coins, Car, Home, Wallet, MoreHorizontal, Sparkles, Plus } f
 import { Asset } from "../../../types";
 import { Button } from "../../../components/ui/Button";
 import { AssetRow } from "./AssetRow";
+import { formatCurrency } from "../../../lib/utils";
+import { convertCurrency } from "../../../lib/fx";
 
 interface AssetListProps {
     assets: Asset[];
     displayCurrency: string;
     fxRates: { [key: string]: number };
+    isSelectMode: boolean;
     selectedAssetIds: string[];
     onSelectAsset: (id: string, checked: boolean) => void;
     onEditAsset: (asset: Asset) => void;
@@ -18,6 +21,7 @@ export const AssetList = ({
     assets,
     displayCurrency,
     fxRates,
+    isSelectMode,
     selectedAssetIds,
     onSelectAsset,
     onEditAsset,
@@ -41,11 +45,17 @@ export const AssetList = ({
         );
     }
 
-    const groupedAssets = assets.reduce((acc, asset) => {
-        acc[asset.assetType] = acc[asset.assetType] || [];
-        acc[asset.assetType].push(asset);
-        return acc;
-    }, {} as Record<string, Asset[]>);
+    const sortedGroupedAssets = Object.entries(
+        assets.reduce((acc, asset) => {
+            acc[asset.assetType] = acc[asset.assetType] || [];
+            acc[asset.assetType].push(asset);
+            return acc;
+        }, {} as Record<string, Asset[]>)
+    ).sort(([, assetsA], [, assetsB]) => {
+        const totalA = assetsA.reduce((sum, a) => sum + convertCurrency(a.totalValue, a.totalValueCurrency, displayCurrency, fxRates), 0);
+        const totalB = assetsB.reduce((sum, b) => sum + convertCurrency(b.totalValue, b.totalValueCurrency, displayCurrency, fxRates), 0);
+        return totalB - totalA;
+    });
 
     const getIcon = (type: string) => {
         switch (type) {
@@ -59,28 +69,49 @@ export const AssetList = ({
     };
 
     return (
-        <div className="grid md:grid-cols-2 gap-8">
-            {Object.entries(groupedAssets).map(([type, typeAssets]) => (
-                <div key={type} className="space-y-4">
-                    <h4 className="text-[10px] font-bold text-text-3 uppercase tracking-widest flex items-center gap-2 pb-2 border-b border-border">
-                        {getIcon(type)}
-                        {type}s
-                    </h4>
-                    <div className="space-y-3">
-                        {typeAssets.map(asset => (
-                            <AssetRow
-                                key={asset.id}
-                                asset={asset}
-                                displayCurrency={displayCurrency}
-                                fxRates={fxRates}
-                                isSelected={selectedAssetIds.includes(asset.id)}
-                                onSelect={onSelectAsset}
-                                onClick={onEditAsset}
-                            />
-                        ))}
+        <div className="space-y-12">
+            {sortedGroupedAssets.map(([type, typeAssets]) => {
+                const typeTotal = typeAssets.reduce((sum, asset) => {
+                    return sum + convertCurrency(asset.totalValue, asset.totalValueCurrency, displayCurrency, fxRates);
+                }, 0);
+
+                const getPluralType = (t: string) => {
+                    switch (t) {
+                        case 'property': return 'properties';
+                        case 'cash': return 'cash';
+                        default: return `${t}s`;
+                    }
+                };
+
+                return (
+                    <div key={type} className="space-y-4">
+                        <div className="flex items-center justify-between border-b border-border pb-2">
+                            <h4 className="text-[10px] font-bold text-text-3 uppercase tracking-widest flex items-center gap-2">
+                                {getIcon(type)}
+                                {getPluralType(type)}
+                            </h4>
+                            <span className="text-[10px] font-bold text-text-2 tabular-nums">
+                                {formatCurrency(typeTotal, displayCurrency)}
+                            </span>
+                        </div>
+                        <div className="md:columns-2 gap-8 space-y-3">
+                            {typeAssets.map(asset => (
+                                <div key={asset.id} className="break-inside-avoid-column">
+                                    <AssetRow
+                                        asset={asset}
+                                        displayCurrency={displayCurrency}
+                                        fxRates={fxRates}
+                                        isSelectMode={isSelectMode}
+                                        isSelected={selectedAssetIds.includes(asset.id)}
+                                        onSelect={onSelectAsset}
+                                        onClick={onEditAsset}
+                                    />
+                                </div>
+                            ))}
+                        </div>
                     </div>
-                </div>
-            ))}
+                );
+            })}
         </div>
     );
 };

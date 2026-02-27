@@ -9,11 +9,12 @@ interface AssetRowProps {
     displayCurrency: string;
     fxRates: { [key: string]: number };
     isSelected: boolean;
+    isSelectMode: boolean;
     onSelect: (id: string, checked: boolean) => void;
     onClick: (asset: Asset) => void;
 }
 
-export const AssetRow: React.FC<AssetRowProps> = ({ asset, displayCurrency, fxRates, isSelected, onSelect, onClick }) => {
+export const AssetRow: React.FC<AssetRowProps> = ({ asset, displayCurrency, fxRates, isSelected, isSelectMode, onSelect, onClick }) => {
     const getIcon = (type: string) => {
         switch (type) {
             case 'stock': return <Briefcase size={20} />;
@@ -32,7 +33,10 @@ export const AssetRow: React.FC<AssetRowProps> = ({ asset, displayCurrency, fxRa
                 isSelected ? "bg-accent-light/20 border-accent/20" : "hover:bg-surface-2"
             )}
         >
-            <div className="flex items-center h-full">
+            <div className={cn(
+                "flex items-center h-full transition-all duration-300 ease-in-out overflow-hidden",
+                isSelectMode ? "w-6 opacity-100 mr-2" : "w-0 opacity-0 mr-0"
+            )}>
                 <input
                     type="checkbox"
                     checked={isSelected}

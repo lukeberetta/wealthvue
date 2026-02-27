@@ -21,24 +21,30 @@ export interface ParsedAsset {
 }
 
 export async function parseTextToAsset(text: string, preferredCurrency: string = "USD"): Promise<ParsedAsset | null> {
-  const model = "gemini-2.0-flash";
-  const systemInstruction = `You are a financial asset parser. The user will describe an asset in plain language. Extract structured data and estimate its current market value. Respond ONLY with valid JSON in this exact format:
+  const model = "gemini-2.5-flash";
+  const systemInstruction = `You are a financial asset parser. The user will describe an asset in plain language. 
+SEARCH for the current market price of any ticker symbols or assets mentioned (it is early 2026). 
+Extract structured data and estimate its current market value based on your search results. 
+
+Respond ONLY with valid raw JSON in this exact format:
 {
   "name": string,
   "assetType": "stock" | "crypto" | "vehicle" | "property" | "cash" | "other",
   "ticker": string | null,
   "quantity": number,
   "unitPrice": number,
-  "unitPriceCurrency": string (ISO 4217 code, e.g., "USD", "ZAR", "EUR"),
+  "unitPriceCurrency": string (ISO 4217 code),
   "totalValue": number,
-  "totalValueCurrency": string (ISO 4217 code, e.g., "USD", "ZAR", "EUR"),
-  "valueSource": "ai_estimate" | "live_price",
-  "source": string | null (e.g., "Robinhood", "Binance", "Coinbase"),
+  "totalValueCurrency": string (ISO 4217 code),
+  "valueSource": "live_price",
+  "source": string | null,
   "aiConfidence": "high" | "medium" | "low",
   "aiRationale": string,
   "description": string
 }
-Use current market knowledge to estimate values. For vehicles, use the local used car market matching the currency ${preferredCurrency}. Be conservative on estimates. Never include markdown, explanation, or any text outside the JSON object. All currency fields MUST be valid ISO 4217 codes.`;
+IMPORTANT: The "source" field MUST only contain institutional names like "Robinhood", "Binance", or "Chase" if explicitly mentioned by the user. 
+DO NOT put website names found during price searching (like "Motley Fool" or "Yahoo Finance") in the "source" field. Put those in "aiRationale" instead.
+Never include any text outside the JSON object. All currency fields MUST be valid ISO 4217 codes.`;
 
   try {
     const response = await ai.models.generateContent({
@@ -46,11 +52,12 @@ Use current market knowledge to estimate values. For vehicles, use the local use
       contents: text,
       config: {
         systemInstruction,
-        responseMimeType: "application/json",
+        tools: [{ googleSearch: {} }] as any,
       },
     });
 
-    return JSON.parse(response.text || "null");
+    const cleanedText = response.text.replace(/```json\n?/, "").replace(/```\n?$/, "").trim();
+    return JSON.parse(cleanedText || "null");
   } catch (error) {
     console.error("Error parsing text to asset:", error);
     throw error;
@@ -58,31 +65,35 @@ Use current market knowledge to estimate values. For vehicles, use the local use
 }
 
 export async function parseScreenshotToAssets(base64Image: string, preferredCurrency: string = "USD"): Promise<ParsedAsset[]> {
-  const model = "gemini-2.0-flash"; // Using 2.0 Flash for best vision performance and updated knowledge
-  const systemInstruction = `You are a financial portfolio parser. The user has uploaded a screenshot of a financial account, portfolio, or asset. Extract ALL visible assets and return them as a JSON array. Each element follows this format:
+  const model = "gemini-2.5-flash"; // Using 2.5 Flash as it has available quota in this project
+  const systemInstruction = `You are a financial portfolio parser. Extract ALL visible assets from the screenshot.
+For any asset found, SEARCH for its current real-time market price (early 2026) to ensure accuracy.
+Return assets as a JSON array. Each element follows this format:
 {
   "name": string,
   "assetType": "stock" | "crypto" | "vehicle" | "property" | "cash" | "other",
   "ticker": string | null,
   "quantity": number,
   "unitPrice": number,
-  "unitPriceCurrency": string (ISO 4217 code, e.g., "USD", "ZAR", "EUR"),
+  "unitPriceCurrency": string (ISO 4217 code),
   "totalValue": number,
-  "totalValueCurrency": string (ISO 4217 code, e.g., "USD", "ZAR", "EUR"),
-  "valueSource": "ai_estimate" | "live_price",
-  "source": string | null (e.g., "Robinhood", "Binance", "Coinbase"),
-  "aiConfidence": "high" | "medium" | "low",
+  "totalValueCurrency": string (ISO 4217 code),
+  "valueSource": "live_price",
+  "source": string | null,
+  "aiConfidence": "high",
   "aiRationale": string,
   "description": string
 }
-Return one object per asset. If a unit price or total value is not explicitly visible in the screenshot, you MUST use your internal market knowledge to provide an accurate estimate based on the asset name or ticker symbol. Set aiConfidence to 'low' for these estimated values. Use current market prices (as of early 2026). Prefer using ${preferredCurrency} for all valuations. Respond ONLY with a valid JSON array. All currency fields MUST be valid ISO 4217 codes. No markdown, no explanation.`;
+IMPORTANT: The "source" field MUST only contain institutional names like "Robinhood", "Binance", or "Chase" if visible in the screenshot. 
+DO NOT put website names found during price searching (like "Motley Fool" or "Yahoo Finance") in the "source" field. Put those in "aiRationale" instead.
+Respond ONLY with a valid JSON array. No markdown, no explanation. All currency fields MUST be valid ISO 4217 codes. Prefer using ${preferredCurrency} for valuations.`;
 
   try {
     const response = await ai.models.generateContent({
       model,
       contents: {
         parts: [
-          { text: "Extract assets from this screenshot." },
+          { text: "Extract assets from this screenshot. For any identified stocks or crypto without visible prices, SEARCH for their current market price." },
           {
             inlineData: {
               mimeType: "image/png",
@@ -93,11 +104,12 @@ Return one object per asset. If a unit price or total value is not explicitly vi
       },
       config: {
         systemInstruction,
-        responseMimeType: "application/json",
+        tools: [{ googleSearch: {} }] as any,
       },
     });
 
-    return JSON.parse(response.text || "[]");
+    const cleanedText = response.text.replace(/```json\n?/, "").replace(/```\n?$/, "").trim();
+    return JSON.parse(cleanedText || "[]");
   } catch (error) {
     console.error("Error parsing screenshot to assets:", error);
     throw error;
@@ -111,7 +123,7 @@ export async function reestimateAssetValue(asset: { name: string; assetType: str
   aiConfidence: "high" | "medium" | "low";
   aiRationale: string;
 } | null> {
-  const model = "gemini-2.0-flash";
+  const model = "gemini-2.5-flash";
   const systemInstruction = `Given this asset:
 Name: ${asset.name}
 Type: ${asset.assetType}
@@ -133,11 +145,12 @@ All currency fields MUST be valid ISO 4217 codes.`;
       contents: `Name: ${asset.name}\nType: ${asset.assetType}\nDescription: ${asset.description}`,
       config: {
         systemInstruction,
-        responseMimeType: "application/json",
+        tools: [{ googleSearch: {} }] as any,
       },
     });
 
-    return JSON.parse(response.text || "null");
+    const cleanedText = response.text.replace(/```json\n?/, "").replace(/```\n?$/, "").trim();
+    return JSON.parse(cleanedText || "null");
   } catch (error) {
     console.error("Error re-estimating asset value:", error);
     return null;

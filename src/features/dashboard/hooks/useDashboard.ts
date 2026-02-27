@@ -22,6 +22,7 @@ export const useDashboard = (user: User | null, isDemo: boolean) => {
     const [currentView, setCurrentView] = useState<'dashboard' | 'settings'>('dashboard');
     const [selectedAssetIds, setSelectedAssetIds] = useState<string[]>([]);
     const [sortBy, setSortBy] = useState<'value_desc' | 'value_asc' | 'name_asc'>('value_desc');
+    const [isSelectMode, setIsSelectMode] = useState(false);
 
     useEffect(() => {
         const loadData = async () => {
@@ -140,6 +141,7 @@ export const useDashboard = (user: User | null, isDemo: boolean) => {
         setAssets(newAssets);
         storage.saveAssets(newAssets);
         setSelectedAssetIds([]);
+        setIsSelectMode(false);
     };
 
     const sortedAssets = [...assets].sort((a, b) => {
@@ -241,6 +243,8 @@ export const useDashboard = (user: User | null, isDemo: boolean) => {
         setSelectedAssetIds,
         sortBy,
         setSortBy,
+        isSelectMode,
+        setIsSelectMode,
         totalNAV,
         change,
         changePercent,

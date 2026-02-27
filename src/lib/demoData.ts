@@ -4,7 +4,7 @@ import { addDays, format, subDays } from "date-fns";
 const generateNAVHistory = (currentTotal: number): NAVHistoryEntry[] => {
   const history: NAVHistoryEntry[] = [];
   let currentVal = currentTotal * 0.9; // Start a bit lower
-  
+
   for (let i = 60; i >= 0; i--) {
     const date = format(subDays(new Date(), i), "yyyy-MM-dd");
     // Add gentle upward drift with occasional small dips

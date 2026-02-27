@@ -58,6 +58,8 @@ export const Dashboard = ({ user, isDemo, onSignOut, onGoHome }: DashboardProps)
         setSelectedAssetIds,
         sortBy,
         setSortBy,
+        isSelectMode,
+        setIsSelectMode,
         totalNAV,
         change,
         changePercent,
@@ -222,6 +224,20 @@ export const Dashboard = ({ user, isDemo, onSignOut, onGoHome }: DashboardProps)
                                 </Button>
                             )}
 
+                            <Button
+                                variant="ghost"
+                                onClick={() => {
+                                    setIsSelectMode(!isSelectMode);
+                                    if (isSelectMode) setSelectedAssetIds([]);
+                                }}
+                                className={cn(
+                                    "text-xs font-bold uppercase tracking-wider py-1.5 px-4 rounded-lg",
+                                    isSelectMode ? "text-accent bg-accent/10" : "text-text-3 hover:bg-surface-2"
+                                )}
+                            >
+                                {isSelectMode ? "Cancel" : "Select"}
+                            </Button>
+
                             <div className="relative flex-1 sm:flex-none">
                                 <select
                                     value={sortBy}
@@ -241,6 +257,7 @@ export const Dashboard = ({ user, isDemo, onSignOut, onGoHome }: DashboardProps)
                         assets={sortedAssets}
                         displayCurrency={displayCurrency}
                         fxRates={fxRates}
+                        isSelectMode={isSelectMode}
                         selectedAssetIds={selectedAssetIds}
                         onSelectAsset={(id, checked) => {
                             if (checked) {
