@@ -175,7 +175,7 @@ export const Dashboard = ({ user, isDemo, onSignIn, onSignOut, onGoHome, onUpdat
                                     {(['1D', '1W', '1M', 'All'] as const).map(p => (
                                         <button
                                             key={p}
-                                            onClick={() => setChangePeriod(p)}
+                                            onClick={isDemo ? onSignIn : () => setChangePeriod(p)}
                                             className={cn(
                                                 "px-3 py-1 rounded-full text-xs font-bold transition-all duration-200",
                                                 changePeriod === p
@@ -208,13 +208,14 @@ export const Dashboard = ({ user, isDemo, onSignIn, onSignOut, onGoHome, onUpdat
                         <div className="flex gap-3">
                             <Button
                                 variant="secondary"
+                                onClick={isDemo ? onSignIn : undefined}
                                 className="flex items-center gap-2 rounded-full px-5 py-2 text-sm"
                             >
                                 <RefreshCw size={15} />
                                 Refresh Prices
                             </Button>
                             <Button
-                                onClick={() => setIsAddModalOpen(true)}
+                                onClick={isDemo ? onSignIn : () => setIsAddModalOpen(true)}
                                 className="flex items-center gap-2 rounded-full px-5 py-2 text-sm"
                             >
                                 <Plus size={17} />
@@ -297,7 +298,7 @@ export const Dashboard = ({ user, isDemo, onSignIn, onSignOut, onGoHome, onUpdat
                                                 <div className="flex items-center gap-1.5">
                                                     <Target size={11} className="text-text-3" />
                                                     <button
-                                                        onClick={() => openGoalEditor(goal)}
+                                                        onClick={isDemo ? onSignIn : () => openGoalEditor(goal)}
                                                         className="text-text-3 hover:text-accent transition-colors"
                                                         aria-label="Edit goal"
                                                     >
@@ -316,7 +317,7 @@ export const Dashboard = ({ user, isDemo, onSignIn, onSignOut, onGoHome, onUpdat
                                 animate={{ opacity: 1 }}
                                 exit={{ opacity: 0 }}
                                 transition={{ duration: 0.15 }}
-                                onClick={() => openGoalEditor(null)}
+                                onClick={isDemo ? onSignIn : () => openGoalEditor(null)}
                                 className="flex items-center gap-1.5 text-xs text-text-3 hover:text-accent transition-colors"
                             >
                                 <Target size={13} />
@@ -331,7 +332,7 @@ export const Dashboard = ({ user, isDemo, onSignIn, onSignOut, onGoHome, onUpdat
                     assets={assets}
                     displayCurrency={displayCurrency}
                     fxRates={fxRates}
-                    onOpenAdvice={() => setIsAdviceModalOpen(true)}
+                    onOpenAdvice={isDemo ? onSignIn : () => setIsAdviceModalOpen(true)}
                 />
 
                 {/* Asset list */}
@@ -345,7 +346,7 @@ export const Dashboard = ({ user, isDemo, onSignIn, onSignOut, onGoHome, onUpdat
                             {selectedAssetIds.length > 0 && (
                                 <Button
                                     variant="ghost"
-                                    onClick={handleBulkDelete}
+                                    onClick={isDemo ? onSignIn : handleBulkDelete}
                                     className="text-negative hover:bg-negative/5 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider py-1.5 px-3 rounded-lg"
                                 >
                                     <Trash2 size={13} />
@@ -355,7 +356,7 @@ export const Dashboard = ({ user, isDemo, onSignIn, onSignOut, onGoHome, onUpdat
 
                             <Button
                                 variant="ghost"
-                                onClick={() => {
+                                onClick={isDemo ? onSignIn : () => {
                                     setIsSelectMode(!isSelectMode);
                                     if (isSelectMode) setSelectedAssetIds([]);
                                 }}
@@ -394,6 +395,10 @@ export const Dashboard = ({ user, isDemo, onSignIn, onSignOut, onGoHome, onUpdat
                         isSelectMode={isSelectMode}
                         selectedAssetIds={selectedAssetIds}
                         onSelectAsset={(id, checked) => {
+                            if (isDemo) {
+                                onSignIn();
+                                return;
+                            }
                             if (checked) {
                                 setSelectedAssetIds([...selectedAssetIds, id]);
                             } else {
@@ -401,10 +406,14 @@ export const Dashboard = ({ user, isDemo, onSignIn, onSignOut, onGoHome, onUpdat
                             }
                         }}
                         onEditAsset={(asset) => {
+                            if (isDemo) {
+                                onSignIn();
+                                return;
+                            }
                             setSelectedAsset(asset);
                             setIsEditModalOpen(true);
                         }}
-                        onAddAsset={() => setIsAddModalOpen(true)}
+                        onAddAsset={isDemo ? onSignIn : () => setIsAddModalOpen(true)}
                     />
                 </div>
             </main>
