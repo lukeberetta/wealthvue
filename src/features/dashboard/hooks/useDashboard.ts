@@ -60,8 +60,12 @@ export const useDashboard = (user: User | null, isDemo: boolean) => {
                 let updated = false;
                 const newAssets = await Promise.all(loadedAssets.map(async (asset) => {
                     if (asset.ticker && (asset.assetType === "stock" || asset.assetType === "crypto")) {
+                        let fetchTicker = asset.ticker;
+                        if (asset.assetType === "crypto" && !fetchTicker.includes("-")) {
+                            fetchTicker = `${fetchTicker}-USD`;
+                        }
                         try {
-                            const res = await fetch(`/api/price?ticker=${asset.ticker}`);
+                            const res = await fetch(`/api/price?ticker=${fetchTicker}`);
                             if (res.ok) {
                                 const quote = await res.json();
                                 if (quote?.regularMarketPrice && quote.regularMarketPrice !== asset.unitPrice) {

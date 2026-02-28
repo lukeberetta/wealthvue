@@ -113,7 +113,7 @@ export const PortfolioInsights = ({ assets, displayCurrency, fxRates, onOpenAdvi
 
                     {/* Donut */}
                     <div className="w-full sm:w-[180px] shrink-0 h-[180px]">
-                        <ResponsiveContainer width="100%" height="100%">
+                        <ResponsiveContainer width="100%" height={180} minWidth={0}>
                             <RePieChart>
                                 <Pie
                                     data={chartData}

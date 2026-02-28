@@ -104,6 +104,7 @@ Respond ONLY with valid raw JSON in this exact format:
   "description": string
 }
 IMPORTANT: The "source" field MUST only contain institutional names like "Robinhood", "Binance", or "Chase" if explicitly mentioned by the user. 
+IMPORTANT: The "ticker" field MUST be a valid Yahoo Finance ticker symbol. For cryptocurrencies, it MUST end with "-USD" (e.g., "BTC-USD", "ETH-USD"). For non-US stocks, include the appropriate exchange suffix (e.g., ".JO" for Johannesburg).
 Never include any text outside the JSON object. All currency fields MUST be valid ISO 4217 codes. 
 IMPORTANT: Valuations should be in ${preferredCurrency}. Make sure to estimate local market value in the country code ${country}.`;
 
@@ -113,8 +114,12 @@ IMPORTANT: Valuations should be in ${preferredCurrency}. Make sure to estimate l
     const asset = JSON.parse(cleanedText || "null");
 
     if (asset && asset.ticker && (asset.assetType === "stock" || asset.assetType === "crypto")) {
+      let fetchTicker = asset.ticker;
+      if (asset.assetType === "crypto" && !fetchTicker.includes("-")) {
+        fetchTicker = `${fetchTicker}-USD`;
+      }
       try {
-        const res = await fetch(`/api/price?ticker=${asset.ticker}`);
+        const res = await fetch(`/api/price?ticker=${fetchTicker}`);
         if (res.ok) {
           const quote = await res.json();
           if (quote?.regularMarketPrice) {
@@ -157,6 +162,7 @@ Return assets as a JSON array. Each element follows this format:
   "description": string
 }
 IMPORTANT: The "source" field MUST only contain institutional names like "Robinhood", "Binance", or "Chase" if visible in the screenshot. 
+IMPORTANT: The "ticker" field MUST be a valid Yahoo Finance ticker symbol. For cryptocurrencies, it MUST end with "-USD" (e.g., "BTC-USD", "ETH-USD"). For non-US stocks, include the appropriate exchange suffix (e.g., ".JO" for Johannesburg).
 Respond ONLY with a valid JSON array. No markdown, no explanation. All currency fields MUST be valid ISO 4217 codes. Prefer using ${preferredCurrency} for valuations and localize market values to the country code ${country}.`;
 
   try {
@@ -178,8 +184,12 @@ Respond ONLY with a valid JSON array. No markdown, no explanation. All currency 
     // Augment with real prices from Yahoo Finance where possible
     assets = await Promise.all(assets.map(async (asset: ParsedAsset) => {
       if (asset.ticker && (asset.assetType === "stock" || asset.assetType === "crypto")) {
+        let fetchTicker = asset.ticker;
+        if (asset.assetType === "crypto" && !fetchTicker.includes("-")) {
+          fetchTicker = `${fetchTicker}-USD`;
+        }
         try {
-          const res = await fetch(`/api/price?ticker=${asset.ticker}`);
+          const res = await fetch(`/api/price?ticker=${fetchTicker}`);
           if (res.ok) {
             const quote = await res.json();
             if (quote?.regularMarketPrice) {
