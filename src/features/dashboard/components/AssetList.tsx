@@ -73,10 +73,8 @@ export const AssetList = ({
     return (
         <div>
             {/* Column headers */}
-            <div className="flex items-center gap-3 pb-2">
-                <div className="w-5 shrink-0" />
-                <div className="w-8 shrink-0" />
-                <span className="flex-1 text-[9px] font-bold text-text-3 uppercase tracking-widest">Name</span>
+            <div className="flex items-center gap-3 pb-2 px-3">
+                <span className="flex-1 text-[9px] font-bold text-text-3 uppercase tracking-widest">Asset</span>
                 <span className="hidden sm:block text-[9px] font-bold text-text-3 uppercase tracking-widest w-24 text-right">Held at</span>
                 <span className="hidden sm:block text-[9px] font-bold text-text-3 uppercase tracking-widest w-16 text-right">Source</span>
                 <span className="text-[9px] font-bold text-text-3 uppercase tracking-widest text-right w-32">Value</span>
