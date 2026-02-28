@@ -7,6 +7,7 @@ import {
 import { cn } from "../../lib/utils";
 import { useScrollReveal } from "../../hooks/useScrollReveal";
 import { AppNav } from "../../components/ui/AppNav";
+import { Footer } from "../../components/ui/Footer";
 
 interface LandingPageProps {
     user: import("../../types").User | null;
@@ -391,22 +392,7 @@ export const LandingPage = ({ user, isDemo = false, onSignIn, onTryDemo, onSignO
                 </section>
             </main>
 
-            {/* ── Footer ── */}
-            <footer className="bg-surface border-t border-border py-16 px-6">
-                <div className="max-w-[1120px] mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
-                    <div>
-                        <div className="font-serif text-xl text-accent font-semibold mb-1">WealthVue</div>
-                        <p className="text-sm text-text-3">Your entire wealth, one beautiful view.</p>
-                    </div>
-                    <div className="flex gap-8 text-sm text-text-3">
-                        <a href="#" className="hover:text-text-1 transition-colors">Privacy Policy</a>
-                        <a href="#" className="hover:text-text-1 transition-colors">Terms of Service</a>
-                    </div>
-                </div>
-                <div className="max-w-[1120px] mx-auto mt-12 pt-8 border-t border-border/50 text-center">
-                    <p className="text-xs text-text-3">© 2026 WealthVue. Built with care and AI.</p>
-                </div>
-            </footer>
+            <Footer />
         </div>
     );
 };

@@ -12,6 +12,7 @@ import { User, Asset } from "../../types";
 import { formatCurrency, cn } from "../../lib/utils";
 import { Button } from "../../components/ui/Button";
 import { AppNav } from "../../components/ui/AppNav";
+import { Footer } from "../../components/ui/Footer";
 import { SettingsView } from "../settings/SettingsView";
 import { useDashboard } from "./hooks/useDashboard";
 import { AssetAllocationChart } from "./components/AssetAllocationChart";
@@ -104,6 +105,7 @@ export const Dashboard = ({ user, isDemo, onSignOut, onGoHome, onUpdateUser }: D
                         }}
                     />
                 </main>
+                <Footer />
             </div>
         );
     }
@@ -251,6 +253,8 @@ export const Dashboard = ({ user, isDemo, onSignOut, onGoHome, onUpdateUser }: D
                     />
                 </div>
             </main>
+
+            <Footer />
 
             {/* Modals */}
             <AddAssetModal
