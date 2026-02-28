@@ -23,7 +23,7 @@ export const AssetRow: React.FC<AssetRowProps> = ({
     return (
         <div
             className={cn(
-                "flex items-center gap-3 py-3 border-b border-border/40 transition-colors cursor-pointer -mx-6 px-6",
+                "flex items-center gap-3 py-3 px-3 rounded-lg border-b border-border/40 last:border-b-0 transition-colors cursor-pointer",
                 isSelected ? "bg-accent/5" : "hover:bg-surface-2/50"
             )}
             onClick={() => onClick(asset)}

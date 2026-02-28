@@ -17,7 +17,6 @@ import { FinancialGoal } from "../../types";
 import { User, Asset } from "../../types";
 import { formatCurrency, formatCurrencyCompact, cn } from "../../lib/utils";
 import { Button } from "../../components/ui/Button";
-import { Card } from "../../components/ui/Card";
 import { AppNav } from "../../components/ui/AppNav";
 import { Footer } from "../../components/ui/Footer";
 import { SettingsView } from "../settings/SettingsView";
@@ -326,9 +325,9 @@ export const Dashboard = ({ user, isDemo, onSignIn, onSignOut, onGoHome, onUpdat
                 />
 
                 {/* Asset list */}
-                <Card>
+                <div className="border-t border-border pt-8">
                     <div className="flex items-center justify-between mb-6">
-                        <h3 className="text-[10px] font-bold text-text-3 uppercase tracking-widest">Holdings</h3>
+                        <h3 className="text-xl font-serif text-text-1">Holdings</h3>
                         <div className="flex items-center gap-2">
                             {selectedAssetIds.length > 0 && (
                                 <Button
@@ -371,7 +370,7 @@ export const Dashboard = ({ user, isDemo, onSignIn, onSignOut, onGoHome, onUpdat
                         }}
                         onAddAsset={isDemo ? onSignIn : () => setIsAddModalOpen(true)}
                     />
-                </Card>
+                </div>
             </main>
 
             <Footer />

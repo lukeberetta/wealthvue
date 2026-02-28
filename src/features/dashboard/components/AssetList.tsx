@@ -90,16 +90,16 @@ export const AssetList = ({
                     <div key={type}>
                         {/* Group header */}
                         <div className={cn(
-                            "flex items-center justify-between -mx-6 px-6 py-2 bg-surface-2/40",
-                            groupIndex > 0 && "mt-0"
+                            "flex items-center justify-between px-3 py-2 rounded-lg bg-surface-2/60",
+                            groupIndex > 0 && "mt-4"
                         )}>
-                            <span className="flex items-center gap-1.5 text-[9px] font-bold text-text-3 uppercase tracking-widest">
+                            <span className="flex items-center gap-1.5 text-[9px] font-bold text-text-2 uppercase tracking-widest">
                                 {getTypeIcon(type)}
                                 {TYPE_LABELS[type] ?? type}
                             </span>
                             <span className={cn(
                                 "text-[9px] font-bold tabular-nums",
-                                typeTotal < 0 ? "text-negative" : "text-text-3"
+                                typeTotal < 0 ? "text-negative" : "text-text-2"
                             )}>
                                 {formatCurrency(typeTotal, displayCurrency)}
                             </span>

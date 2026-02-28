@@ -1,10 +1,10 @@
 import React from "react";
 import { PieChart as RePieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { PieChart, Sparkles } from "lucide-react";
-import { Card } from "../../../components/ui/Card";
 import { Asset } from "../../../types";
 import { formatCurrency, cn } from "../../../lib/utils";
 import { convertCurrency } from "../../../lib/fx";
+import { TYPE_COLORS } from "./AssetIcon";
 
 interface PortfolioInsightsProps {
     assets: Asset[];
@@ -13,7 +13,6 @@ interface PortfolioInsightsProps {
     onOpenAdvice: () => void;
 }
 
-const COLORS = ['#C96442', '#4A7C59', '#6B6560', '#B5534A', '#7A6A5E', '#38312A'];
 
 const TYPE_LABELS: Record<string, string> = {
     stock: "Stocks & ETFs",
@@ -85,20 +84,20 @@ export const PortfolioInsights = ({ assets, displayCurrency, fxRates, onOpenAdvi
     if (assets.length === 0) {
         return (
             <div className="grid lg:grid-cols-5 gap-6">
-                <Card className="lg:col-span-3">
+                <div className="lg:col-span-3 bg-surface rounded-2xl p-6">
                     <h3 className="text-[10px] font-bold text-text-3 uppercase tracking-widest mb-6">Allocation</h3>
                     <div className="h-[220px] flex flex-col items-center justify-center text-center bg-surface-2/30 rounded-2xl border border-dashed border-border">
                         <PieChart className="text-text-3/30 mb-4" size={28} />
                         <p className="text-xs text-text-3 font-medium">No data to show</p>
                     </div>
-                </Card>
-                <Card className="lg:col-span-2">
+                </div>
+                <div className="lg:col-span-2 bg-surface rounded-2xl p-6">
                     <h3 className="text-[10px] font-bold text-text-3 uppercase tracking-widest mb-6">Portfolio Profile</h3>
                     <div className="h-[220px] flex flex-col items-center justify-center text-center bg-surface-2/30 rounded-2xl border border-dashed border-border">
                         <Sparkles className="text-text-3/30 mb-4" size={28} />
                         <p className="text-xs text-text-3 font-medium">Add assets to reveal your profile</p>
                     </div>
-                </Card>
+                </div>
             </div>
         );
     }
@@ -107,7 +106,7 @@ export const PortfolioInsights = ({ assets, displayCurrency, fxRates, onOpenAdvi
         <div className="grid lg:grid-cols-5 gap-6">
 
             {/* ── Left: Allocation Breakdown ── */}
-            <Card className="lg:col-span-3">
+            <div className="lg:col-span-3 bg-surface rounded-2xl p-6">
                 <h3 className="text-[10px] font-bold text-text-3 uppercase tracking-widest mb-6">Allocation</h3>
                 <div className="flex flex-col sm:flex-row gap-6 items-start">
 
@@ -125,8 +124,8 @@ export const PortfolioInsights = ({ assets, displayCurrency, fxRates, onOpenAdvi
                                     dataKey="value"
                                     stroke="none"
                                 >
-                                    {chartData.map((_, index) => (
-                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                    {chartData.map((entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={TYPE_COLORS[entry.name] || TYPE_COLORS.other} />
                                     ))}
                                 </Pie>
                                 <Tooltip
@@ -147,7 +146,7 @@ export const PortfolioInsights = ({ assets, displayCurrency, fxRates, onOpenAdvi
                                         <div className="flex items-center gap-2">
                                             <div
                                                 className="w-2 h-2 rounded-full shrink-0"
-                                                style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                                                style={{ backgroundColor: TYPE_COLORS[entry.name] || TYPE_COLORS.other }}
                                             />
                                             <span className="font-semibold text-text-1">
                                                 {TYPE_LABELS[entry.name] || entry.name}
@@ -165,7 +164,7 @@ export const PortfolioInsights = ({ assets, displayCurrency, fxRates, onOpenAdvi
                                             className="h-full rounded-full transition-all duration-500"
                                             style={{
                                                 width: `${p}%`,
-                                                backgroundColor: COLORS[index % COLORS.length],
+                                                backgroundColor: TYPE_COLORS[entry.name] || TYPE_COLORS.other,
                                                 opacity: 0.75,
                                             }}
                                         />
@@ -206,10 +205,10 @@ export const PortfolioInsights = ({ assets, displayCurrency, fxRates, onOpenAdvi
                         </p>
                     </div>
                 </div>
-            </Card>
+            </div>
 
             {/* ── Right: Portfolio Character ── */}
-            <Card className="lg:col-span-2 flex flex-col justify-between">
+            <div className="lg:col-span-2 bg-surface rounded-2xl p-6 flex flex-col justify-between">
                 <div>
                     <h3 className="text-[10px] font-bold text-text-3 uppercase tracking-widest mb-6">Portfolio Profile</h3>
 
@@ -228,7 +227,7 @@ export const PortfolioInsights = ({ assets, displayCurrency, fxRates, onOpenAdvi
                                 <span className="text-text-3">{TYPE_LABELS[entry.name] || entry.name}</span>
                                 <span
                                     className="font-bold"
-                                    style={{ color: COLORS[index % COLORS.length] }}
+                                    style={{ color: TYPE_COLORS[entry.name] || TYPE_COLORS.other }}
                                 >
                                     {(pct[entry.name] || 0).toFixed(0)}%
                                 </span>
@@ -244,7 +243,7 @@ export const PortfolioInsights = ({ assets, displayCurrency, fxRates, onOpenAdvi
                     <Sparkles size={15} className="text-accent group-hover:text-white transition-colors" />
                     Analyse Portfolio
                 </button>
-            </Card>
+            </div>
         </div>
     );
 };
