@@ -153,7 +153,7 @@ export const Dashboard = ({ user, isDemo, onSignIn, onSignOut, onGoHome, onUpdat
         <div className="min-h-screen flex flex-col bg-bg text-text-1">
             <AppNav {...navProps} />
 
-            <main className="flex-1 max-w-[1120px] mx-auto w-full px-6 pt-28 pb-12 space-y-10">
+            <main className={cn("flex-1 max-w-[1120px] mx-auto w-full px-6 pb-24 space-y-16", isDemo ? "pt-36" : "pt-28")}>
 
                 {/* NAV Hero — net worth headline */}
                 <div className="space-y-5">
