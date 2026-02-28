@@ -100,7 +100,7 @@ function EditableNumber({
 }: {
     value: number;
     currency: string;
-    label: string;
+    label?: string;
     onChange: (n: number) => void;
 }) {
     const [editing, setEditing] = useState(false);
@@ -118,29 +118,29 @@ function EditableNumber({
 
     return (
         <div className="text-right">
-            <p className="text-[10px] text-text-3 font-medium uppercase tracking-wider mb-0.5">{label}</p>
+            {label && <p className="text-[9px] text-text-3 font-bold uppercase tracking-widest mb-0.5">{label}</p>}
             {editing ? (
                 <div className="flex items-center justify-end gap-1">
-                    <span className="text-xs text-text-3">{currency}</span>
+                    <span className="text-[10px] text-text-3">{currency}</span>
                     <input
                         ref={inputRef}
                         value={raw}
                         onChange={e => setRaw(e.target.value)}
                         onBlur={commit}
                         onKeyDown={e => { if (e.key === "Enter") commit(); if (e.key === "Escape") setEditing(false); }}
-                        className="w-28 text-right font-serif text-base text-text-1 bg-surface border-b border-accent/50 focus:outline-none tabular-nums"
+                        className="w-20 text-right font-medium text-sm text-text-1 bg-transparent border-b border-accent/50 focus:outline-none tabular-nums"
                     />
                 </div>
             ) : (
                 <button
                     onClick={() => { setRaw(String(value)); setEditing(true); }}
                     className="group flex items-center justify-end gap-1 text-right"
-                    title={`Edit ${label}`}
+                    title={`Edit ${label || "value"}`}
                 >
-                    <span className="font-serif text-base tabular-nums text-text-1 group-hover:text-accent transition-colors">
+                    <span className="font-medium text-sm tabular-nums text-text-1 group-hover:text-accent transition-colors">
                         {formatCurrency(value, currency)}
                     </span>
-                    <Pencil size={11} className="text-text-3 opacity-0 group-hover:opacity-60 transition-opacity" />
+                    <Pencil size={10} className="text-text-3 opacity-0 group-hover:opacity-60 transition-opacity" />
                 </button>
             )}
         </div>
@@ -183,16 +183,19 @@ function DraftCard({
 
     return (
         <motion.div
-            initial={reduced ? {} : { opacity: 0, y: 20 }}
+            initial={reduced ? {} : { opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: index * 0.09, ease: [0.16, 1, 0.3, 1] }}
-            className="bg-surface border border-border rounded-2xl overflow-hidden shadow-sm"
+            transition={{ duration: 0.3, delay: index * 0.05, ease: "easeOut" }}
+            className={cn(
+                "flex flex-col py-3.5 px-4 rounded-xl transition-colors",
+                index % 2 !== 0 && "bg-surface-2/40"
+            )}
         >
             {/* Main row */}
-            <div className="p-5 flex items-start gap-4">
+            <div className="flex items-center gap-3">
                 {/* Icon */}
-                <div className="mt-0.5 w-9 h-9 rounded-xl bg-accent-light flex items-center justify-center text-accent shrink-0">
-                    <AssetIcon asset={asset} size={17} />
+                <div className="w-8 h-8 rounded-lg bg-surface-2 flex items-center justify-center text-accent shrink-0">
+                    <AssetIcon asset={asset} size={14} />
                 </div>
 
                 {/* Name + meta */}
@@ -205,40 +208,42 @@ function DraftCard({
                                 onChange={e => setName(e.target.value)}
                                 onBlur={() => { setNameEditing(false); onUpdate({ ...asset, name }); }}
                                 onKeyDown={e => { if (e.key === "Enter") { setNameEditing(false); onUpdate({ ...asset, name }); } }}
-                                className="font-serif text-lg text-text-1 bg-transparent border-b border-accent/40 focus:outline-none w-full"
+                                className="font-medium text-sm text-text-1 bg-transparent border-b border-accent/40 focus:outline-none w-full"
                             />
                         ) : (
-                            <h3 className="font-serif text-lg text-text-1 group-hover:text-accent transition-colors leading-tight">
+                            <h3 className="font-medium text-sm text-text-1 group-hover:text-accent transition-colors truncate">
                                 {name}
-                                <span className="ml-1.5 opacity-0 group-hover:opacity-40 transition-opacity text-sm font-sans font-normal">✎</span>
+                                <span className="ml-1 opacity-0 group-hover:opacity-40 transition-opacity font-sans font-normal text-xs">✎</span>
                             </h3>
                         )}
                     </div>
-                    <div className="flex items-center flex-wrap gap-x-2 gap-y-1 mt-1">
-                        <span className="text-xs text-text-3 font-medium capitalize">{asset.assetType}</span>
+                    <div className="flex items-center flex-wrap gap-x-2 gap-y-1 mt-0.5">
+                        <span className="text-[10px] text-text-3 font-medium capitalize">{asset.assetType}</span>
                         {asset.ticker && (
                             <>
-                                <span className="text-text-3 text-xs">·</span>
-                                <span className="text-xs font-bold text-accent bg-accent-light/60 px-1.5 py-0.5 rounded">{asset.ticker}</span>
+                                <span className="text-text-3/40 text-[10px]">•</span>
+                                <span className="text-[10px] font-bold text-accent bg-accent-light/60 px-1 rounded-sm">{asset.ticker}</span>
                             </>
                         )}
                         {qty > 1 && (
                             <>
-                                <span className="text-text-3 text-xs">·</span>
-                                <span className="text-xs text-text-3">{qty} units</span>
+                                <span className="text-text-3/40 text-[10px]">•</span>
+                                <span className="text-[10px] text-text-3 tabular-nums">{qty} units</span>
+                            </>
+                        )}
+                        {confidence !== "high" && (
+                            <>
+                                <span className="text-text-3/40 text-[10px]">•</span>
+                                <span className={cn("text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-sm border", conf.cls)}>
+                                    {conf.label}
+                                </span>
                             </>
                         )}
                     </div>
                 </div>
 
                 {/* Editable pricing */}
-                <div className="shrink-0 flex flex-col gap-2 items-end">
-                    <EditableNumber
-                        value={asset.totalValue ?? 0}
-                        currency={totalCurrency}
-                        label="Total value"
-                        onChange={handleTotalValueChange}
-                    />
+                <div className="shrink-0 flex gap-4 items-center justify-end">
                     {qty > 1 && (
                         <EditableNumber
                             value={asset.unitPrice ?? 0}
@@ -247,27 +252,22 @@ function DraftCard({
                             onChange={handleUnitPriceChange}
                         />
                     )}
+                    <EditableNumber
+                        value={asset.totalValue ?? 0}
+                        currency={totalCurrency}
+                        label={qty > 1 ? "Total" : undefined}
+                        onChange={handleTotalValueChange}
+                    />
                 </div>
-            </div>
 
-            {/* Footer: confidence + rationale toggle */}
-            <div className="border-t border-border/50 px-5 py-2.5 flex items-center justify-between gap-4 bg-surface-2/25">
-                <span className={cn(
-                    "inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-full border",
-                    conf.cls
-                )}>
-                    {confidence === "low" && <ShieldAlert size={10} />}
-                    {confidence === "high" && <Check size={10} />}
-                    {conf.label}
-                </span>
-
+                {/* Rationale Toggle */}
                 {asset.aiRationale && (
                     <button
                         onClick={() => setRationaleOpen(o => !o)}
-                        className="flex items-center gap-1 text-[11px] font-medium text-text-3 hover:text-text-1 transition-colors"
+                        className="w-6 h-6 rounded-full flex items-center justify-center text-text-3 hover:bg-surface-2 hover:text-text-1 ml-1 shrink-0 transition-colors"
+                        title="AI Reasoning"
                     >
-                        AI reasoning
-                        <ChevronDown size={11} className={cn("transition-transform", rationaleOpen && "rotate-180")} />
+                        <MessageSquareText size={13} className={rationaleOpen ? "text-accent" : ""} />
                     </button>
                 )}
             </div>
@@ -276,23 +276,15 @@ function DraftCard({
                 {rationaleOpen && asset.aiRationale && (
                     <motion.div
                         initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.22, ease: "easeInOut" }}
+                        exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2, ease: "easeInOut" }}
                         className="overflow-hidden"
                     >
-                        <p className="px-5 py-4 text-xs text-text-2 leading-relaxed border-t border-border/40 bg-surface-2/20">
+                        <div className="mt-3 ml-11 text-xs text-text-2 bg-surface-2/40 p-3 rounded-lg border border-border/50 leading-relaxed">
                             {asset.aiRationale}
-                        </p>
+                        </div>
                     </motion.div>
                 )}
             </AnimatePresence>
-
-            {confidence === "low" && (
-                <div className="px-5 py-2.5 border-t border-negative/10 bg-negative/5">
-                    <p className="text-[11px] text-negative font-medium">
-                        Low confidence — please verify and adjust the value above before saving.
-                    </p>
-                </div>
-            )}
         </motion.div>
     );
 }
@@ -641,7 +633,7 @@ export const AddAssetModal = ({
                                 transition={{ duration: 0.25 }}
                                 className="px-7 pt-5 pb-7 space-y-4"
                             >
-                                <div className="space-y-3 max-h-[56vh] overflow-y-auto pr-0.5 -mr-0.5">
+                                <div className="max-h-[56vh] overflow-y-auto pr-0.5 -mr-0.5">
                                     {draftAssets.map((asset, i) => (
                                         <React.Fragment key={i}>
                                             <DraftCard
