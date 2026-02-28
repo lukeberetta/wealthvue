@@ -61,10 +61,8 @@ export function AppNav({
     return (
         <header
             className={cn(
-                "fixed top-0 left-0 right-0 z-50 flex flex-col text-text-1 transition-all duration-300",
-                scrolled
-                    ? "bg-surface/85 backdrop-blur-md border-b border-border shadow-sm"
-                    : "bg-bg sm:bg-transparent"
+                "fixed top-0 left-0 right-0 z-50 flex flex-col text-text-1 bg-bg/80 backdrop-blur-md border-b transition-colors duration-300",
+                scrolled ? "border-border" : "border-transparent"
             )}
         >
             {/* Demo banner */}
@@ -77,10 +75,7 @@ export function AppNav({
                     to track your real assets
                 </div>
             )}
-            <div className={cn(
-                "max-w-[1120px] mx-auto w-full px-6 flex items-center justify-between transition-all duration-300 shrink-0",
-                scrolled ? "py-3" : "py-5"
-            )}>
+            <div className="max-w-[1120px] mx-auto w-full px-6 flex items-center justify-between py-4 shrink-0">
 
                 {/* ── Logo ── */}
                 <button

@@ -56,10 +56,45 @@ export const useDashboard = (user: User | null, isDemo: boolean) => {
             setIsLoading(false);
 
             if (!isDemo && user) {
+                // Auto-refresh prices via Yahoo Finance API
+                let updated = false;
+                const newAssets = await Promise.all(loadedAssets.map(async (asset) => {
+                    if (asset.ticker && (asset.assetType === "stock" || asset.assetType === "crypto")) {
+                        try {
+                            const res = await fetch(`/api/price?ticker=${asset.ticker}`);
+                            if (res.ok) {
+                                const quote = await res.json();
+                                if (quote?.regularMarketPrice && quote.regularMarketPrice !== asset.unitPrice) {
+                                    updated = true;
+                                    const newUnitPrice = quote.regularMarketPrice;
+                                    return {
+                                        ...asset,
+                                        unitPrice: newUnitPrice,
+                                        totalValue: newUnitPrice * asset.quantity,
+                                        totalValueCurrency: quote.currency || asset.unitPriceCurrency,
+                                        unitPriceCurrency: quote.currency || asset.unitPriceCurrency,
+                                        valueSource: "live_price" as const,
+                                        lastRefreshed: new Date().toISOString()
+                                    };
+                                }
+                            }
+                        } catch (e) {
+                            console.warn("Auto-refresh failed for", asset.ticker);
+                        }
+                    }
+                    return asset;
+                }));
+
+                if (updated) {
+                    setAssets(newAssets);
+                    storage.saveAssets(newAssets);
+                }
+
                 const today = new Date().toISOString().split('T')[0];
                 const hasToday = loadedHistory.some(h => h.date === today);
                 if (!hasToday) {
-                    const totalNAV = loadedAssets.reduce((acc, asset) => {
+                    const navAssets = updated ? newAssets : loadedAssets;
+                    const totalNAV = navAssets.reduce((acc, asset) => {
                         return acc + convertCurrency(asset.totalValue, asset.totalValueCurrency, "USD", rates.rates);
                     }, 0);
                     const newHistory = [...loadedHistory, { date: today, totalNAV, displayCurrency: "ZAR" }];

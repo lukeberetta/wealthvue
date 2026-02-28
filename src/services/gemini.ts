@@ -85,8 +85,7 @@ async function callAIWithRotation(
 
 export async function parseTextToAsset(text: string, preferredCurrency: string = "ZAR", country: string = "ZA"): Promise<ParsedAsset | null> {
   const systemInstruction = `You are a financial asset parser. The user will describe an asset in plain language. 
-SEARCH for the current market price of any ticker symbols or assets mentioned (it is early 2026). 
-Extract structured data and estimate its current market value based on your search results. 
+Extract structured data and estimate its current market value. DO NOT search the internet for exact prices of stocks/crypto if a ticker is identified.
 
 Respond ONLY with valid raw JSON in this exact format:
 {
@@ -98,21 +97,40 @@ Respond ONLY with valid raw JSON in this exact format:
   "unitPriceCurrency": string (ISO 4217 code),
   "totalValue": number,
   "totalValueCurrency": string (ISO 4217 code),
-  "valueSource": "live_price",
+  "valueSource": "live_price" | "estimated",
   "source": string | null,
   "aiConfidence": "high" | "medium" | "low",
   "aiRationale": string,
   "description": string
 }
 IMPORTANT: The "source" field MUST only contain institutional names like "Robinhood", "Binance", or "Chase" if explicitly mentioned by the user. 
-DO NOT put website names found during price searching (like "Motley Fool" or "Yahoo Finance") in the "source" field. Put those in "aiRationale" instead.
 Never include any text outside the JSON object. All currency fields MUST be valid ISO 4217 codes. 
-IMPORTANT: Valuations should be in ${preferredCurrency}. Make sure to search for the local market value in the country code ${country} (e.g., local AutoTrader for cars, or local property sites).`;
+IMPORTANT: Valuations should be in ${preferredCurrency}. Make sure to estimate local market value in the country code ${country}.`;
 
   try {
-    const response = await callAIWithRotation(text, systemInstruction);
+    const response = await callAIWithRotation(text, systemInstruction, false); // Removed live search capability
     const cleanedText = response.text.replace(/```json\n?/, "").replace(/```\n?$/, "").trim();
-    return JSON.parse(cleanedText || "null");
+    const asset = JSON.parse(cleanedText || "null");
+
+    if (asset && asset.ticker && (asset.assetType === "stock" || asset.assetType === "crypto")) {
+      try {
+        const res = await fetch(`/api/price?ticker=${asset.ticker}`);
+        if (res.ok) {
+          const quote = await res.json();
+          if (quote?.regularMarketPrice) {
+            asset.unitPrice = quote.regularMarketPrice;
+            asset.unitPriceCurrency = quote.currency || preferredCurrency;
+            asset.totalValue = asset.unitPrice * asset.quantity;
+            asset.totalValueCurrency = asset.unitPriceCurrency;
+            asset.valueSource = "live_price";
+            asset.aiRationale = `Price fetched live from Yahoo Finance.`;
+          }
+        }
+      } catch (e) {
+        console.warn("Failed to fetch live price for", asset.ticker);
+      }
+    }
+    return asset;
   } catch (error) {
     console.error("Error parsing text to asset:", error);
     throw error;
@@ -121,7 +139,7 @@ IMPORTANT: Valuations should be in ${preferredCurrency}. Make sure to search for
 
 export async function parseScreenshotToAssets(base64Image: string, preferredCurrency: string = "ZAR", country: string = "ZA"): Promise<ParsedAsset[]> {
   const systemInstruction = `You are a financial portfolio parser. Extract ALL visible assets from the screenshot.
-For any asset found, SEARCH for its current real-time market price (early 2026) to ensure accuracy.
+DO NOT use search tools. Rely purely on vision.
 Return assets as a JSON array. Each element follows this format:
 {
   "name": string,
@@ -132,20 +150,19 @@ Return assets as a JSON array. Each element follows this format:
   "unitPriceCurrency": string (ISO 4217 code),
   "totalValue": number,
   "totalValueCurrency": string (ISO 4217 code),
-  "valueSource": "live_price",
+  "valueSource": "estimated",
   "source": string | null,
   "aiConfidence": "high",
   "aiRationale": string,
   "description": string
 }
 IMPORTANT: The "source" field MUST only contain institutional names like "Robinhood", "Binance", or "Chase" if visible in the screenshot. 
-DO NOT put website names found during price searching (like "Motley Fool" or "Yahoo Finance") in the "source" field. Put those in "aiRationale" instead.
 Respond ONLY with a valid JSON array. No markdown, no explanation. All currency fields MUST be valid ISO 4217 codes. Prefer using ${preferredCurrency} for valuations and localize market values to the country code ${country}.`;
 
   try {
     const contents = {
       parts: [
-        { text: "Extract assets from this screenshot. For any identified stocks or crypto without visible prices, SEARCH for their current market price." },
+        { text: "Extract assets from this screenshot. Find the exact ticker symbol, quantity, and cost basis if possible." },
         {
           inlineData: {
             mimeType: "image/png",
@@ -154,9 +171,34 @@ Respond ONLY with a valid JSON array. No markdown, no explanation. All currency 
         },
       ],
     };
-    const response = await callAIWithRotation(contents, systemInstruction);
+    const response = await callAIWithRotation(contents, systemInstruction, false); // Removed live search
     const cleanedText = response.text.replace(/```json\n?/, "").replace(/```\n?$/, "").trim();
-    return JSON.parse(cleanedText || "[]");
+    let assets = JSON.parse(cleanedText || "[]");
+
+    // Augment with real prices from Yahoo Finance where possible
+    assets = await Promise.all(assets.map(async (asset: ParsedAsset) => {
+      if (asset.ticker && (asset.assetType === "stock" || asset.assetType === "crypto")) {
+        try {
+          const res = await fetch(`/api/price?ticker=${asset.ticker}`);
+          if (res.ok) {
+            const quote = await res.json();
+            if (quote?.regularMarketPrice) {
+              asset.unitPrice = quote.regularMarketPrice;
+              asset.unitPriceCurrency = quote.currency || preferredCurrency;
+              asset.totalValue = asset.unitPrice * asset.quantity;
+              asset.totalValueCurrency = asset.unitPriceCurrency;
+              asset.valueSource = "live_price";
+              asset.aiRationale = `Pricing via real-time market data matching ticker ${asset.ticker}.`;
+            }
+          }
+        } catch (e) {
+          console.warn("Failed to fetch live price for screenshot asset", asset.ticker);
+        }
+      }
+      return asset;
+    }));
+
+    return assets;
   } catch (error) {
     console.error("Error parsing screenshot to assets:", error);
     throw error;

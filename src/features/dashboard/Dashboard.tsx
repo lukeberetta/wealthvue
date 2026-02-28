@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import {
     Plus,
-    RefreshCw,
     ChevronDown,
     ArrowUpRight,
     ArrowDownRight,
@@ -206,14 +205,6 @@ export const Dashboard = ({ user, isDemo, onSignIn, onSignOut, onGoHome, onUpdat
                         </div>
 
                         <div className="flex gap-3">
-                            <Button
-                                variant="secondary"
-                                onClick={isDemo ? onSignIn : undefined}
-                                className="flex items-center gap-2 rounded-full px-5 py-2 text-sm"
-                            >
-                                <RefreshCw size={15} />
-                                Refresh Prices
-                            </Button>
                             <Button
                                 onClick={isDemo ? onSignIn : () => setIsAddModalOpen(true)}
                                 className="flex items-center gap-2 rounded-full px-5 py-2 text-sm"
