@@ -72,15 +72,30 @@ export const AssetRow: React.FC<AssetRowProps> = ({ asset, displayCurrency, fxRa
                     </div>
                 </div>
                 <div className="text-right">
-                    <p className="font-medium tabular-nums text-sm">
-                        {formatCurrency(convertCurrency(asset.totalValue, asset.totalValueCurrency, displayCurrency, fxRates), displayCurrency)}
-                    </p>
-                    <span className={cn(
-                        "text-[9px] px-1.5 py-0.5 rounded font-bold uppercase tracking-tighter",
-                        asset.valueSource === 'live_price' ? "bg-positive/10 text-positive" : "bg-accent-light text-accent"
-                    )}>
-                        {asset.valueSource === 'live_price' ? 'Live' : asset.valueSource === 'ai_estimate' ? 'AI Estimate' : 'Manual'}
-                    </span>
+                    {(() => {
+                        const converted = convertCurrency(asset.totalValue, asset.totalValueCurrency, displayCurrency, fxRates);
+                        const isLiability = converted < 0;
+                        return (
+                            <>
+                                <p className={cn("font-medium tabular-nums text-sm", isLiability && "text-negative")}>
+                                    {formatCurrency(converted, displayCurrency)}
+                                </p>
+                                <div className="flex items-center justify-end gap-1 mt-0.5">
+                                    {isLiability && (
+                                        <span className="text-[9px] px-1.5 py-0.5 rounded font-bold uppercase tracking-tighter bg-negative/10 text-negative">
+                                            Liability
+                                        </span>
+                                    )}
+                                    <span className={cn(
+                                        "text-[9px] px-1.5 py-0.5 rounded font-bold uppercase tracking-tighter",
+                                        asset.valueSource === 'live_price' ? "bg-positive/10 text-positive" : "bg-accent-light text-accent"
+                                    )}>
+                                        {asset.valueSource === 'live_price' ? 'Live' : asset.valueSource === 'ai_estimate' ? 'AI Estimate' : 'Manual'}
+                                    </span>
+                                </div>
+                            </>
+                        );
+                    })()}
                 </div>
             </div>
         </div>

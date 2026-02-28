@@ -3,7 +3,7 @@ import { Briefcase, Coins, Car, Home, Wallet, MoreHorizontal, Sparkles, Plus } f
 import { Asset } from "../../../types";
 import { Button } from "../../../components/ui/Button";
 import { AssetRow } from "./AssetRow";
-import { formatCurrency } from "../../../lib/utils";
+import { formatCurrency, cn } from "../../../lib/utils";
 import { convertCurrency } from "../../../lib/fx";
 
 interface AssetListProps {
@@ -90,7 +90,7 @@ export const AssetList = ({
                                 {getIcon(type)}
                                 {getPluralType(type)}
                             </h4>
-                            <span className="text-[10px] font-bold text-text-2 tabular-nums">
+                            <span className={cn("text-[10px] font-bold tabular-nums", typeTotal < 0 ? "text-negative" : "text-text-2")}>
                                 {formatCurrency(typeTotal, displayCurrency)}
                             </span>
                         </div>

@@ -81,9 +81,10 @@ export const Dashboard = ({ user, isDemo, onSignOut, onGoHome, onUpdateUser }: D
     }
 
     // Portfolio archetype — shared between PortfolioInsights and PortfolioAdviceModal
+    // Use only positive-value assets for archetype (liabilities don't define investor type)
     const byType: Record<string, number> = assets.reduce((acc: Record<string, number>, a: Asset) => {
         const val = convertCurrency(a.totalValue, a.totalValueCurrency, displayCurrency, fxRates);
-        acc[a.assetType] = (acc[a.assetType] || 0) + val;
+        if (val > 0) acc[a.assetType] = (acc[a.assetType] || 0) + val;
         return acc;
     }, {});
     const allocationTotal: number = Object.values(byType).reduce((s: number, v: number) => s + v, 0);

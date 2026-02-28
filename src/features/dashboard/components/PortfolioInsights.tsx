@@ -59,16 +59,28 @@ export const PortfolioInsights = ({ assets, displayCurrency, fxRates, onOpenAdvi
         return acc;
     }, {} as Record<string, number>);
 
-    const chartData = Object.entries(byType)
+    // Separate positive assets from liabilities (negative values)
+    const positiveByType: Record<string, number> = {};
+    let totalLiabilities = 0;
+    for (const [type, val] of Object.entries(byType)) {
+        if (val >= 0) positiveByType[type] = val;
+        else totalLiabilities += val;
+    }
+
+    const positiveTotal = Object.values(positiveByType).reduce((s, v) => s + v, 0);
+
+    const chartData = Object.entries(positiveByType)
         .map(([name, value]) => ({ name, value }))
         .sort((a, b) => b.value - a.value);
 
+    // Percentages based on positive assets only (for chart and archetype)
     const pct = Object.fromEntries(
-        Object.entries(byType).map(([k, v]) => [k, totalNAV > 0 ? (v / totalNAV) * 100 : 0])
+        Object.entries(positiveByType).map(([k, v]) => [k, positiveTotal > 0 ? (v / positiveTotal) * 100 : 0])
     );
 
     const archetype = getArchetype(pct);
     const holdingsCount = assets.length;
+    const hasLiabilities = totalLiabilities < 0;
 
     if (assets.length === 0) {
         return (
@@ -161,6 +173,22 @@ export const PortfolioInsights = ({ assets, displayCurrency, fxRates, onOpenAdvi
                                 </div>
                             );
                         })}
+
+                        {/* Liabilities summary row */}
+                        {hasLiabilities && (
+                            <div className="space-y-1 pt-1 border-t border-border/50">
+                                <div className="flex items-center justify-between text-[11px]">
+                                    <div className="flex items-center gap-2">
+                                        <div className="w-2 h-2 rounded-full shrink-0 bg-negative/60" />
+                                        <span className="font-semibold text-negative">Liabilities</span>
+                                    </div>
+                                    <span className="font-bold text-negative tabular-nums">
+                                        {formatCurrency(totalLiabilities, displayCurrency)}
+                                    </span>
+                                </div>
+                            </div>
+                        )}
+
                         <p className="text-[10px] text-text-3 pt-1">
                             {holdingsCount} holding{holdingsCount !== 1 ? "s" : ""} across {chartData.length} class{chartData.length !== 1 ? "es" : ""}
                         </p>

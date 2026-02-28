@@ -161,7 +161,8 @@ function EditableNumber({
     useEffect(() => { if (editing) inputRef.current?.focus(); }, [editing]);
 
     const commit = () => {
-        const parsed = parseFloat(raw.replace(/[^0-9.]/g, ""));
+        // Allow negative values (e.g. credit card debt: -5000)
+        const parsed = parseFloat(raw.replace(/[^0-9.\-]/g, ""));
         if (!isNaN(parsed)) onChange(parsed);
         setEditing(false);
     };
