@@ -123,7 +123,7 @@ export function AppNav({
                 <div className="flex items-center gap-2.5">
 
                     {/* Cross-nav pill: landing → app or app → site */}
-                    {isOnApp && !isDemo && (
+                    {isOnApp && (
                         <button
                             onClick={() => navigate("/")}
                             className="hidden sm:flex items-center gap-1.5 text-xs font-medium text-text-3 hover:text-text-1 transition-colors px-3 py-1.5 rounded-full hover:bg-surface-2 border border-transparent hover:border-border"
@@ -132,9 +132,15 @@ export function AppNav({
                             Website
                         </button>
                     )}
-                    {!isOnApp && (user || isDemo) && (
+                    {!isOnApp && (
                         <button
-                            onClick={() => navigate("/app")}
+                            onClick={() => {
+                                if (!user) {
+                                    onTryDemo?.();
+                                } else {
+                                    navigate("/app");
+                                }
+                            }}
                             className="hidden sm:flex items-center gap-1.5 text-xs font-medium text-text-3 hover:text-text-1 transition-colors px-3 py-1.5 rounded-full hover:bg-surface-2 border border-transparent hover:border-border"
                         >
                             <LayoutDashboard size={13} />
@@ -280,15 +286,9 @@ export function AppNav({
                         <div className="flex items-center gap-3">
                             <button
                                 onClick={onSignIn}
-                                className="text-sm font-medium text-text-2 hover:text-text-1 transition-colors"
-                            >
-                                Sign In
-                            </button>
-                            <button
-                                onClick={onTryDemo}
                                 className="btn-primary px-5 py-2 text-sm rounded-full"
                             >
-                                Try Free
+                                Sign In
                             </button>
                         </div>
                     )}
