@@ -112,7 +112,7 @@ export const SettingsView = ({ user, onSignOut, onBack, onUpdateUser }: Settings
                             <div>
                                 <p className="font-medium text-text-1 text-sm">Theme</p>
                                 <p className="text-xs text-text-3 mt-0.5 leading-relaxed max-w-xs">
-                                    Dark mode is the native WealthVue experience. Light follows the same warm palette in daylight. Device Default respects your OS setting.
+                                    Dark mode is the native WealthVue experience. Light follows the same warm palette in daylight. Device respects your OS setting.
                                 </p>
                             </div>
                         </div>

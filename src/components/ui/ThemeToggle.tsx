@@ -11,7 +11,7 @@ interface ThemeToggleProps {
 
 const MODES: { value: ThemeMode; icon: React.ReactNode; label: string }[] = [
     { value: "light", icon: <Sun size={14} strokeWidth={1.75} />, label: "Light" },
-    { value: "system", icon: <Monitor size={13} strokeWidth={1.75} />, label: "Device Default" },
+    { value: "system", icon: <Monitor size={13} strokeWidth={1.75} />, label: "Device" },
     { value: "dark", icon: <Moon size={13} strokeWidth={1.75} />, label: "Dark" },
 ];
 
@@ -20,13 +20,13 @@ export function ThemeToggle({ variant = "compact" }: ThemeToggleProps) {
 
     if (variant === "labeled") {
         return (
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2 w-64">
                 <div className="theme-toggle w-full">
                     {MODES.map(m => (
                         <button
                             key={m.value}
                             onClick={() => setTheme(m.value)}
-                            className={cn("theme-toggle-btn flex-1 gap-1.5 text-xs font-medium", mode === m.value && "active")}
+                            className={cn("theme-toggle-btn flex-1 gap-1.5 text-xs font-medium whitespace-nowrap", mode === m.value && "active")}
                             style={{ width: "auto", paddingLeft: 10, paddingRight: 10 }}
                             aria-pressed={mode === m.value}
                             title={m.label}
