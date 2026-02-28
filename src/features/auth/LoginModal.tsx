@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Shield, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { Modal } from "../../components/ui/Modal";
 
 interface LoginModalProps {
@@ -23,11 +23,11 @@ export const LoginModal = ({ isOpen, onClose, onSignIn }: LoginModalProps) => {
     return (
         <Modal isOpen={isOpen} onClose={onClose} title="Sign In">
             <div className="flex flex-col items-center text-center py-4">
-                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center text-primary mb-6">
-                    <Shield size={32} />
+                <div className="w-16 h-16 bg-accent rounded-2xl flex items-center justify-center mb-6 shadow-sm">
+                    <span className="text-white font-serif font-bold text-4xl leading-none">W</span>
                 </div>
-                <h2 className="text-2xl font-medium mb-2">Welcome back</h2>
-                <p className="text-text-secondary mb-8">Sign in to sync your portfolio across all your devices.</p>
+                <h2 className="text-2xl font-medium mb-2">Welcome to WealthVue</h2>
+                <p className="text-text-secondary mb-8">Sign in to start managing your portfolio.</p>
 
                 <button
                     onClick={handleSignIn}
