@@ -62,57 +62,11 @@ const CONFIDENCE_CONFIG = {
 // Sub-components
 // ---------------------------------------------------------------------------
 
-/** Animated geometric orb */
-function AnalysisOrb({ reduced }: { reduced: boolean }) {
-    if (reduced) {
-        return (
-            <div className="flex items-center justify-center py-16">
-                <div className="w-14 h-14 rounded-full border-4 border-accent border-t-transparent animate-spin" />
-            </div>
-        );
-    }
+/** Minimal spinner */
+function AnalysisOrb() {
     return (
-        <div className="relative flex items-center justify-center" style={{ width: 192, height: 192 }}>
-            <motion.div className="absolute rounded-full border border-accent/12"
-                style={{ width: 192, height: 192 }}
-                animate={{ rotate: 360 }}
-                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-            />
-            <motion.div className="absolute rounded-full"
-                style={{ width: 148, height: 148, border: "1.5px dashed", borderColor: "rgba(201,100,66,0.22)" }}
-                animate={{ rotate: -360 }}
-                transition={{ duration: 13, repeat: Infinity, ease: "linear" }}
-            />
-            <motion.div className="absolute" style={{ width: 116, height: 116 }}
-                animate={{ rotate: 360 }}
-                transition={{ duration: 5, repeat: Infinity, ease: "linear" }}
-            >
-                <svg viewBox="0 0 116 116" className="w-full h-full">
-                    <circle cx="58" cy="58" r="54" fill="none" strokeWidth="2.5"
-                        stroke="#C96442" strokeDasharray="75 265" strokeLinecap="round" opacity="0.75" />
-                </svg>
-            </motion.div>
-            <motion.div className="absolute" style={{ width: 84, height: 84 }}
-                animate={{ rotate: -360 }}
-                transition={{ duration: 7.5, repeat: Infinity, ease: "linear" }}
-            >
-                <svg viewBox="0 0 84 84" className="w-full h-full">
-                    <circle cx="42" cy="42" r="38" fill="none" strokeWidth="2"
-                        stroke="#C96442" strokeDasharray="36 200" strokeLinecap="round" opacity="0.35" />
-                </svg>
-            </motion.div>
-            <motion.div className="absolute rounded-full bg-accent"
-                style={{ width: 26, height: 26 }}
-                animate={{ scale: [1, 1.2, 1], opacity: [0.75, 1, 0.75] }}
-                transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
-            />
-            <motion.div className="absolute" style={{ width: 116, height: 116 }}
-                animate={{ rotate: 360 }}
-                transition={{ duration: 3.5, repeat: Infinity, ease: "linear" }}
-            >
-                <div className="absolute w-2.5 h-2.5 bg-accent rounded-full shadow"
-                    style={{ top: 0, left: "calc(50% - 5px)" }} />
-            </motion.div>
+        <div className="flex items-center justify-center py-16">
+            <div className="w-10 h-10 rounded-full border-2 border-accent/20 border-t-accent animate-spin" />
         </div>
     );
 }
@@ -674,7 +628,7 @@ export const AddAssetModal = ({
                                 transition={{ duration: 0.3 }}
                                 className="px-7 pt-4 pb-12 flex flex-col items-center gap-7"
                             >
-                                <AnalysisOrb reduced={reduced} />
+                                <AnalysisOrb />
                                 <div className="text-center space-y-2">
                                     <AnalysisMessages reduced={reduced} />
                                     <p className="text-[11px] text-text-3">Using live market data to estimate value</p>
