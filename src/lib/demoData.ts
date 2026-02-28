@@ -1,4 +1,4 @@
-import { Asset, User, NAVHistoryEntry } from "../types";
+import { Asset, User, NAVHistoryEntry, FinancialGoal } from "../types";
 import { addDays, format, subDays } from "date-fns";
 
 const generateNAVHistory = (currentTotal: number): NAVHistoryEntry[] => {
@@ -24,6 +24,7 @@ export const DEMO_USER: User = {
   email: "alex@example.com",
   photoURL: "https://api.dicebear.com/7.x/avataaars/svg?seed=Alex",
   defaultCurrency: "USD",
+  country: "US",
   plan: "trial",
   trialStartDate: format(subDays(new Date(), 12), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"),
   trialEndsAt: format(addDays(new Date(), 18), "yyyy-MM-dd'T'HH:mm:ss.SSSxxx"),
@@ -200,3 +201,8 @@ const totalDemoNAV = DEMO_ASSETS.reduce((acc, asset) => {
 }, 0);
 
 export const DEMO_NAV_HISTORY = generateNAVHistory(totalDemoNAV);
+
+export const DEMO_GOAL: FinancialGoal = {
+  targetAmount: 250000,
+  currency: "USD",
+};

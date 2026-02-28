@@ -52,7 +52,7 @@ export const useDashboard = (user: User | null, isDemo: boolean) => {
 
             setAssets(loadedAssets);
             setNavHistory(loadedHistory);
-            setGoalState(storage.getGoal());
+            setGoalState(storage.getGoal(isDemo));
             setIsLoading(false);
 
             if (!isDemo && user) {

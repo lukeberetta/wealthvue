@@ -1,5 +1,5 @@
 import { User, Asset, NAVHistoryEntry, FXCache, FinancialGoal } from "../types";
-import { DEMO_USER, DEMO_ASSETS, DEMO_NAV_HISTORY } from "./demoData";
+import { DEMO_USER, DEMO_ASSETS, DEMO_NAV_HISTORY, DEMO_GOAL } from "./demoData";
 
 const KEYS = {
   USER: "wealthvue_user",
@@ -45,7 +45,8 @@ export const storage = {
   saveFXCache: (cache: FXCache) => {
     localStorage.setItem(KEYS.FX_CACHE, JSON.stringify(cache));
   },
-  getGoal: (): FinancialGoal | null => {
+  getGoal: (isDemo?: boolean): FinancialGoal | null => {
+    if (isDemo) return DEMO_GOAL;
     const data = localStorage.getItem(KEYS.GOAL);
     return data ? JSON.parse(data) : null;
   },
