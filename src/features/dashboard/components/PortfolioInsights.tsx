@@ -174,20 +174,32 @@ export const PortfolioInsights = ({ assets, displayCurrency, fxRates, onOpenAdvi
                             );
                         })}
 
-                        {/* Liabilities summary row */}
-                        {hasLiabilities && (
-                            <div className="space-y-1 pt-1 border-t border-border/50">
-                                <div className="flex items-center justify-between text-[11px]">
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-2 h-2 rounded-full shrink-0 bg-negative/60" />
-                                        <span className="font-semibold text-negative">Liabilities</span>
+                        {/* Liabilities row */}
+                        {hasLiabilities && (() => {
+                            const liabPct = positiveTotal > 0 ? (Math.abs(totalLiabilities) / positiveTotal) * 100 : 0;
+                            return (
+                                <div className="space-y-1">
+                                    <div className="flex items-center justify-between text-[11px]">
+                                        <div className="flex items-center gap-2">
+                                            <div className="w-2 h-2 rounded-full shrink-0 bg-negative/60" />
+                                            <span className="font-semibold text-text-1">Liabilities</span>
+                                        </div>
+                                        <div className="flex items-center gap-3 tabular-nums">
+                                            <span className="text-text-3">{liabPct.toFixed(1)}%</span>
+                                            <span className="font-bold text-negative">
+                                                {formatCurrency(totalLiabilities, displayCurrency)}
+                                            </span>
+                                        </div>
                                     </div>
-                                    <span className="font-bold text-negative tabular-nums">
-                                        {formatCurrency(totalLiabilities, displayCurrency)}
-                                    </span>
+                                    <div className="h-1 bg-surface-2 rounded-full overflow-hidden">
+                                        <div
+                                            className="h-full rounded-full transition-all duration-500 bg-negative/60"
+                                            style={{ width: `${liabPct}%` }}
+                                        />
+                                    </div>
                                 </div>
-                            </div>
-                        )}
+                            );
+                        })()}
 
                         <p className="text-[10px] text-text-3 pt-1">
                             {holdingsCount} holding{holdingsCount !== 1 ? "s" : ""} across {chartData.length} class{chartData.length !== 1 ? "es" : ""}
