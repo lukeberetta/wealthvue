@@ -32,12 +32,13 @@ import { convertCurrency } from "../../lib/fx";
 interface DashboardProps {
     user: User | null;
     isDemo: boolean;
+    onSignIn: () => void;
     onSignOut: () => void;
     onGoHome: () => void;
     onUpdateUser: (user: User) => void;
 }
 
-export const Dashboard = ({ user, isDemo, onSignOut, onGoHome, onUpdateUser }: DashboardProps) => {
+export const Dashboard = ({ user, isDemo, onSignIn, onSignOut, onGoHome, onUpdateUser }: DashboardProps) => {
     const [isAdviceModalOpen, setIsAdviceModalOpen] = useState(false);
     const [goalAmountInput, setGoalAmountInput] = useState('');
 
@@ -126,7 +127,7 @@ export const Dashboard = ({ user, isDemo, onSignOut, onGoHome, onUpdateUser }: D
         displayCurrency,
         fxRates,
         onDisplayCurrencyChange: setDisplayCurrency,
-        onSignIn: onGoHome,         // from app context, sign-in = go home to trigger login modal
+        onSignIn,
         onSignOut,
         onOpenSettings: () => setCurrentView("settings"),
     };

@@ -91,10 +91,10 @@ export function AppNav({
             )}
         >
             {/* Demo banner */}
-            {isDemo && (
+            {isDemo && isOnApp && (
                 <div className="bg-accent text-white py-2 text-center text-xs font-bold uppercase tracking-widest shrink-0">
                     DEMO MODE ·{" "}
-                    <button onClick={onSignOut} className="underline hover:no-underline">
+                    <button onClick={onSignIn} className="underline hover:no-underline">
                         Sign in
                     </button>{" "}
                     to track your real assets

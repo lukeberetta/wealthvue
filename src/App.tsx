@@ -109,6 +109,7 @@ export default function App() {
                   <Dashboard
                     user={user}
                     isDemo={isDemo}
+                    onSignIn={() => setIsLoginModalOpen(true)}
                     onSignOut={handleSignOut}
                     onGoHome={handleGoHome}
                     onUpdateUser={handleUpdateUser}
