@@ -44,12 +44,26 @@ export default function App() {
     }
   }, []);
 
-  const handleSignIn = () => {
+  const handleSignIn = async () => {
+    let countryCode = "ZA"; // Default
+    try {
+      const response = await fetch("https://ipapi.co/json/");
+      if (response.ok) {
+        const data = await response.json();
+        if (data.country) {
+          countryCode = data.country;
+        }
+      }
+    } catch (e) {
+      console.warn("Could not fetch IP data, defaulting country.", e);
+    }
+
     const mockUser: User = {
       displayName: "Alex Morgan",
       email: "alex@example.com",
       photoURL: "https://api.dicebear.com/7.x/avataaars/svg?seed=Alex",
       defaultCurrency: "ZAR",
+      country: countryCode,
       plan: "trial",
       trialStartDate: new Date().toISOString(),
       trialEndsAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),

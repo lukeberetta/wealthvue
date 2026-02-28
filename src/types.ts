@@ -8,6 +8,7 @@ export interface User {
   email: string;
   photoURL: string;
   defaultCurrency: string;
+  country: string;
   plan: PlanType;
   trialStartDate: string;
   trialEndsAt: string;

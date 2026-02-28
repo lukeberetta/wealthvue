@@ -87,7 +87,7 @@ export const useDashboard = (user: User | null, isDemo: boolean) => {
         setIsAnalyzing(true);
         setAnalysisError(null);
         try {
-            const parsed = await parseTextToAsset(inputText, displayCurrency);
+            const parsed = await parseTextToAsset(inputText, displayCurrency, user?.country || "ZA");
             if (parsed) {
                 const quantity = parsed.quantity || 1;
                 const unitPrice = parsed.unitPrice || (parsed.totalValue / quantity) || 0;
@@ -215,7 +215,7 @@ export const useDashboard = (user: User | null, isDemo: boolean) => {
         reader.onloadend = async () => {
             const base64 = reader.result as string;
             try {
-                const parsed = await parseScreenshotToAssets(base64, displayCurrency);
+                const parsed = await parseScreenshotToAssets(base64, displayCurrency, user?.country || "ZA");
                 setDraftAssets(parsed.map(p => {
                     const quantity = p.quantity || 1;
                     const unitPrice = p.unitPrice || (p.totalValue / quantity) || 0;

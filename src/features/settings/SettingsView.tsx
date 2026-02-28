@@ -17,6 +17,19 @@ export const SettingsView = ({ user, onSignOut, onBack, onUpdateUser }: Settings
         if (user) onUpdateUser({ ...user, defaultCurrency: e.target.value });
     };
 
+    const handleCountryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        if (user) onUpdateUser({ ...user, country: e.target.value });
+    };
+
+    const SUPPORTED_COUNTRIES = [
+        { code: "US", name: "United States" },
+        { code: "ZA", name: "South Africa" },
+        { code: "GB", name: "United Kingdom" },
+        { code: "AU", name: "Australia" },
+        { code: "CA", name: "Canada" },
+        { code: "EU", name: "European Union" },
+    ];
+
     return (
         <div className="max-w-2xl mx-auto w-full py-10 px-6 space-y-10">
             {/* Header */}
@@ -63,6 +76,18 @@ export const SettingsView = ({ user, onSignOut, onBack, onUpdateUser }: Settings
                                 <option value="GBP">GBP – British Pound</option>
                                 <option value="AUD">AUD – Australian Dollar</option>
                                 <option value="CAD">CAD – Canadian Dollar</option>
+                            </select>
+                        </div>
+                        <div className="space-y-1.5">
+                            <label className="text-[10px] uppercase font-bold text-text-3 tracking-wider">Country Location</label>
+                            <select
+                                className="w-full bg-surface-2 border border-border rounded-xl px-3 py-2 text-sm text-text-1 focus:outline-none focus:ring-2 focus:ring-accent/20"
+                                defaultValue={user?.country || "ZA"}
+                                onChange={handleCountryChange}
+                            >
+                                {SUPPORTED_COUNTRIES.map(c => (
+                                    <option key={c.code} value={c.code}>{c.name}</option>
+                                ))}
                             </select>
                         </div>
                     </div>
