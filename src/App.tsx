@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Routes, Route, useNavigate, useLocation, Navigate } from "react-router-dom";
 import { storage } from "./lib/storage";
@@ -6,8 +6,27 @@ import { User } from "./types";
 import { LandingPage } from "./features/landing/LandingPage";
 import { Dashboard } from "./features/dashboard/Dashboard";
 import { LoginModal } from "./features/auth/LoginModal";
+import { useTheme, ThemeMode } from "./hooks/useTheme";
 
+// ---------------------------------------------------------------------------
+// Theme context — consumed by nav and settings
+// ---------------------------------------------------------------------------
+interface ThemeContextValue {
+  mode: ThemeMode;
+  setTheme: (m: ThemeMode) => void;
+}
+export const ThemeContext = createContext<ThemeContextValue>({
+  mode: "system",
+  setTheme: () => { },
+});
+export const useThemeContext = () => useContext(ThemeContext);
+
+// ---------------------------------------------------------------------------
+// App
+// ---------------------------------------------------------------------------
 export default function App() {
+  const { mode, setTheme } = useTheme();
+
   const [user, setUser] = useState<User | null>(null);
   const [isDemo, setIsDemo] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -19,9 +38,8 @@ export default function App() {
     const savedUser = storage.getUser();
     if (savedUser) {
       setUser(savedUser);
-      // Only redirect to dashboard if on landing page and user is already logged in
-      if (window.location.pathname === '/') {
-        navigate('/app', { replace: true });
+      if (window.location.pathname === "/") {
+        navigate("/app", { replace: true });
       }
     }
   }, []);
@@ -40,69 +58,53 @@ export default function App() {
     storage.saveUser(mockUser);
     setUser(mockUser);
     setIsDemo(false);
-    navigate('/app');
+    navigate("/app");
   };
 
-  const handleTryDemo = () => {
-    setIsDemo(true);
-    navigate('/app');
-  };
-
-  const handleSignOut = () => {
-    storage.clearUser();
-    setUser(null);
-    setIsDemo(false);
-    navigate('/');
-  };
-
-  const handleGoHome = () => {
-    navigate('/');
-  };
-
-  const handleUpdateUser = (updatedUser: User) => {
-    setUser(updatedUser);
-    storage.saveUser(updatedUser);
-  };
+  const handleTryDemo = () => { setIsDemo(true); navigate("/app"); };
+  const handleSignOut = () => { storage.clearUser(); setUser(null); setIsDemo(false); navigate("/"); };
+  const handleGoHome = () => navigate("/");
+  const handleUpdateUser = (updatedUser: User) => { setUser(updatedUser); storage.saveUser(updatedUser); };
 
   return (
-    <div className="min-h-screen">
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={location.pathname}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.3 }}
-        >
-          <Routes location={location}>
-            <Route
-              path="/"
-              element={
-                <LandingPage onSignIn={() => setIsLoginModalOpen(true)} onTryDemo={handleTryDemo} />
-              }
-            />
-            <Route
-              path="/app"
-              element={
-                <Dashboard
-                  user={user}
-                  isDemo={isDemo}
-                  onSignOut={handleSignOut}
-                  onGoHome={handleGoHome}
-                  onUpdateUser={handleUpdateUser}
-                />
-              }
-            />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </motion.div>
-      </AnimatePresence>
+    <ThemeContext.Provider value={{ mode, setTheme }}>
+      <div className="min-h-screen bg-bg text-text-1">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={location.pathname}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+          >
+            <Routes location={location}>
+              <Route
+                path="/"
+                element={<LandingPage onSignIn={() => setIsLoginModalOpen(true)} onTryDemo={handleTryDemo} />}
+              />
+              <Route
+                path="/app"
+                element={
+                  <Dashboard
+                    user={user}
+                    isDemo={isDemo}
+                    onSignOut={handleSignOut}
+                    onGoHome={handleGoHome}
+                    onUpdateUser={handleUpdateUser}
+                  />
+                }
+              />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </motion.div>
+        </AnimatePresence>
 
-      <LoginModal
-        isOpen={isLoginModalOpen}
-        onClose={() => setIsLoginModalOpen(false)}
-        onSignIn={handleSignIn}
-      />
-    </div>
+        <LoginModal
+          isOpen={isLoginModalOpen}
+          onClose={() => setIsLoginModalOpen(false)}
+          onSignIn={handleSignIn}
+        />
+      </div>
+    </ThemeContext.Provider>
   );
 }

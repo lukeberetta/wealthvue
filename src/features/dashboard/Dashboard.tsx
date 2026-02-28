@@ -14,6 +14,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { User, Asset } from "../../types";
 import { formatCurrency, cn } from "../../lib/utils";
 import { Button } from "../../components/ui/Button";
+import { ThemeToggle } from "../../components/ui/ThemeToggle";
 import { SettingsView } from "../settings/SettingsView";
 import { useDashboard } from "./hooks/useDashboard";
 import { AssetAllocationChart } from "./components/AssetAllocationChart";
@@ -112,7 +113,9 @@ export const Dashboard = ({ user, isDemo, onSignOut, onGoHome, onUpdateUser }: D
                         <span className="text-xl font-serif font-semibold text-accent hidden sm:block">WealthVue</span>
                     </button>
 
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-3">
+                        <ThemeToggle variant="compact" />
+                        <div className="w-px h-5 bg-border" />
                         <div className="relative">
                             <select
                                 value={displayCurrency}

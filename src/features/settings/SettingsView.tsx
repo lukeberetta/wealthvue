@@ -1,8 +1,9 @@
 import React from "react";
-import { X, CreditCard, Trash2, LogOut } from "lucide-react";
+import { ArrowLeft, CreditCard, Trash2, LogOut, Palette } from "lucide-react";
 import { User } from "../../types";
 import { Card } from "../../components/ui/Card";
 import { Button } from "../../components/ui/Button";
+import { ThemeToggle } from "../../components/ui/ThemeToggle";
 
 interface SettingsViewProps {
     user: User | null;
@@ -13,90 +14,121 @@ interface SettingsViewProps {
 
 export const SettingsView = ({ user, onSignOut, onBack, onUpdateUser }: SettingsViewProps) => {
     const handleCurrencyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        if (user) {
-            onUpdateUser({
-                ...user,
-                defaultCurrency: e.target.value
-            });
-        }
+        if (user) onUpdateUser({ ...user, defaultCurrency: e.target.value });
     };
 
     return (
-        <div className="max-w-3xl mx-auto w-full py-8 space-y-8">
-            <div className="flex items-center gap-4 mb-8">
-                <button onClick={onBack} className="p-2 hover:bg-nav rounded-lg transition-colors">
-                    <X size={24} />
+        <div className="max-w-2xl mx-auto w-full py-10 px-6 space-y-10">
+            {/* Header */}
+            <div className="flex items-center gap-4">
+                <button
+                    onClick={onBack}
+                    className="w-9 h-9 flex items-center justify-center rounded-full border border-border text-text-2 hover:text-text-1 hover:bg-surface-2 transition-colors"
+                    aria-label="Back"
+                >
+                    <ArrowLeft size={18} />
                 </button>
-                <h2 className="text-3xl font-medium">Settings</h2>
+                <h2 className="font-serif text-3xl text-text-1">Settings</h2>
             </div>
 
-            <section className="space-y-4">
-                <h3 className="text-sm font-medium text-text-secondary uppercase tracking-wider">Profile</h3>
-                <Card className="space-y-6">
+            {/* Profile */}
+            <section className="space-y-3">
+                <h3 className="text-[10px] font-bold text-text-3 uppercase tracking-[0.18em]">Profile</h3>
+                <Card className="p-6 space-y-6">
                     <div className="flex items-center gap-4">
-                        <img src={user?.photoURL} className="w-16 h-16 rounded-full border border-border" alt="Avatar" />
+                        <img src={user?.photoURL} className="w-14 h-14 rounded-full border border-border" alt="Avatar" />
                         <div>
-                            <p className="text-lg font-medium">{user?.displayName}</p>
-                            <p className="text-text-secondary">{user?.email}</p>
+                            <p className="font-medium text-text-1">{user?.displayName}</p>
+                            <p className="text-sm text-text-3">{user?.email}</p>
                         </div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-1">
-                            <label className="text-[10px] uppercase font-bold text-text-secondary">Display Name</label>
-                            <input className="w-full bg-nav border border-border rounded p-2 text-sm" defaultValue={user?.displayName} />
+                        <div className="space-y-1.5">
+                            <label className="text-[10px] uppercase font-bold text-text-3 tracking-wider">Display Name</label>
+                            <input
+                                className="w-full bg-surface-2 border border-border rounded-xl px-3 py-2 text-sm text-text-1 focus:outline-none focus:ring-2 focus:ring-accent/20"
+                                defaultValue={user?.displayName}
+                            />
                         </div>
-                        <div className="space-y-1">
-                            <label className="text-[10px] uppercase font-bold text-text-secondary">Default Currency</label>
+                        <div className="space-y-1.5">
+                            <label className="text-[10px] uppercase font-bold text-text-3 tracking-wider">Default Currency</label>
                             <select
-                                className="w-full bg-nav border border-border rounded p-2 text-sm"
+                                className="w-full bg-surface-2 border border-border rounded-xl px-3 py-2 text-sm text-text-1 focus:outline-none focus:ring-2 focus:ring-accent/20"
                                 defaultValue={user?.defaultCurrency}
                                 onChange={handleCurrencyChange}
                             >
-                                <option value="USD">USD - US Dollar</option>
-                                <option value="ZAR">ZAR - SA Rand</option>
-                                <option value="EUR">EUR - Euro</option>
-                                <option value="GBP">GBP - British Pound</option>
+                                <option value="USD">USD – US Dollar</option>
+                                <option value="ZAR">ZAR – SA Rand</option>
+                                <option value="EUR">EUR – Euro</option>
+                                <option value="GBP">GBP – British Pound</option>
+                                <option value="AUD">AUD – Australian Dollar</option>
+                                <option value="CAD">CAD – Canadian Dollar</option>
                             </select>
                         </div>
                     </div>
                 </Card>
             </section>
 
-            <section className="space-y-4">
-                <h3 className="text-sm font-medium text-text-secondary uppercase tracking-wider">Plan & Billing</h3>
-                <Card className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center text-primary">
-                            <CreditCard size={20} />
+            {/* Appearance */}
+            <section className="space-y-3">
+                <h3 className="text-[10px] font-bold text-text-3 uppercase tracking-[0.18em]">Appearance</h3>
+                <Card className="p-6">
+                    <div className="flex items-start justify-between gap-8">
+                        <div className="flex items-start gap-3">
+                            <div className="w-9 h-9 rounded-xl bg-accent-light flex items-center justify-center text-accent shrink-0 mt-0.5">
+                                <Palette size={17} />
+                            </div>
+                            <div>
+                                <p className="font-medium text-text-1 text-sm">Theme</p>
+                                <p className="text-xs text-text-3 mt-0.5 leading-relaxed max-w-xs">
+                                    Dark mode is the native WealthVue experience. Light follows the same warm palette in daylight. Device Default respects your OS setting.
+                                </p>
+                            </div>
                         </div>
-                        <div>
-                            <p className="font-medium capitalize">{user?.plan} Plan</p>
-                            <p className="text-xs text-text-secondary">Your trial ends in 18 days.</p>
+                        <div className="shrink-0 pt-0.5">
+                            <ThemeToggle variant="labeled" />
                         </div>
                     </div>
-                    <Button variant="secondary">Upgrade to Pro</Button>
                 </Card>
             </section>
 
-            <section className="space-y-4">
-                <h3 className="text-sm font-medium text-text-secondary uppercase tracking-wider">Danger Zone</h3>
-                <Card className="border-negative/20 bg-negative/5">
+            {/* Plan & Billing */}
+            <section className="space-y-3">
+                <h3 className="text-[10px] font-bold text-text-3 uppercase tracking-[0.18em]">Plan & Billing</h3>
+                <Card className="p-6 flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                        <div className="w-9 h-9 bg-accent-light rounded-xl flex items-center justify-center text-accent">
+                            <CreditCard size={17} />
+                        </div>
+                        <div>
+                            <p className="font-medium text-text-1 text-sm capitalize">{user?.plan} Plan</p>
+                            <p className="text-xs text-text-3">Your trial ends in 18 days.</p>
+                        </div>
+                    </div>
+                    <Button variant="secondary" className="text-sm rounded-full px-5 py-2">Upgrade to Pro</Button>
+                </Card>
+            </section>
+
+            {/* Danger Zone */}
+            <section className="space-y-3">
+                <h3 className="text-[10px] font-bold text-negative uppercase tracking-[0.18em]">Danger Zone</h3>
+                <Card className="p-6 border-negative/20 bg-negative/5">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="font-medium text-negative">Delete Account</p>
-                            <p className="text-xs text-text-secondary">Permanently remove all your data and assets.</p>
+                            <p className="font-medium text-negative text-sm">Delete Account</p>
+                            <p className="text-xs text-text-3 mt-0.5">Permanently removes all your data and assets.</p>
                         </div>
-                        <Button variant="ghost" className="text-negative hover:bg-negative/10 flex items-center gap-2">
-                            <Trash2 size={18} />
+                        <Button variant="ghost" className="text-negative hover:bg-negative/10 flex items-center gap-2 text-sm">
+                            <Trash2 size={15} />
                             Delete
                         </Button>
                     </div>
                 </Card>
             </section>
 
-            <div className="pt-8 flex justify-center">
-                <Button variant="ghost" onClick={onSignOut} className="text-text-secondary flex items-center gap-2">
-                    <LogOut size={18} />
+            <div className="flex justify-center pt-4">
+                <Button variant="ghost" onClick={onSignOut} className="text-text-3 flex items-center gap-2 text-sm hover:text-negative">
+                    <LogOut size={15} />
                     Sign Out
                 </Button>
             </div>
