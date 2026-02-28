@@ -238,9 +238,9 @@ export const PortfolioInsights = ({ assets, displayCurrency, fxRates, onOpenAdvi
 
                 <button
                     onClick={onOpenAdvice}
-                    className="mt-6 w-full flex items-center justify-center gap-2 bg-surface-2 hover:bg-accent hover:text-white border border-border hover:border-accent text-text-1 rounded-xl py-3 px-4 text-sm font-medium transition-all duration-200 group"
+                    className="mt-6 w-full flex items-center justify-center gap-2 bg-surface-2 hover:bg-surface-2/80 text-text-1 rounded-xl py-3 px-4 text-sm font-medium transition-colors"
                 >
-                    <Sparkles size={15} className="text-accent group-hover:text-white transition-colors" />
+                    <Sparkles size={15} className="text-accent" />
                     Analyse Portfolio
                 </button>
             </div>
