@@ -1,7 +1,7 @@
 import React from "react";
 import { motion } from "motion/react";
 import {
-    Briefcase, Coins, Car, Home, Wallet, MoreHorizontal,
+    LineChart, Coins, Car, Home, Wallet, MoreHorizontal,
     Check, Upload, Search, User as UserIcon, ArrowRight
 } from "lucide-react";
 import { cn } from "../../lib/utils";
@@ -236,7 +236,7 @@ export const LandingPage = ({ user, isDemo = false, onSignIn, onTryDemo, onSignO
 
                         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
                             {[
-                                { i: <Briefcase size={22} />, t: "Stocks & ETFs", b: "Live prices from any exchange. Just enter the ticker." },
+                                { i: <LineChart size={22} />, t: "Stocks & ETFs", b: "Live prices from any exchange. Just enter the ticker." },
                                 { i: <Coins size={22} />, t: "Crypto", b: "Bitcoin, Ethereum, Solana and thousands more via live market data." },
                                 { i: <Car size={22} />, t: "Vehicles", b: "Make, model, year, mileage — AI estimates current resale value." },
                                 { i: <Home size={22} />, t: "Property", b: "Manual or AI-assisted value for homes and investment property." },

@@ -7,6 +7,7 @@ import {
 import { motion, AnimatePresence, useReducedMotion } from "motion/react";
 import { Asset } from "../../../types";
 import { formatCurrency, cn } from "../../../lib/utils";
+import { AssetIcon } from "./AssetIcon";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -34,15 +35,9 @@ type InputMode = "text" | "image";
 // Helpers
 // ---------------------------------------------------------------------------
 
-const ASSET_ICONS: Record<string, React.ReactNode> = {
-    stock: <Briefcase size={17} />,
-    crypto: <Coins size={17} />,
-    vehicle: <Car size={17} />,
-    property: <Home size={17} />,
-    cash: <Wallet size={17} />,
-};
-
-const getIcon = (type?: string) => ASSET_ICONS[type ?? ""] ?? <MoreHorizontal size={17} />;
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
 
 const ANALYSIS_MESSAGES = [
     "Reading your input…",
@@ -197,7 +192,7 @@ function DraftCard({
             <div className="p-5 flex items-start gap-4">
                 {/* Icon */}
                 <div className="mt-0.5 w-9 h-9 rounded-xl bg-accent-light flex items-center justify-center text-accent shrink-0">
-                    {getIcon(asset.assetType)}
+                    <AssetIcon asset={asset} size={17} />
                 </div>
 
                 {/* Name + meta */}

@@ -17,6 +17,7 @@ import { FinancialGoal } from "../../types";
 import { User, Asset } from "../../types";
 import { formatCurrency, formatCurrencyCompact, cn } from "../../lib/utils";
 import { Button } from "../../components/ui/Button";
+import { Card } from "../../components/ui/Card";
 import { AppNav } from "../../components/ui/AppNav";
 import { Footer } from "../../components/ui/Footer";
 import { SettingsView } from "../settings/SettingsView";
@@ -66,8 +67,6 @@ export const Dashboard = ({ user, isDemo, onSignIn, onSignOut, onGoHome, onUpdat
         setSelectedAssetIds,
         sortBy,
         setSortBy,
-        isSelectMode,
-        setIsSelectMode,
         totalNAV,
         change,
         changePercent,
@@ -327,13 +326,10 @@ export const Dashboard = ({ user, isDemo, onSignIn, onSignOut, onGoHome, onUpdat
                 />
 
                 {/* Asset list */}
-                <div className="space-y-5">
-                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                        <h3 className="text-[10px] font-bold text-text-3 uppercase tracking-[0.22em]">
-                            Your Assets
-                        </h3>
-
-                        <div className="flex items-center gap-2.5 w-full sm:w-auto">
+                <Card>
+                    <div className="flex items-center justify-between mb-6">
+                        <h3 className="text-[10px] font-bold text-text-3 uppercase tracking-widest">Holdings</h3>
+                        <div className="flex items-center gap-2">
                             {selectedAssetIds.length > 0 && (
                                 <Button
                                     variant="ghost"
@@ -344,69 +340,38 @@ export const Dashboard = ({ user, isDemo, onSignIn, onSignOut, onGoHome, onUpdat
                                     Delete ({selectedAssetIds.length})
                                 </Button>
                             )}
-
-                            <Button
-                                variant="ghost"
-                                onClick={isDemo ? onSignIn : () => {
-                                    setIsSelectMode(!isSelectMode);
-                                    if (isSelectMode) setSelectedAssetIds([]);
-                                }}
-                                className={cn(
-                                    "text-xs font-bold uppercase tracking-wider py-1.5 px-4 rounded-lg",
-                                    isSelectMode
-                                        ? "text-accent bg-accent/10"
-                                        : "text-text-3 hover:bg-surface-2"
-                                )}
-                            >
-                                {isSelectMode ? "Cancel" : "Select"}
-                            </Button>
-
-                            <div className="relative flex-1 sm:flex-none">
+<div className="relative">
                                 <select
                                     value={sortBy}
                                     onChange={(e) => setSortBy(e.target.value as any)}
-                                    className="w-full appearance-none bg-surface-2 border border-border rounded-lg px-4 py-1.5 pr-9 text-xs font-bold text-text-1 focus:outline-none focus:ring-2 focus:ring-accent/20"
+                                    className="appearance-none bg-surface-2 border border-border rounded-lg px-3 py-1.5 pr-8 text-xs font-bold text-text-1 focus:outline-none focus:ring-2 focus:ring-accent/20"
                                 >
-                                    <option value="value_desc">Value: High to Low</option>
-                                    <option value="value_asc">Value: Low to High</option>
-                                    <option value="name_asc">Name: A to Z</option>
+                                    <option value="value_desc">High to Low</option>
+                                    <option value="value_asc">Low to High</option>
+                                    <option value="name_asc">A to Z</option>
                                 </select>
-                                <ChevronDown
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-text-3"
-                                    size={13}
-                                />
+                                <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-text-3" size={12} />
                             </div>
                         </div>
                     </div>
-
                     <AssetList
                         assets={sortedAssets}
                         displayCurrency={displayCurrency}
                         fxRates={fxRates}
-                        isSelectMode={isSelectMode}
                         selectedAssetIds={selectedAssetIds}
                         onSelectAsset={(id, checked) => {
-                            if (isDemo) {
-                                onSignIn();
-                                return;
-                            }
-                            if (checked) {
-                                setSelectedAssetIds([...selectedAssetIds, id]);
-                            } else {
-                                setSelectedAssetIds(selectedAssetIds.filter(x => x !== id));
-                            }
+                            if (isDemo) { onSignIn(); return; }
+                            if (checked) setSelectedAssetIds([...selectedAssetIds, id]);
+                            else setSelectedAssetIds(selectedAssetIds.filter(x => x !== id));
                         }}
                         onEditAsset={(asset) => {
-                            if (isDemo) {
-                                onSignIn();
-                                return;
-                            }
+                            if (isDemo) { onSignIn(); return; }
                             setSelectedAsset(asset);
                             setIsEditModalOpen(true);
                         }}
                         onAddAsset={isDemo ? onSignIn : () => setIsAddModalOpen(true)}
                     />
-                </div>
+                </Card>
             </main>
 
             <Footer />

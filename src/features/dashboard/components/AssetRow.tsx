@@ -1,103 +1,84 @@
 import React from "react";
-import { Briefcase, Coins, Car, Home, Wallet, MoreHorizontal } from "lucide-react";
 import { Asset } from "../../../types";
 import { formatCurrency, cn } from "../../../lib/utils";
 import { convertCurrency } from "../../../lib/fx";
+import { AssetIcon } from "./AssetIcon";
 
 interface AssetRowProps {
     asset: Asset;
     displayCurrency: string;
     fxRates: { [key: string]: number };
     isSelected: boolean;
-    isSelectMode: boolean;
     onSelect: (id: string, checked: boolean) => void;
     onClick: (asset: Asset) => void;
 }
 
-export const AssetRow: React.FC<AssetRowProps> = ({ asset, displayCurrency, fxRates, isSelected, isSelectMode, onSelect, onClick }) => {
-    const getIcon = (type: string) => {
-        switch (type) {
-            case 'stock': return <Briefcase size={20} />;
-            case 'crypto': return <Coins size={20} />;
-            case 'vehicle': return <Car size={20} />;
-            case 'property': return <Home size={20} />;
-            case 'cash': return <Wallet size={20} />;
-            default: return <MoreHorizontal size={20} />;
-        }
-    };
+
+export const AssetRow: React.FC<AssetRowProps> = ({
+    asset, displayCurrency, fxRates, isSelected, onSelect, onClick,
+}) => {
+    const converted = convertCurrency(asset.totalValue, asset.totalValueCurrency, displayCurrency, fxRates);
+    const isLiability = converted < 0;
 
     return (
         <div
             className={cn(
-                "group flex items-center gap-3 p-3 rounded-xl transition-all border border-transparent hover:border-border",
-                isSelected ? "bg-accent-light/20 border-accent/20" : "hover:bg-surface-2"
+                "flex items-center gap-3 py-3 border-b border-border/40 transition-colors cursor-pointer -mx-6 px-6",
+                isSelected ? "bg-accent/5" : "hover:bg-surface-2/50"
             )}
+            onClick={() => onClick(asset)}
         >
-            <div className={cn(
-                "flex items-center h-full transition-all duration-300 ease-in-out overflow-hidden",
-                isSelectMode ? "w-6 opacity-100 mr-2" : "w-0 opacity-0 mr-0"
-            )}>
+            {/* Checkbox */}
+            <div className="w-5 shrink-0" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
                 <input
                     type="checkbox"
                     checked={isSelected}
-                    onChange={(e) => onSelect(asset.id, e.target.checked)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => onSelect(asset.id, e.target.checked)}
                     className="w-4 h-4 rounded border-border text-accent focus:ring-accent/20 cursor-pointer"
                 />
             </div>
 
-            <div
-                className="flex-1 flex items-center justify-between cursor-pointer"
-                onClick={() => onClick(asset)}
-            >
-                <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 bg-surface-2 rounded-lg flex items-center justify-center text-accent group-hover:scale-110 transition-transform">
-                        {getIcon(asset.assetType)}
-                    </div>
-                    <div>
-                        <p className="font-medium text-sm">{asset.name}</p>
-                        <div className="flex items-center gap-2">
-                            <p className="text-[10px] font-bold text-text-3 uppercase tracking-tighter">
-                                {asset.quantity > 1 ? `${asset.quantity} units · ` : ''}
-                                {formatCurrency(asset.unitPrice, asset.unitPriceCurrency)}
-                            </p>
-                            {asset.source && (
-                                <>
-                                    <span className="text-text-3">·</span>
-                                    <span className="text-[9px] font-bold text-accent uppercase tracking-tighter bg-accent-light/50 px-1 rounded">
-                                        {asset.source}
-                                    </span>
-                                </>
-                            )}
-                        </div>
-                    </div>
-                </div>
-                <div className="text-right">
-                    {(() => {
-                        const converted = convertCurrency(asset.totalValue, asset.totalValueCurrency, displayCurrency, fxRates);
-                        const isLiability = converted < 0;
-                        return (
-                            <>
-                                <p className={cn("font-medium tabular-nums text-sm", isLiability && "text-negative")}>
-                                    {formatCurrency(converted, displayCurrency)}
-                                </p>
-                                <div className="flex items-center justify-end gap-1 mt-0.5">
-                                    {isLiability && (
-                                        <span className="text-[9px] px-1.5 py-0.5 rounded font-bold uppercase tracking-tighter bg-negative/10 text-negative">
-                                            Liability
-                                        </span>
-                                    )}
-                                    <span className={cn(
-                                        "text-[9px] px-1.5 py-0.5 rounded font-bold uppercase tracking-tighter",
-                                        asset.valueSource === 'live_price' ? "bg-positive/10 text-positive" : "bg-accent-light text-accent"
-                                    )}>
-                                        {asset.valueSource === 'live_price' ? 'Live' : asset.valueSource === 'ai_estimate' ? 'AI Estimate' : 'Manual'}
-                                    </span>
-                                </div>
-                            </>
-                        );
-                    })()}
-                </div>
+            {/* Icon */}
+            <div className="w-8 h-8 rounded-lg bg-surface-2 flex items-center justify-center text-accent shrink-0">
+                <AssetIcon asset={asset} size={14} />
             </div>
+
+            {/* Name + subtitle */}
+            <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-text-1 truncate">{asset.name}</p>
+                <p className="text-[10px] text-text-3 tabular-nums">
+                    {asset.quantity !== 1 ? `${asset.quantity} × ` : ""}
+                    {formatCurrency(asset.unitPrice, asset.unitPriceCurrency)}
+                </p>
+            </div>
+
+            {/* Held at */}
+            <div className="hidden sm:flex w-24 justify-end shrink-0">
+                {asset.source && (
+                    <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-surface-2 text-text-2 truncate max-w-full">
+                        {asset.source}
+                    </span>
+                )}
+            </div>
+
+            {/* Price source */}
+            <div className="hidden sm:flex w-16 justify-end shrink-0">
+                <span className={cn(
+                    "text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full",
+                    asset.valueSource === "live_price"
+                        ? "bg-positive/10 text-positive"
+                        : asset.valueSource === "ai_estimate"
+                        ? "bg-accent/10 text-accent"
+                        : "bg-surface-2 text-text-3"
+                )}>
+                    {asset.valueSource === "live_price" ? "Live" : asset.valueSource === "ai_estimate" ? "AI Est." : "Manual"}
+                </span>
+            </div>
+
+            {/* Value */}
+            <p className={cn("text-sm font-medium tabular-nums text-right w-32 shrink-0", isLiability && "text-negative")}>
+                {formatCurrency(converted, displayCurrency)}
+            </p>
         </div>
     );
 };
