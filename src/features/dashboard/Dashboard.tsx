@@ -317,15 +317,18 @@ export const Dashboard = ({ user, isDemo, onSignIn, onSignOut, onGoHome, onUpdat
                 </div>
 
                 {/* Portfolio Insights */}
-                <PortfolioInsights
-                    assets={assets}
-                    displayCurrency={displayCurrency}
-                    fxRates={fxRates}
-                    onOpenAdvice={isDemo ? onSignIn : () => setIsAdviceModalOpen(true)}
-                />
+                <div>
+                    <h3 className="text-xl font-serif text-text-1 mb-6">Breakdown</h3>
+                    <PortfolioInsights
+                        assets={assets}
+                        displayCurrency={displayCurrency}
+                        fxRates={fxRates}
+                        onOpenAdvice={isDemo ? onSignIn : () => setIsAdviceModalOpen(true)}
+                    />
+                </div>
 
                 {/* Asset list */}
-                <div className="border-t border-border pt-8">
+                <div>
                     <div className="flex items-center justify-between mb-6">
                         <h3 className="text-xl font-serif text-text-1">Holdings</h3>
                         <div className="flex items-center gap-2">
@@ -339,7 +342,7 @@ export const Dashboard = ({ user, isDemo, onSignIn, onSignOut, onGoHome, onUpdat
                                     Delete ({selectedAssetIds.length})
                                 </Button>
                             )}
-<div className="relative">
+                            <div className="relative">
                                 <select
                                     value={sortBy}
                                     onChange={(e) => setSortBy(e.target.value as any)}
