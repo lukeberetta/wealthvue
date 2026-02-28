@@ -1,9 +1,16 @@
-import React from "react";
-import { Sparkles, Upload, Loader2, Check, Briefcase, Coins, Car, Home, Wallet, MoreHorizontal, AlertCircle } from "lucide-react";
-import { Modal } from "../../../components/ui/Modal";
-import { Button } from "../../../components/ui/Button";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import {
+    Briefcase, Coins, Car, Home, Wallet, MoreHorizontal,
+    AlertCircle, ChevronDown, Check, X, ImagePlus, ArrowRight,
+    ShieldAlert, MessageSquareText, Pencil
+} from "lucide-react";
+import { motion, AnimatePresence, useReducedMotion } from "motion/react";
 import { Asset } from "../../../types";
 import { formatCurrency, cn } from "../../../lib/utils";
+
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
 
 interface AddAssetModalProps {
     isOpen: boolean;
@@ -15,10 +22,334 @@ interface AddAssetModalProps {
     onFileUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
     onAnalyze: () => void;
     draftAssets: Partial<Asset>[];
+    onUpdateDraft: (index: number, updated: Partial<Asset>) => void;
     onDiscardDrafts: () => void;
     onSaveDrafts: () => void;
     displayCurrency: string;
 }
+
+type InputMode = "text" | "image";
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+const ASSET_ICONS: Record<string, React.ReactNode> = {
+    stock: <Briefcase size={17} />,
+    crypto: <Coins size={17} />,
+    vehicle: <Car size={17} />,
+    property: <Home size={17} />,
+    cash: <Wallet size={17} />,
+};
+
+const getIcon = (type?: string) => ASSET_ICONS[type ?? ""] ?? <MoreHorizontal size={17} />;
+
+const ANALYSIS_MESSAGES = [
+    "Reading your input…",
+    "Identifying the asset…",
+    "Checking market data…",
+    "Estimating current value…",
+    "Finalising results…",
+];
+
+const CONFIDENCE_CONFIG = {
+    high: { label: "High confidence", cls: "text-positive bg-positive/10 border-positive/20" },
+    medium: { label: "Medium confidence", cls: "text-amber-600 bg-amber-50 border-amber-200" },
+    low: { label: "Low confidence", cls: "text-negative bg-negative/10 border-negative/20" },
+};
+
+// ---------------------------------------------------------------------------
+// Sub-components
+// ---------------------------------------------------------------------------
+
+/** Animated geometric orb */
+function AnalysisOrb({ reduced }: { reduced: boolean }) {
+    if (reduced) {
+        return (
+            <div className="flex items-center justify-center py-16">
+                <div className="w-14 h-14 rounded-full border-4 border-accent border-t-transparent animate-spin" />
+            </div>
+        );
+    }
+    return (
+        <div className="relative flex items-center justify-center" style={{ width: 192, height: 192 }}>
+            <motion.div className="absolute rounded-full border border-accent/12"
+                style={{ width: 192, height: 192 }}
+                animate={{ rotate: 360 }}
+                transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+            />
+            <motion.div className="absolute rounded-full"
+                style={{ width: 148, height: 148, border: "1.5px dashed", borderColor: "rgba(201,100,66,0.22)" }}
+                animate={{ rotate: -360 }}
+                transition={{ duration: 13, repeat: Infinity, ease: "linear" }}
+            />
+            <motion.div className="absolute" style={{ width: 116, height: 116 }}
+                animate={{ rotate: 360 }}
+                transition={{ duration: 5, repeat: Infinity, ease: "linear" }}
+            >
+                <svg viewBox="0 0 116 116" className="w-full h-full">
+                    <circle cx="58" cy="58" r="54" fill="none" strokeWidth="2.5"
+                        stroke="#C96442" strokeDasharray="75 265" strokeLinecap="round" opacity="0.75" />
+                </svg>
+            </motion.div>
+            <motion.div className="absolute" style={{ width: 84, height: 84 }}
+                animate={{ rotate: -360 }}
+                transition={{ duration: 7.5, repeat: Infinity, ease: "linear" }}
+            >
+                <svg viewBox="0 0 84 84" className="w-full h-full">
+                    <circle cx="42" cy="42" r="38" fill="none" strokeWidth="2"
+                        stroke="#C96442" strokeDasharray="36 200" strokeLinecap="round" opacity="0.35" />
+                </svg>
+            </motion.div>
+            <motion.div className="absolute rounded-full bg-accent"
+                style={{ width: 26, height: 26 }}
+                animate={{ scale: [1, 1.2, 1], opacity: [0.75, 1, 0.75] }}
+                transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
+            />
+            <motion.div className="absolute" style={{ width: 116, height: 116 }}
+                animate={{ rotate: 360 }}
+                transition={{ duration: 3.5, repeat: Infinity, ease: "linear" }}
+            >
+                <div className="absolute w-2.5 h-2.5 bg-accent rounded-full shadow"
+                    style={{ top: 0, left: "calc(50% - 5px)" }} />
+            </motion.div>
+        </div>
+    );
+}
+
+/** Cycling messages */
+function AnalysisMessages({ reduced }: { reduced: boolean }) {
+    const [index, setIndex] = useState(0);
+    useEffect(() => {
+        const id = setInterval(() => setIndex(i => (i + 1) % ANALYSIS_MESSAGES.length), 2200);
+        return () => clearInterval(id);
+    }, []);
+
+    if (reduced) return <p className="text-sm text-text-2 text-center">{ANALYSIS_MESSAGES[index]}</p>;
+
+    return (
+        <div className="h-6 overflow-hidden relative">
+            <AnimatePresence mode="wait">
+                <motion.p key={index}
+                    initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.32 }}
+                    className="text-sm text-text-2 text-center absolute inset-x-0"
+                >
+                    {ANALYSIS_MESSAGES[index]}
+                </motion.p>
+            </AnimatePresence>
+        </div>
+    );
+}
+
+/** Inline editable number field */
+function EditableNumber({
+    value,
+    currency,
+    label,
+    onChange,
+}: {
+    value: number;
+    currency: string;
+    label: string;
+    onChange: (n: number) => void;
+}) {
+    const [editing, setEditing] = useState(false);
+    const [raw, setRaw] = useState(String(value));
+    const inputRef = useRef<HTMLInputElement>(null);
+
+    useEffect(() => { if (editing) inputRef.current?.focus(); }, [editing]);
+
+    const commit = () => {
+        const parsed = parseFloat(raw.replace(/[^0-9.]/g, ""));
+        if (!isNaN(parsed)) onChange(parsed);
+        setEditing(false);
+    };
+
+    return (
+        <div className="text-right">
+            <p className="text-[10px] text-text-3 font-medium uppercase tracking-wider mb-0.5">{label}</p>
+            {editing ? (
+                <div className="flex items-center justify-end gap-1">
+                    <span className="text-xs text-text-3">{currency}</span>
+                    <input
+                        ref={inputRef}
+                        value={raw}
+                        onChange={e => setRaw(e.target.value)}
+                        onBlur={commit}
+                        onKeyDown={e => { if (e.key === "Enter") commit(); if (e.key === "Escape") setEditing(false); }}
+                        className="w-28 text-right font-serif text-base text-text-1 bg-surface border-b border-accent/50 focus:outline-none tabular-nums"
+                    />
+                </div>
+            ) : (
+                <button
+                    onClick={() => { setRaw(String(value)); setEditing(true); }}
+                    className="group flex items-center justify-end gap-1 text-right"
+                    title={`Edit ${label}`}
+                >
+                    <span className="font-serif text-base tabular-nums text-text-1 group-hover:text-accent transition-colors">
+                        {formatCurrency(value, currency)}
+                    </span>
+                    <Pencil size={11} className="text-text-3 opacity-0 group-hover:opacity-60 transition-opacity" />
+                </button>
+            )}
+        </div>
+    );
+}
+
+/** Draft card with editable pricing */
+function DraftCard({
+    asset,
+    index,
+    displayCurrency,
+    reduced,
+    onUpdate,
+}: {
+    asset: Partial<Asset>;
+    index: number;
+    displayCurrency: string;
+    reduced: boolean;
+    onUpdate: (updated: Partial<Asset>) => void;
+}) {
+    const [nameEditing, setNameEditing] = useState(false);
+    const [name, setName] = useState(asset.name ?? "");
+    const [rationaleOpen, setRationaleOpen] = useState(false);
+    const nameInputRef = useRef<HTMLInputElement>(null);
+
+    useEffect(() => { if (nameEditing) nameInputRef.current?.focus(); }, [nameEditing]);
+
+    const confidence = asset.aiConfidence ?? "medium";
+    const conf = CONFIDENCE_CONFIG[confidence];
+    const priceCurrency = asset.unitPriceCurrency ?? displayCurrency;
+    const totalCurrency = asset.totalValueCurrency ?? displayCurrency;
+    const qty = asset.quantity ?? 1;
+
+    const handleUnitPriceChange = (newUnitPrice: number) => {
+        onUpdate({ ...asset, unitPrice: newUnitPrice, totalValue: newUnitPrice * qty });
+    };
+    const handleTotalValueChange = (newTotal: number) => {
+        onUpdate({ ...asset, totalValue: newTotal, unitPrice: qty > 0 ? newTotal / qty : newTotal });
+    };
+
+    return (
+        <motion.div
+            initial={reduced ? {} : { opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: index * 0.09, ease: [0.16, 1, 0.3, 1] }}
+            className="bg-surface border border-border rounded-2xl overflow-hidden shadow-sm"
+        >
+            {/* Main row */}
+            <div className="p-5 flex items-start gap-4">
+                {/* Icon */}
+                <div className="mt-0.5 w-9 h-9 rounded-xl bg-accent-light flex items-center justify-center text-accent shrink-0">
+                    {getIcon(asset.assetType)}
+                </div>
+
+                {/* Name + meta */}
+                <div className="flex-1 min-w-0">
+                    <div className="group cursor-text" onClick={() => setNameEditing(true)}>
+                        {nameEditing ? (
+                            <input
+                                ref={nameInputRef}
+                                value={name}
+                                onChange={e => setName(e.target.value)}
+                                onBlur={() => { setNameEditing(false); onUpdate({ ...asset, name }); }}
+                                onKeyDown={e => { if (e.key === "Enter") { setNameEditing(false); onUpdate({ ...asset, name }); } }}
+                                className="font-serif text-lg text-text-1 bg-transparent border-b border-accent/40 focus:outline-none w-full"
+                            />
+                        ) : (
+                            <h3 className="font-serif text-lg text-text-1 group-hover:text-accent transition-colors leading-tight">
+                                {name}
+                                <span className="ml-1.5 opacity-0 group-hover:opacity-40 transition-opacity text-sm font-sans font-normal">✎</span>
+                            </h3>
+                        )}
+                    </div>
+                    <div className="flex items-center flex-wrap gap-x-2 gap-y-1 mt-1">
+                        <span className="text-xs text-text-3 font-medium capitalize">{asset.assetType}</span>
+                        {asset.ticker && (
+                            <>
+                                <span className="text-text-3 text-xs">·</span>
+                                <span className="text-xs font-bold text-accent bg-accent-light/60 px-1.5 py-0.5 rounded">{asset.ticker}</span>
+                            </>
+                        )}
+                        {qty > 1 && (
+                            <>
+                                <span className="text-text-3 text-xs">·</span>
+                                <span className="text-xs text-text-3">{qty} units</span>
+                            </>
+                        )}
+                    </div>
+                </div>
+
+                {/* Editable pricing */}
+                <div className="shrink-0 flex flex-col gap-2 items-end">
+                    <EditableNumber
+                        value={asset.totalValue ?? 0}
+                        currency={totalCurrency}
+                        label="Total value"
+                        onChange={handleTotalValueChange}
+                    />
+                    {qty > 1 && (
+                        <EditableNumber
+                            value={asset.unitPrice ?? 0}
+                            currency={priceCurrency}
+                            label="Per unit"
+                            onChange={handleUnitPriceChange}
+                        />
+                    )}
+                </div>
+            </div>
+
+            {/* Footer: confidence + rationale toggle */}
+            <div className="border-t border-border/50 px-5 py-2.5 flex items-center justify-between gap-4 bg-surface-2/25">
+                <span className={cn(
+                    "inline-flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider px-2.5 py-1 rounded-full border",
+                    conf.cls
+                )}>
+                    {confidence === "low" && <ShieldAlert size={10} />}
+                    {confidence === "high" && <Check size={10} />}
+                    {conf.label}
+                </span>
+
+                {asset.aiRationale && (
+                    <button
+                        onClick={() => setRationaleOpen(o => !o)}
+                        className="flex items-center gap-1 text-[11px] font-medium text-text-3 hover:text-text-1 transition-colors"
+                    >
+                        AI reasoning
+                        <ChevronDown size={11} className={cn("transition-transform", rationaleOpen && "rotate-180")} />
+                    </button>
+                )}
+            </div>
+
+            <AnimatePresence>
+                {rationaleOpen && asset.aiRationale && (
+                    <motion.div
+                        initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.22, ease: "easeInOut" }}
+                        className="overflow-hidden"
+                    >
+                        <p className="px-5 py-4 text-xs text-text-2 leading-relaxed border-t border-border/40 bg-surface-2/20">
+                            {asset.aiRationale}
+                        </p>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {confidence === "low" && (
+                <div className="px-5 py-2.5 border-t border-negative/10 bg-negative/5">
+                    <p className="text-[11px] text-negative font-medium">
+                        Low confidence — please verify and adjust the value above before saving.
+                    </p>
+                </div>
+            )}
+        </motion.div>
+    );
+}
+
+// ---------------------------------------------------------------------------
+// Main component
+// ---------------------------------------------------------------------------
 
 export const AddAssetModal = ({
     isOpen,
@@ -30,144 +361,373 @@ export const AddAssetModal = ({
     onFileUpload,
     onAnalyze,
     draftAssets,
+    onUpdateDraft,
     onDiscardDrafts,
     onSaveDrafts,
-    displayCurrency
+    displayCurrency,
 }: AddAssetModalProps) => {
-    const getIcon = (type?: string) => {
-        switch (type) {
-            case 'stock': return <Briefcase size={20} />;
-            case 'crypto': return <Coins size={20} />;
-            case 'vehicle': return <Car size={20} />;
-            case 'property': return <Home size={20} />;
-            case 'cash': return <Wallet size={20} />;
-            default: return <MoreHorizontal size={20} />;
+    const reduced = useReducedMotion() ?? false;
+
+    const [inputMode, setInputMode] = useState<InputMode>("text");
+    const [isDragOver, setIsDragOver] = useState(false);
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+    const state: "input" | "analyzing" | "result" =
+        isAnalyzing ? "analyzing" :
+            draftAssets.length > 0 ? "result" : "input";
+
+    const hasText = inputText.trim().length > 0;
+    const hasImage = !!imagePreview;
+    const canSubmit = inputMode === "text" ? hasText : hasImage;
+
+    // Autofocus on open
+    useEffect(() => {
+        if (isOpen && state === "input" && inputMode === "text") {
+            setTimeout(() => textareaRef.current?.focus(), 120);
         }
-    };
+    }, [isOpen, state, inputMode]);
+
+    // Auto-grow textarea
+    const handleTextareaInput = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        const el = e.target;
+        el.style.height = "auto";
+        el.style.height = el.scrollHeight + "px";
+        onInputTextChange(el.value);
+    }, [onInputTextChange]);
+
+    // ⌘+Enter submit
+    const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        if ((e.metaKey || e.ctrlKey) && e.key === "Enter") {
+            e.preventDefault();
+            if (canSubmit && !isAnalyzing) onAnalyze();
+        }
+    }, [canSubmit, isAnalyzing, onAnalyze]);
+
+    // Drag & drop
+    const handleDragOver = useCallback((e: React.DragEvent) => { e.preventDefault(); setIsDragOver(true); }, []);
+    const handleDragLeave = useCallback(() => setIsDragOver(false), []);
+    const handleDrop = useCallback((e: React.DragEvent) => {
+        e.preventDefault(); setIsDragOver(false);
+        const file = e.dataTransfer.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => setImagePreview(reader.result as string);
+        reader.readAsDataURL(file);
+        const dt = new DataTransfer(); dt.items.add(file);
+        onFileUpload({ target: { files: dt.files } } as unknown as React.ChangeEvent<HTMLInputElement>);
+    }, [onFileUpload]);
+
+    const handleFileInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) { const r = new FileReader(); r.onload = () => setImagePreview(r.result as string); r.readAsDataURL(file); }
+        onFileUpload(e);
+    }, [onFileUpload]);
+
+    // ESC
+    useEffect(() => {
+        if (!isOpen) return;
+        const handler = (e: KeyboardEvent) => {
+            if (e.key !== "Escape") return;
+            if (state === "result") { if (window.confirm("Discard results and go back?")) onDiscardDrafts(); }
+            else if (state === "input") onClose();
+        };
+        window.addEventListener("keydown", handler);
+        return () => window.removeEventListener("keydown", handler);
+    }, [isOpen, state, onClose, onDiscardDrafts]);
+
+    useEffect(() => { if (!isOpen) setImagePreview(null); }, [isOpen]);
+
+    if (!isOpen) return null;
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title="Add Asset">
-            <div className="space-y-8">
-                {draftAssets.length === 0 ? (
-                    <div className="space-y-6">
-                        <div className="bg-accent-light/30 p-6 rounded-2xl border border-accent/10">
-                            <div className="flex items-center gap-3 mb-4">
-                                <div className="w-8 h-8 bg-accent rounded-lg flex items-center justify-center text-white">
-                                    <Sparkles size={18} />
-                                </div>
-                                <h4 className="font-serif text-lg">AI-Powered Input</h4>
-                            </div>
-                            <p className="text-sm text-text-2 mb-6">
-                                Describe your asset in plain English or upload a screenshot from any investment app.
+        <div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            style={{ background: "rgba(10,8,6,0.55)" }}
+            onClick={e => { if (e.target === e.currentTarget && state === "input") onClose(); }}
+        >
+            <div className="absolute inset-0 backdrop-blur-sm pointer-events-none" />
+
+            <AnimatePresence mode="wait">
+                <motion.div
+                    key="modal-shell"
+                    initial={reduced ? {} : { opacity: 0, scale: 0.96, y: 24 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={reduced ? {} : { opacity: 0, scale: 0.96, y: 24 }}
+                    transition={{ duration: 0.38, ease: [0.16, 1, 0.3, 1] }}
+                    className="relative bg-surface w-full max-w-xl rounded-3xl shadow-2xl overflow-hidden z-10"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-label="Add Asset"
+                >
+                    {/* ── Header ── */}
+                    <div className="flex items-center justify-between px-7 pt-7 pb-0">
+                        <div>
+                            <h2 className="font-serif text-2xl text-text-1">Add Asset</h2>
+                            <p className="text-xs text-text-3 mt-0.5 font-medium">
+                                {state === "input" && "Describe your asset or upload a screenshot"}
+                                {state === "analyzing" && "AI is thinking…"}
+                                {state === "result" && `${draftAssets.length} asset${draftAssets.length !== 1 ? "s" : ""} found — review and adjust before saving`}
                             </p>
-
-                            <div className="space-y-4">
-                                <textarea
-                                    className="w-full h-32 p-4 bg-surface border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-accent/20 resize-none text-sm leading-relaxed"
-                                    placeholder="E.g.: 'I have 15 shares of Apple' or '2020 VW Polo 1.0 with 50,000km'..."
-                                    value={inputText}
-                                    onChange={(e) => onInputTextChange(e.target.value)}
-                                    disabled={isAnalyzing}
-                                />
-
-                                <div className="flex items-center gap-4">
-                                    <div className="flex-1 h-px bg-border" />
-                                    <span className="text-[10px] font-bold text-text-3 uppercase tracking-widest">OR</span>
-                                    <div className="flex-1 h-px bg-border" />
-                                </div>
-
-                                <label className={cn(
-                                    "flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-border rounded-2xl cursor-pointer hover:bg-surface-2 transition-all group",
-                                    isAnalyzing && "opacity-50 pointer-events-none"
-                                )}>
-                                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                                        <Upload className="w-8 h-8 text-text-3 group-hover:text-accent transition-colors mb-2" />
-                                        <p className="text-xs font-medium text-text-2">Upload screenshot</p>
-                                        <p className="text-[10px] text-text-3 mt-1 uppercase tracking-tighter">PNG, JPG up to 10MB</p>
-                                    </div>
-                                    <input type="file" className="hidden" accept="image/*" onChange={onFileUpload} />
-                                </label>
-                            </div>
                         </div>
+                        <button
+                            id="add-asset-close"
+                            onClick={() => {
+                                if (state === "result") { if (window.confirm("Discard results?")) { onDiscardDrafts(); onClose(); } }
+                                else onClose();
+                            }}
+                            className="w-8 h-8 flex items-center justify-center rounded-full text-text-3 hover:text-text-1 hover:bg-surface-2 transition-colors"
+                            aria-label="Close"
+                        >
+                            <X size={18} />
+                        </button>
+                    </div>
 
-                        {analysisError && (
-                            <div className="bg-negative/5 p-4 rounded-xl border border-negative/20 flex items-center gap-3 animate-in fade-in slide-in-from-top-2">
-                                <div className="w-8 h-8 bg-negative/10 rounded-full flex items-center justify-center text-negative shrink-0">
-                                    <AlertCircle size={18} />
+                    {/* ── Body ── */}
+                    <AnimatePresence mode="wait">
+
+                        {/* ═══════════ STATE 1: INPUT ═══════════ */}
+                        {state === "input" && (
+                            <motion.div
+                                key="input"
+                                initial={reduced ? {} : { opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={reduced ? {} : { opacity: 0 }}
+                                transition={{ duration: 0.2 }}
+                                className="px-7 pt-6 pb-7 space-y-5"
+                            >
+                                {/* Mode toggle — pill switcher */}
+                                <div className="flex bg-surface-2 rounded-2xl p-1 gap-1">
+                                    {(["text", "image"] as InputMode[]).map(mode => (
+                                        <button
+                                            key={mode}
+                                            onClick={() => setInputMode(mode)}
+                                            className={cn(
+                                                "flex-1 flex items-center justify-center gap-2 py-2 rounded-xl text-sm font-semibold transition-all duration-200",
+                                                inputMode === mode
+                                                    ? "bg-surface text-text-1 shadow-sm"
+                                                    : "text-text-3 hover:text-text-2"
+                                            )}
+                                        >
+                                            {mode === "text"
+                                                ? <><MessageSquareText size={15} /> Describe</>
+                                                : <><ImagePlus size={15} /> Upload screenshot</>
+                                            }
+                                        </button>
+                                    ))}
                                 </div>
-                                <p className="text-sm font-medium text-negative">{analysisError}</p>
-                            </div>
+
+                                {/* ── TEXT MODE ── */}
+                                <AnimatePresence mode="wait">
+                                    {inputMode === "text" && (
+                                        <motion.div
+                                            key="text-mode"
+                                            initial={reduced ? {} : { opacity: 0, x: -8 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            exit={reduced ? {} : { opacity: 0, x: -8 }}
+                                            transition={{ duration: 0.2 }}
+                                            className="relative"
+                                        >
+                                            <textarea
+                                                ref={textareaRef}
+                                                id="add-asset-input"
+                                                value={inputText}
+                                                onChange={handleTextareaInput}
+                                                onKeyDown={handleKeyDown}
+                                                disabled={isAnalyzing}
+                                                rows={4}
+                                                placeholder={"Tell me about an asset…\ne.g. \"15 Apple shares\" or \"2021 Toyota Corolla, 42 000 km\""}
+                                                className="w-full resize-none bg-surface-2/50 border border-border rounded-2xl text-text-1 placeholder:text-text-3 text-base leading-relaxed focus:outline-none focus:ring-2 focus:ring-accent/20 p-4 transition-all duration-300"
+                                                style={{ minHeight: 100 }}
+                                            />
+                                            <AnimatePresence>
+                                                {hasText && (
+                                                    <motion.span
+                                                        initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+                                                        className="absolute bottom-3 right-4 text-[10px] text-text-3 font-medium pointer-events-none select-none"
+                                                    >
+                                                        ⌘↵ to analyse
+                                                    </motion.span>
+                                                )}
+                                            </AnimatePresence>
+                                        </motion.div>
+                                    )}
+
+                                    {/* ── IMAGE MODE ── */}
+                                    {inputMode === "image" && (
+                                        <motion.div
+                                            key="image-mode"
+                                            initial={reduced ? {} : { opacity: 0, x: 8 }}
+                                            animate={{ opacity: 1, x: 0 }}
+                                            exit={reduced ? {} : { opacity: 0, x: 8 }}
+                                            transition={{ duration: 0.2 }}
+                                        >
+                                            <label
+                                                htmlFor="add-asset-file"
+                                                onDragOver={handleDragOver}
+                                                onDragLeave={handleDragLeave}
+                                                onDrop={handleDrop}
+                                                className={cn(
+                                                    "relative flex flex-col items-center justify-center w-full rounded-2xl cursor-pointer overflow-hidden",
+                                                    "border-2 border-dashed transition-all duration-300",
+                                                    isDragOver
+                                                        ? "border-accent bg-accent-light/20 scale-[1.01]"
+                                                        : imagePreview
+                                                            ? "border-border bg-surface-2/40"
+                                                            : "border-border hover:border-accent/40 hover:bg-surface-2/50",
+                                                )}
+                                                style={{ minHeight: 140 }}
+                                                aria-label="Upload screenshot"
+                                            >
+                                                {isDragOver && (
+                                                    <motion.div
+                                                        className="absolute inset-0 bg-gradient-to-r from-accent/5 via-accent/12 to-accent/5"
+                                                        animate={{ x: ["-100%", "100%"] }}
+                                                        transition={{ duration: 1.1, repeat: Infinity, ease: "linear" }}
+                                                    />
+                                                )}
+
+                                                {imagePreview ? (
+                                                    <div className="relative w-full p-3">
+                                                        <img src={imagePreview} alt="Preview"
+                                                            className="w-full max-h-40 object-contain rounded-xl border border-border" />
+                                                        <button
+                                                            type="button"
+                                                            onClick={e => { e.preventDefault(); setImagePreview(null); if (fileInputRef.current) fileInputRef.current.value = ""; }}
+                                                            className="absolute top-5 right-5 w-6 h-6 bg-surface rounded-full flex items-center justify-center text-text-3 hover:text-negative border border-border/60 transition-colors shadow-sm"
+                                                            aria-label="Remove screenshot"
+                                                        >
+                                                            <X size={12} />
+                                                        </button>
+                                                        <p className="text-xs text-center text-text-3 mt-2 font-medium">AI will extract all visible assets</p>
+                                                    </div>
+                                                ) : (
+                                                    <div className="flex flex-col items-center gap-3 py-8 px-6 text-center">
+                                                        <div className={cn(
+                                                            "w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300",
+                                                            isDragOver ? "bg-accent-light text-accent" : "bg-surface-2 text-text-3"
+                                                        )}>
+                                                            <ImagePlus size={22} />
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-sm font-semibold text-text-2">
+                                                                {isDragOver ? "Drop it here" : "Drag & drop or click to browse"}
+                                                            </p>
+                                                            <p className="text-xs text-text-3 mt-1">PNG, JPG, WEBP · up to 10 MB</p>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </label>
+                                            <input
+                                                id="add-asset-file"
+                                                ref={fileInputRef}
+                                                type="file"
+                                                accept="image/*"
+                                                className="sr-only"
+                                                onChange={handleFileInputChange}
+                                                tabIndex={-1}
+                                            />
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+
+                                {/* Error */}
+                                <AnimatePresence>
+                                    {analysisError && (
+                                        <motion.div
+                                            initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }}
+                                            className="flex items-start gap-3 bg-negative/5 border border-negative/20 rounded-xl px-4 py-3"
+                                        >
+                                            <AlertCircle size={15} className="text-negative mt-0.5 shrink-0" />
+                                            <p className="text-sm text-negative">{analysisError}</p>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+
+                                {/* Submit */}
+                                <button
+                                    id="add-asset-analyze"
+                                    onClick={onAnalyze}
+                                    disabled={!canSubmit || isAnalyzing}
+                                    className={cn(
+                                        "w-full flex items-center justify-center gap-2.5 py-3.5 rounded-2xl",
+                                        "text-sm font-semibold bg-accent text-white shadow-md shadow-accent/20",
+                                        "hover:opacity-90 active:scale-[0.98] transition-all duration-200",
+                                        "disabled:opacity-40 disabled:pointer-events-none"
+                                    )}
+                                >
+                                    <span>Analyse with AI</span>
+                                    <ArrowRight size={16} />
+                                </button>
+                            </motion.div>
                         )}
 
-                        <Button
-                            className="w-full py-4 rounded-xl flex items-center justify-center gap-2 text-lg font-medium shadow-lg shadow-accent/10"
-                            onClick={onAnalyze}
-                            disabled={isAnalyzing || !inputText.trim()}
-                        >
-                            {isAnalyzing ? <Loader2 className="animate-spin" size={20} /> : <Sparkles size={20} />}
-                            {isAnalyzing ? "AI is analyzing..." : "Analyze with AI"}
-                        </Button>
-                    </div>
-                ) : (
-                    <div className="space-y-6">
-                        <div className="bg-positive/5 p-4 rounded-xl border border-positive/20 flex items-center gap-3">
-                            <div className="w-8 h-8 bg-positive/10 rounded-full flex items-center justify-center text-positive">
-                                <Check size={18} />
-                            </div>
-                            <div>
-                                <p className="text-sm font-medium text-positive">Analysis Complete</p>
-                                <p className="text-xs text-text-3">Review the detected assets below before saving.</p>
-                            </div>
-                        </div>
-
-                        <div className="space-y-3">
-                            {draftAssets.map((asset, idx) => (
-                                <div key={idx} className="bg-surface-2/50 p-4 rounded-xl border border-border flex items-center justify-between">
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-10 h-10 bg-surface rounded-lg flex items-center justify-center text-accent">
-                                            {getIcon(asset.assetType)}
-                                        </div>
-                                        <div>
-                                            <p className="font-medium text-sm">{asset.name}</p>
-                                            <div className="flex items-center gap-2">
-                                                <p className="text-[10px] font-bold text-text-3 uppercase tracking-tighter">
-                                                    {asset.quantity && asset.quantity > 1 ? `${asset.quantity} units · ` : ''}
-                                                    {formatCurrency(asset.unitPrice || 0, asset.unitPriceCurrency || displayCurrency)}
-                                                </p>
-                                                {asset.source && (
-                                                    <>
-                                                        <span className="text-text-3">·</span>
-                                                        <span className="text-[9px] font-bold text-accent uppercase tracking-tighter bg-accent-light/50 px-1 rounded">
-                                                            {asset.source}
-                                                        </span>
-                                                    </>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="text-right">
-                                        <p className="font-medium tabular-nums text-sm">
-                                            {formatCurrency(asset.totalValue || 0, asset.totalValueCurrency || displayCurrency)}
-                                        </p>
-                                        <span className="text-[9px] px-1.5 py-0.5 rounded bg-accent-light text-accent font-bold uppercase tracking-tighter">
-                                            AI Estimate
-                                        </span>
-                                    </div>
+                        {/* ═══════════ STATE 2: ANALYZING ═══════════ */}
+                        {state === "analyzing" && (
+                            <motion.div
+                                key="analyzing"
+                                initial={reduced ? {} : { opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={reduced ? {} : { opacity: 0 }}
+                                transition={{ duration: 0.3 }}
+                                className="px-7 pt-4 pb-12 flex flex-col items-center gap-7"
+                            >
+                                <AnalysisOrb reduced={reduced} />
+                                <div className="text-center space-y-2">
+                                    <AnalysisMessages reduced={reduced} />
+                                    <p className="text-[11px] text-text-3">Using live market data to estimate value</p>
                                 </div>
-                            ))}
-                        </div>
+                            </motion.div>
+                        )}
 
-                        <div className="flex gap-3">
-                            <Button variant="secondary" className="flex-1 py-3 rounded-xl" onClick={onDiscardDrafts}>
-                                Discard
-                            </Button>
-                            <Button className="flex-[2] py-3 rounded-xl" onClick={onSaveDrafts}>
-                                Save to Portfolio
-                            </Button>
-                        </div>
-                    </div>
-                )}
-            </div>
-        </Modal>
+                        {/* ═══════════ STATE 3: RESULT ═══════════ */}
+                        {state === "result" && (
+                            <motion.div
+                                key="result"
+                                initial={reduced ? {} : { opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={reduced ? {} : { opacity: 0 }}
+                                transition={{ duration: 0.25 }}
+                                className="px-7 pt-5 pb-7 space-y-4"
+                            >
+                                <div className="space-y-3 max-h-[56vh] overflow-y-auto pr-0.5 -mr-0.5">
+                                    {draftAssets.map((asset, i) => (
+                                        <React.Fragment key={i}>
+                                            <DraftCard
+                                                asset={asset}
+                                                index={i}
+                                                displayCurrency={displayCurrency}
+                                                reduced={reduced}
+                                                onUpdate={(updated) => onUpdateDraft(i, updated)}
+                                            />
+                                        </React.Fragment>
+                                    ))}
+                                </div>
+
+                                <div className="flex gap-3 pt-1">
+                                    <button
+                                        id="add-asset-discard"
+                                        onClick={onDiscardDrafts}
+                                        className="flex-1 py-3 rounded-2xl border border-border text-sm font-semibold text-text-2 hover:bg-surface-2 transition-colors"
+                                    >
+                                        Try again
+                                    </button>
+                                    <button
+                                        id="add-asset-save"
+                                        onClick={onSaveDrafts}
+                                        className="flex-[2] flex items-center justify-center gap-2 py-3 rounded-2xl bg-accent text-white text-sm font-semibold hover:opacity-90 active:scale-[0.98] transition-all duration-200"
+                                    >
+                                        <Check size={16} />
+                                        {draftAssets.length > 1 ? `Save all ${draftAssets.length} assets` : "Save to portfolio"}
+                                    </button>
+                                </div>
+                            </motion.div>
+                        )}
+
+                    </AnimatePresence>
+                </motion.div>
+            </AnimatePresence>
+        </div>
     );
 };

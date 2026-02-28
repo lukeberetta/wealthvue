@@ -300,6 +300,9 @@ export const Dashboard = ({ user, isDemo, onSignOut, onGoHome, onUpdateUser }: D
                 onFileUpload={handleFileUpload}
                 onAnalyze={handleAddAsset}
                 draftAssets={draftAssets}
+                onUpdateDraft={(index, updated) => {
+                    setDraftAssets(prev => prev.map((d, i) => i === index ? { ...d, ...updated } : d));
+                }}
                 onDiscardDrafts={() => setDraftAssets([])}
                 onSaveDrafts={handleSaveDrafts}
                 displayCurrency={displayCurrency}
