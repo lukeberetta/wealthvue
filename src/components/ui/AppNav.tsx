@@ -3,31 +3,8 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
 import { ChevronDown, Settings, LogOut, LayoutDashboard, Globe } from "lucide-react";
 import { User } from "../../types";
-import { cn } from "../../lib/utils";
+import { cn, getInitials, avatarPalette } from "../../lib/utils";
 import { ThemeToggle } from "./ThemeToggle";
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-function getInitials(displayName: string): string {
-    const parts = displayName.trim().split(/\s+/);
-    if (parts.length === 1) return parts[0][0].toUpperCase();
-    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-}
-
-// Consistent warm background for each initials string (deterministic)
-const AVATAR_PALETTES = [
-    "bg-[#8B6B52] text-[#F0EBE3]",
-    "bg-[#5D6B52] text-[#F0EBE3]",
-    "bg-[#526B6B] text-[#F0EBE3]",
-    "bg-[#6B525D] text-[#F0EBE3]",
-    "bg-[#6B6B52] text-[#F0EBE3]",
-];
-function avatarPalette(name: string) {
-    let hash = 0;
-    for (const c of name) hash = ((hash << 5) - hash) + c.charCodeAt(0);
-    return AVATAR_PALETTES[Math.abs(hash) % AVATAR_PALETTES.length];
-}
 
 // ---------------------------------------------------------------------------
 // Props

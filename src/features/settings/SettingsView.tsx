@@ -4,6 +4,7 @@ import { User } from "../../types";
 import { Card } from "../../components/ui/Card";
 import { Button } from "../../components/ui/Button";
 import { ThemeToggle } from "../../components/ui/ThemeToggle";
+import { cn, getInitials, avatarPalette } from "../../lib/utils";
 
 interface SettingsViewProps {
     user: User | null;
@@ -49,7 +50,12 @@ export const SettingsView = ({ user, onSignOut, onBack, onUpdateUser }: Settings
                 <h3 className="text-[10px] font-bold text-text-3 uppercase tracking-[0.18em]">Profile</h3>
                 <Card className="p-6 space-y-6">
                     <div className="flex items-center gap-4">
-                        <img src={user?.photoURL} className="w-14 h-14 rounded-full border border-border" alt="Avatar" />
+                        <div className={cn(
+                            "w-14 h-14 rounded-full flex items-center justify-center text-xl font-bold shrink-0",
+                            user?.displayName ? avatarPalette(user.displayName) : "bg-surface-2 text-text-3"
+                        )}>
+                            {user?.displayName ? getInitials(user.displayName) : ""}
+                        </div>
                         <div>
                             <p className="font-medium text-text-1">{user?.displayName}</p>
                             <p className="text-sm text-text-3">{user?.email}</p>

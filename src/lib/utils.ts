@@ -42,3 +42,24 @@ export function formatCurrencyCompact(value: number, currency: string) {
     return formatCompactNumber(value) + " " + (currency || "USD");
   }
 }
+
+export function getInitials(displayName: string): string {
+  const parts = displayName.trim().split(/\s+/);
+  if (!parts.length || !parts[0]) return "";
+  if (parts.length === 1) return parts[0][0].toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
+const AVATAR_PALETTES = [
+  "bg-[#8B6B52] text-[#F0EBE3]",
+  "bg-[#5D6B52] text-[#F0EBE3]",
+  "bg-[#526B6B] text-[#F0EBE3]",
+  "bg-[#6B525D] text-[#F0EBE3]",
+  "bg-[#6B6B52] text-[#F0EBE3]",
+];
+
+export function avatarPalette(name: string) {
+  let hash = 0;
+  for (const c of name) hash = ((hash << 5) - hash) + c.charCodeAt(0);
+  return AVATAR_PALETTES[Math.abs(hash) % AVATAR_PALETTES.length];
+}
