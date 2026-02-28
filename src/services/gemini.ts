@@ -195,3 +195,40 @@ All currency fields MUST be valid ISO 4217 codes.`;
     return null;
   }
 }
+
+export async function analyzePortfolio(
+  breakdown: { assetType: string; value: number; pct: number }[],
+  totalNAV: number,
+  currency: string
+): Promise<{ summary: string; advice: string[] } | null> {
+  const breakdownTable = breakdown
+    .map(b => `- ${b.assetType}: ${b.pct.toFixed(1)}% (${currency} ${b.value.toLocaleString(undefined, { maximumFractionDigits: 0 })})`)
+    .join("\n");
+
+  const systemInstruction = `You are a sharp, senior wealth advisor — precise, direct, and never generic. You are analyzing a client's investment portfolio.
+
+Portfolio breakdown (${currency}):
+${breakdownTable}
+Total NAV: ${currency} ${totalNAV.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+
+Respond ONLY with valid JSON in this exact format:
+{
+  "summary": string,
+  "advice": string[]
+}
+
+Rules:
+- "summary": 2–3 sentences. Be specific about this portfolio's actual composition and risk profile. Do NOT use clichés like "diversification is key" — say something that only applies to THIS portfolio.
+- "advice": exactly 3–4 items. Each must be a concrete, specific recommendation that references this portfolio's actual numbers or types. No vague platitudes. Write like you're advising a real client — confident, informed, and slightly direct.
+- Do NOT wrap in markdown. Raw JSON only.`;
+
+  try {
+    const contents = `Analyse this portfolio and return the JSON.`;
+    const response = await callAIWithRotation(contents, systemInstruction, false);
+    const cleanedText = response.text.replace(/```json\n?/, "").replace(/```\n?$/, "").trim();
+    return JSON.parse(cleanedText || "null");
+  } catch (error) {
+    console.error("Error analyzing portfolio:", error);
+    throw error;
+  }
+}

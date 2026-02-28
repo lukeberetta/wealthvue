@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
     Plus,
     RefreshCw,
@@ -15,11 +15,12 @@ import { AppNav } from "../../components/ui/AppNav";
 import { Footer } from "../../components/ui/Footer";
 import { SettingsView } from "../settings/SettingsView";
 import { useDashboard } from "./hooks/useDashboard";
-import { AssetAllocationChart } from "./components/AssetAllocationChart";
-import { PerformanceChart } from "./components/PerformanceChart";
+import { PortfolioInsights, getArchetype } from "./components/PortfolioInsights";
+import { PortfolioAdviceModal } from "./components/PortfolioAdviceModal";
 import { AssetList } from "./components/AssetList";
 import { AddAssetModal } from "./components/AddAssetModal";
 import { EditAssetModal } from "./components/EditAssetModal";
+import { convertCurrency } from "../../lib/fx";
 
 interface DashboardProps {
     user: User | null;
@@ -30,9 +31,10 @@ interface DashboardProps {
 }
 
 export const Dashboard = ({ user, isDemo, onSignOut, onGoHome, onUpdateUser }: DashboardProps) => {
+    const [isAdviceModalOpen, setIsAdviceModalOpen] = useState(false);
+
     const {
         assets,
-        navHistory,
         displayCurrency,
         setDisplayCurrency,
         fxRates,
@@ -77,6 +79,18 @@ export const Dashboard = ({ user, isDemo, onSignOut, onGoHome, onUpdateUser }: D
             </div>
         );
     }
+
+    // Portfolio archetype — shared between PortfolioInsights and PortfolioAdviceModal
+    const byType: Record<string, number> = assets.reduce((acc: Record<string, number>, a: Asset) => {
+        const val = convertCurrency(a.totalValue, a.totalValueCurrency, displayCurrency, fxRates);
+        acc[a.assetType] = (acc[a.assetType] || 0) + val;
+        return acc;
+    }, {});
+    const allocationTotal: number = Object.values(byType).reduce((s: number, v: number) => s + v, 0);
+    const allocationPct: Record<string, number> = Object.fromEntries(
+        Object.entries(byType).map(([k, v]) => [k, allocationTotal > 0 ? (v / allocationTotal) * 100 : 0])
+    );
+    const archetype = getArchetype(allocationPct);
 
     // Shared nav props
     const navProps = {
@@ -173,11 +187,13 @@ export const Dashboard = ({ user, isDemo, onSignOut, onGoHome, onUpdateUser }: D
                     </div>
                 </div>
 
-                {/* Charts */}
-                <div className="grid lg:grid-cols-3 gap-6">
-                    <AssetAllocationChart assets={assets} displayCurrency={displayCurrency} fxRates={fxRates} />
-                    <PerformanceChart navHistory={navHistory} displayCurrency={displayCurrency} fxRates={fxRates} />
-                </div>
+                {/* Portfolio Insights */}
+                <PortfolioInsights
+                    assets={assets}
+                    displayCurrency={displayCurrency}
+                    fxRates={fxRates}
+                    onOpenAdvice={() => setIsAdviceModalOpen(true)}
+                />
 
                 {/* Asset list */}
                 <div className="space-y-5">
@@ -291,6 +307,17 @@ export const Dashboard = ({ user, isDemo, onSignOut, onGoHome, onUpdateUser }: D
                     isDemo={isDemo}
                 />
             )}
+
+            <PortfolioAdviceModal
+                isOpen={isAdviceModalOpen}
+                onClose={() => setIsAdviceModalOpen(false)}
+                assets={assets}
+                totalNAV={totalNAV}
+                displayCurrency={displayCurrency}
+                fxRates={fxRates}
+                archetypeTitle={archetype.title}
+                archetypeSubtitle={archetype.subtitle}
+            />
         </div>
     );
 };
