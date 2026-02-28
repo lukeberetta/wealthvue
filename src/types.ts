@@ -45,3 +45,8 @@ export interface FXCache {
   rates: { [currencyCode: string]: number };
   fetchedAt: string;
 }
+
+export interface FinancialGoal {
+  targetAmount: number;
+  currency: string;
+}

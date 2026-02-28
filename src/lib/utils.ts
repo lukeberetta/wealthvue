@@ -29,3 +29,16 @@ export function formatCompactNumber(value: number) {
     maximumFractionDigits: 1,
   }).format(value);
 }
+
+export function formatCurrencyCompact(value: number, currency: string) {
+  try {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: currency || "USD",
+      notation: "compact",
+      maximumFractionDigits: 1,
+    }).format(value);
+  } catch (e) {
+    return formatCompactNumber(value) + " " + (currency || "USD");
+  }
+}

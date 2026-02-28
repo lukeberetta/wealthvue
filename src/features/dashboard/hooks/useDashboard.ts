@@ -1,9 +1,23 @@
 import React, { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { Asset, User, NAVHistoryEntry } from "../../../types";
+import { Asset, User, NAVHistoryEntry, FinancialGoal } from "../../../types";
 import { storage } from "../../../lib/storage";
 import { fetchFXRates, convertCurrency } from "../../../lib/fx";
 import { parseTextToAsset, parseScreenshotToAssets } from "../../../services/gemini";
+
+type ChangePeriod = '1D' | '1W' | '1M' | 'All';
+
+function getPeriodAnchor(history: NAVHistoryEntry[], period: ChangePeriod): NAVHistoryEntry | null {
+    if (history.length < 2) return null;
+    const sorted = [...history].sort((a, b) => a.date.localeCompare(b.date));
+    if (period === '1D') return sorted[sorted.length - 2] ?? null;
+    if (period === 'All') return sorted[0];
+    const daysBack = period === '1W' ? 7 : 30;
+    const target = new Date();
+    target.setDate(target.getDate() - daysBack);
+    const targetStr = target.toISOString().split('T')[0];
+    return sorted.filter(e => e.date <= targetStr).at(-1) ?? sorted[0];
+}
 
 export const useDashboard = (user: User | null, isDemo: boolean) => {
     const [assets, setAssets] = useState<Asset[]>([]);
@@ -23,6 +37,9 @@ export const useDashboard = (user: User | null, isDemo: boolean) => {
     const [selectedAssetIds, setSelectedAssetIds] = useState<string[]>([]);
     const [sortBy, setSortBy] = useState<'value_desc' | 'value_asc' | 'name_asc'>('value_desc');
     const [isSelectMode, setIsSelectMode] = useState(false);
+    const [changePeriod, setChangePeriod] = useState<ChangePeriod>('1D');
+    const [goal, setGoalState] = useState<FinancialGoal | null>(null);
+    const [isEditingGoal, setIsEditingGoal] = useState(false);
 
     useEffect(() => {
         const loadData = async () => {
@@ -35,6 +52,7 @@ export const useDashboard = (user: User | null, isDemo: boolean) => {
 
             setAssets(loadedAssets);
             setNavHistory(loadedHistory);
+            setGoalState(storage.getGoal());
             setIsLoading(false);
 
             if (!isDemo && user) {
@@ -57,8 +75,10 @@ export const useDashboard = (user: User | null, isDemo: boolean) => {
         return acc + convertCurrency(asset.totalValue, asset.totalValueCurrency, displayCurrency, fxRates);
     }, 0);
 
-    const prevNAV = navHistory.length > 1 ? navHistory[navHistory.length - 2].totalNAV : totalNAV;
-    const convertedPrevNAV = convertCurrency(prevNAV, "USD", displayCurrency, fxRates);
+    const anchorEntry = getPeriodAnchor(navHistory, changePeriod);
+    const convertedPrevNAV = anchorEntry
+        ? convertCurrency(anchorEntry.totalNAV, "USD", displayCurrency, fxRates)
+        : totalNAV;
     const change = totalNAV - convertedPrevNAV;
     const changePercent = (change / (convertedPrevNAV || 1)) * 100;
 
@@ -172,6 +192,18 @@ export const useDashboard = (user: User | null, isDemo: boolean) => {
         setIsEditModalOpen(false);
     };
 
+    const handleSaveGoal = (newGoal: FinancialGoal) => {
+        setGoalState(newGoal);
+        storage.saveGoal(newGoal);
+        setIsEditingGoal(false);
+    };
+
+    const handleClearGoal = () => {
+        setGoalState(null);
+        storage.clearGoal();
+        setIsEditingGoal(false);
+    };
+
     const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (isDemo) return;
         const file = e.target.files?.[0];
@@ -246,6 +278,13 @@ export const useDashboard = (user: User | null, isDemo: boolean) => {
         totalNAV,
         change,
         changePercent,
+        changePeriod,
+        setChangePeriod,
+        goal,
+        isEditingGoal,
+        setIsEditingGoal,
+        handleSaveGoal,
+        handleClearGoal,
         sortedAssets,
         handleAddAsset,
         handleSaveDrafts,
