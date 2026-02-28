@@ -235,8 +235,6 @@ export const useDashboard = (user: User | null, isDemo: boolean) => {
         setAnalysisError,
         draftAssets,
         setDraftAssets,
-        isAccountMenuOpen,
-        setIsAccountMenuOpen,
         currentView,
         setCurrentView,
         selectedAssetIds,

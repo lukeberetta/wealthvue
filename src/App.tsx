@@ -80,7 +80,14 @@ export default function App() {
             <Routes location={location}>
               <Route
                 path="/"
-                element={<LandingPage onSignIn={() => setIsLoginModalOpen(true)} onTryDemo={handleTryDemo} />}
+                element={
+                  <LandingPage
+                    user={user}
+                    isDemo={isDemo}
+                    onSignIn={() => setIsLoginModalOpen(true)}
+                    onTryDemo={handleTryDemo}
+                    onSignOut={handleSignOut}
+                  />}
               />
               <Route
                 path="/app"

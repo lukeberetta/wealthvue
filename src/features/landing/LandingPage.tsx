@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { motion } from "motion/react";
 import {
     Briefcase, Coins, Car, Home, Wallet, MoreHorizontal,
@@ -6,53 +6,29 @@ import {
 } from "lucide-react";
 import { cn } from "../../lib/utils";
 import { useScrollReveal } from "../../hooks/useScrollReveal";
-import { ThemeToggle } from "../../components/ui/ThemeToggle";
+import { AppNav } from "../../components/ui/AppNav";
 
 interface LandingPageProps {
+    user: import("../../types").User | null;
+    isDemo?: boolean;
     onSignIn: () => void;
     onTryDemo: () => void;
+    onSignOut?: () => void;
 }
 
-export const LandingPage = ({ onSignIn, onTryDemo }: LandingPageProps) => {
+export const LandingPage = ({ user, isDemo = false, onSignIn, onTryDemo, onSignOut }: LandingPageProps) => {
     useScrollReveal();
-    const [isScrolled, setIsScrolled] = useState(false);
-
-    useEffect(() => {
-        const handleScroll = () => setIsScrolled(window.scrollY > 20);
-        window.addEventListener("scroll", handleScroll);
-        return () => window.removeEventListener("scroll", handleScroll);
-    }, []);
 
     return (
         <div className="min-h-screen bg-bg text-text-1 selection:bg-accent/20">
 
-            {/* ── Navigation ── */}
-            <nav className={cn(
-                "fixed top-0 left-0 right-0 z-50 transition-all duration-300 px-6",
-                isScrolled
-                    ? "bg-surface/80 backdrop-blur-md border-b border-border py-3 shadow-sm"
-                    : "bg-transparent py-5"
-            )}>
-                <div className="max-w-[1120px] mx-auto flex justify-between items-center">
-                    <div className="font-serif text-2xl text-accent font-semibold tracking-tight">WealthVue</div>
-                    <div className="flex items-center gap-4">
-                        <ThemeToggle variant="compact" />
-                        <div className="w-px h-5 bg-border" />
-                        <button
-                            onClick={onSignIn}
-                            className="text-sm font-medium text-text-2 hover:text-text-1 transition-colors"
-                        >
-                            Sign In
-                        </button>
-                        <button
-                            onClick={onTryDemo}
-                            className="bg-accent text-white px-5 py-2 rounded-full text-sm font-medium hover:opacity-88 transition-all shadow-md shadow-accent/20"
-                        >
-                            Try Free
-                        </button>
-                    </div>
-                </div>
-            </nav>
+            <AppNav
+                user={user}
+                isDemo={isDemo}
+                onSignIn={onSignIn}
+                onTryDemo={onTryDemo}
+                onSignOut={onSignOut}
+            />
 
             <main>
                 {/* ── HERO ── */}
