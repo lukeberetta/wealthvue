@@ -84,13 +84,26 @@ export function AppNav({
     return (
         <header
             className={cn(
-                "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
+                "fixed top-0 left-0 right-0 z-50 flex flex-col text-text-1 transition-all duration-300",
                 scrolled
-                    ? "bg-surface/85 backdrop-blur-md border-b border-border shadow-sm py-3"
-                    : "bg-transparent py-5"
+                    ? "bg-surface/85 backdrop-blur-md border-b border-border shadow-sm"
+                    : "bg-bg sm:bg-transparent"
             )}
         >
-            <div className="max-w-[1120px] mx-auto px-6 flex items-center justify-between">
+            {/* Demo banner */}
+            {isDemo && (
+                <div className="bg-accent text-white py-2 text-center text-xs font-bold uppercase tracking-widest shrink-0">
+                    DEMO MODE ·{" "}
+                    <button onClick={onSignOut} className="underline hover:no-underline">
+                        Sign in
+                    </button>{" "}
+                    to track your real assets
+                </div>
+            )}
+            <div className={cn(
+                "max-w-[1120px] mx-auto w-full px-6 flex items-center justify-between transition-all duration-300 shrink-0",
+                scrolled ? "py-3" : "py-5"
+            )}>
 
                 {/* ── Logo ── */}
                 <button

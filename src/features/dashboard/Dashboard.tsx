@@ -153,17 +153,6 @@ export const Dashboard = ({ user, isDemo, onSignOut, onGoHome, onUpdateUser }: D
 
     return (
         <div className="min-h-screen flex flex-col bg-bg text-text-1">
-            {/* Demo banner */}
-            {isDemo && (
-                <div className="bg-accent text-white py-2 text-center text-xs font-bold uppercase tracking-widest z-50 relative">
-                    DEMO MODE ·{" "}
-                    <button onClick={onSignOut} className="underline hover:no-underline">
-                        Sign in
-                    </button>{" "}
-                    to track your real assets
-                </div>
-            )}
-
             <AppNav {...navProps} />
 
             <main className="flex-1 max-w-[1120px] mx-auto w-full px-6 pt-28 pb-12 space-y-10">
@@ -209,8 +198,8 @@ export const Dashboard = ({ user, isDemo, onSignOut, onGoHome, onUpdateUser }: D
                                 <span className="text-text-3 font-normal text-xs">
                                     {changePeriod === '1D' ? 'since yesterday'
                                         : changePeriod === '1W' ? 'past week'
-                                        : changePeriod === '1M' ? 'past month'
-                                        : 'all time'}
+                                            : changePeriod === '1M' ? 'past month'
+                                                : 'all time'}
                                 </span>
                             </div>
                         </div>
