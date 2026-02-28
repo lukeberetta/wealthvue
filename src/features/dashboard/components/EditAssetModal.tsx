@@ -1,5 +1,5 @@
 import React from "react";
-import { Sparkles, Trash2 } from "lucide-react";
+import { Sparkles, Trash2, ChevronDown } from "lucide-react";
 import { Modal } from "../../../components/ui/Modal";
 import { Button } from "../../../components/ui/Button";
 import { Asset, AssetType } from "../../../types";
@@ -38,19 +38,22 @@ export const EditAssetModal = ({
                     </div>
                     <div className="space-y-1.5">
                         <label className="text-[10px] font-bold text-text-3 uppercase tracking-widest">Type</label>
-                        <select
-                            className="w-full bg-surface-2 border border-border rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent/20"
-                            value={selectedAsset.assetType}
-                            onChange={(e) => onAssetChange({ ...selectedAsset, assetType: e.target.value as AssetType })}
-                            disabled={isDemo}
-                        >
-                            <option value="stock">Stock</option>
-                            <option value="crypto">Crypto</option>
-                            <option value="vehicle">Vehicle</option>
-                            <option value="property">Property</option>
-                            <option value="cash">Cash</option>
-                            <option value="other">Other</option>
-                        </select>
+                        <div className="relative">
+                            <select
+                                className="appearance-none w-full bg-surface-2 border border-border rounded-xl p-3 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-accent/20"
+                                value={selectedAsset.assetType}
+                                onChange={(e) => onAssetChange({ ...selectedAsset, assetType: e.target.value as AssetType })}
+                                disabled={isDemo}
+                            >
+                                <option value="stock">Stock</option>
+                                <option value="crypto">Crypto</option>
+                                <option value="vehicle">Vehicle</option>
+                                <option value="property">Property</option>
+                                <option value="cash">Cash</option>
+                                <option value="other">Other</option>
+                            </select>
+                            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-text-3" size={16} />
+                        </div>
                     </div>
                 </div>
 

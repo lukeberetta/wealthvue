@@ -1,5 +1,5 @@
 import React from "react";
-import { ArrowLeft, CreditCard, Trash2, LogOut, Palette } from "lucide-react";
+import { ArrowLeft, CreditCard, Trash2, LogOut, Palette, ChevronDown } from "lucide-react";
 import { User } from "../../types";
 import { Card } from "../../components/ui/Card";
 import { Button } from "../../components/ui/Button";
@@ -71,30 +71,36 @@ export const SettingsView = ({ user, onSignOut, onBack, onUpdateUser }: Settings
                         </div>
                         <div className="space-y-1.5">
                             <label className="text-[10px] uppercase font-bold text-text-3 tracking-wider">Default Currency</label>
-                            <select
-                                className="w-full bg-surface-2 border border-border rounded-xl px-3 py-2 text-sm text-text-1 focus:outline-none focus:ring-2 focus:ring-accent/20"
-                                defaultValue={user?.defaultCurrency}
-                                onChange={handleCurrencyChange}
-                            >
-                                <option value="USD">USD – US Dollar</option>
-                                <option value="ZAR">ZAR – SA Rand</option>
-                                <option value="EUR">EUR – Euro</option>
-                                <option value="GBP">GBP – British Pound</option>
-                                <option value="AUD">AUD – Australian Dollar</option>
-                                <option value="CAD">CAD – Canadian Dollar</option>
-                            </select>
+                            <div className="relative">
+                                <select
+                                    className="appearance-none w-full bg-surface-2 border border-border rounded-xl px-3 py-2 pr-10 text-sm text-text-1 focus:outline-none focus:ring-2 focus:ring-accent/20"
+                                    defaultValue={user?.defaultCurrency}
+                                    onChange={handleCurrencyChange}
+                                >
+                                    <option value="USD">USD – US Dollar</option>
+                                    <option value="ZAR">ZAR – SA Rand</option>
+                                    <option value="EUR">EUR – Euro</option>
+                                    <option value="GBP">GBP – British Pound</option>
+                                    <option value="AUD">AUD – Australian Dollar</option>
+                                    <option value="CAD">CAD – Canadian Dollar</option>
+                                </select>
+                                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-text-3" size={16} />
+                            </div>
                         </div>
                         <div className="space-y-1.5">
                             <label className="text-[10px] uppercase font-bold text-text-3 tracking-wider">Country Location</label>
-                            <select
-                                className="w-full bg-surface-2 border border-border rounded-xl px-3 py-2 text-sm text-text-1 focus:outline-none focus:ring-2 focus:ring-accent/20"
-                                defaultValue={user?.country || "ZA"}
-                                onChange={handleCountryChange}
-                            >
-                                {SUPPORTED_COUNTRIES.map(c => (
-                                    <option key={c.code} value={c.code}>{c.name}</option>
-                                ))}
-                            </select>
+                            <div className="relative">
+                                <select
+                                    className="appearance-none w-full bg-surface-2 border border-border rounded-xl px-3 py-2 pr-10 text-sm text-text-1 focus:outline-none focus:ring-2 focus:ring-accent/20"
+                                    defaultValue={user?.country || "ZA"}
+                                    onChange={handleCountryChange}
+                                >
+                                    {SUPPORTED_COUNTRIES.map(c => (
+                                        <option key={c.code} value={c.code}>{c.name}</option>
+                                    ))}
+                                </select>
+                                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-text-3" size={16} />
+                            </div>
                         </div>
                     </div>
                 </Card>
