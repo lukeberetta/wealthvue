@@ -159,7 +159,7 @@ export const useDashboard = (user: User | null, isDemo: boolean) => {
         }
     };
 
-    const handleSaveDrafts = () => {
+    const handleSaveDrafts = (globalSource?: string) => {
         let updatedAssets = [...assets];
 
         (draftAssets as Asset[]).forEach(draft => {
@@ -168,13 +168,15 @@ export const useDashboard = (user: User | null, isDemo: boolean) => {
                 a.assetType === draft.assetType
             );
 
+            const sourceToUse = globalSource?.trim() || draft.source;
+
             if (existingIdx !== -1) {
                 const existing = updatedAssets[existingIdx];
                 const newQuantity = existing.quantity + draft.quantity;
                 const newTotalValue = existing.totalValue + draft.totalValue;
 
                 const sources = new Set((existing.source || "").split(", ").filter(Boolean));
-                if (draft.source) sources.add(draft.source);
+                if (sourceToUse) sources.add(sourceToUse);
                 const combinedSource = Array.from(sources).join(", ");
 
                 updatedAssets[existingIdx] = {
@@ -186,7 +188,7 @@ export const useDashboard = (user: User | null, isDemo: boolean) => {
                     aiRationale: `Combined holdings. ${existing.aiRationale || ""} ${draft.aiRationale || ""}`.trim()
                 };
             } else {
-                updatedAssets.push(draft);
+                updatedAssets.push(sourceToUse ? { ...draft, source: sourceToUse } : draft);
             }
         });
 

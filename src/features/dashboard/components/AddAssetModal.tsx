@@ -25,7 +25,7 @@ interface AddAssetModalProps {
     draftAssets: Partial<Asset>[];
     onUpdateDraft: (index: number, updated: Partial<Asset>) => void;
     onDiscardDrafts: () => void;
-    onSaveDrafts: () => void;
+    onSaveDrafts: (globalSource?: string) => void;
     displayCurrency: string;
 }
 
@@ -313,6 +313,7 @@ export const AddAssetModal = ({
     const [inputMode, setInputMode] = useState<InputMode>("text");
     const [isDragOver, setIsDragOver] = useState(false);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
+    const [globalSource, setGlobalSource] = useState("");
     const fileInputRef = useRef<HTMLInputElement>(null);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -372,14 +373,14 @@ export const AddAssetModal = ({
         if (!isOpen) return;
         const handler = (e: KeyboardEvent) => {
             if (e.key !== "Escape") return;
-            if (state === "result") { if (window.confirm("Discard results and go back?")) onDiscardDrafts(); }
-            else if (state === "input") onClose();
+            if (state === "result") { if (window.confirm("Discard results and go back?")) { onDiscardDrafts(); setGlobalSource(""); } }
+            else if (state === "input") { setGlobalSource(""); onClose(); }
         };
         window.addEventListener("keydown", handler);
         return () => window.removeEventListener("keydown", handler);
     }, [isOpen, state, onClose, onDiscardDrafts]);
 
-    useEffect(() => { if (!isOpen) setImagePreview(null); }, [isOpen]);
+    useEffect(() => { if (!isOpen) { setImagePreview(null); setGlobalSource(""); } }, [isOpen]);
 
     if (!isOpen) return null;
 
@@ -416,8 +417,8 @@ export const AddAssetModal = ({
                         <button
                             id="add-asset-close"
                             onClick={() => {
-                                if (state === "result") { if (window.confirm("Discard results?")) { onDiscardDrafts(); onClose(); } }
-                                else onClose();
+                                if (state === "result") { if (window.confirm("Discard results?")) { onDiscardDrafts(); setGlobalSource(""); onClose(); } }
+                                else { setGlobalSource(""); onClose(); }
                             }}
                             className="w-8 h-8 flex items-center justify-center rounded-full text-text-3 hover:text-text-1 hover:bg-surface-2 transition-colors"
                             aria-label="Close"
@@ -647,17 +648,34 @@ export const AddAssetModal = ({
                                     ))}
                                 </div>
 
-                                <div className="flex gap-3 pt-1">
+                                <div className="pt-2 px-1">
+                                    <label className="block text-xs font-semibold text-text-2 mb-1.5">Account / Institution <span className="text-text-3/60 font-normal">(Optional)</span></label>
+                                    <input
+                                        type="text"
+                                        value={globalSource}
+                                        onChange={e => setGlobalSource(e.target.value)}
+                                        placeholder="e.g. Fidelity, Vanguard..."
+                                        className="w-full bg-surface-2/60 border border-border rounded-xl text-text-1 placeholder:text-text-3/60 text-sm px-4 py-3 focus:outline-none focus:border-accent/40 focus:bg-surface-2 transition-all"
+                                    />
+                                </div>
+
+                                <div className="flex gap-3 pt-2">
                                     <button
                                         id="add-asset-discard"
-                                        onClick={onDiscardDrafts}
+                                        onClick={() => {
+                                            onDiscardDrafts();
+                                            setGlobalSource("");
+                                        }}
                                         className="flex-1 py-3 rounded-2xl border border-border text-sm font-semibold text-text-2 hover:bg-surface-2 transition-colors"
                                     >
                                         Try again
                                     </button>
                                     <button
                                         id="add-asset-save"
-                                        onClick={onSaveDrafts}
+                                        onClick={() => {
+                                            onSaveDrafts(globalSource);
+                                            setGlobalSource("");
+                                        }}
                                         className="flex-[2] flex items-center justify-center gap-2 py-3 rounded-2xl bg-accent text-white text-sm font-semibold hover:opacity-90 active:scale-[0.98] transition-all duration-200"
                                     >
                                         <Check size={16} />
