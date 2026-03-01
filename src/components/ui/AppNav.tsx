@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
-import { ChevronDown, Settings, LogOut, LayoutDashboard, Globe } from "lucide-react";
+import { ChevronDown, Settings, LogOut, LayoutDashboard, Globe, MessageSquare } from "lucide-react";
 import { User } from "../../types";
 import { cn, getInitials, avatarPalette } from "../../lib/utils";
 import { ThemeToggle } from "./ThemeToggle";
@@ -23,6 +23,8 @@ interface AppNavProps {
     onSignOut?: () => void;
     /** Opens the Settings view (only meaningful inside the app) */
     onOpenSettings?: () => void;
+    /** Opens the Feedback modal */
+    onOpenFeedback?: () => void;
 }
 
 // ---------------------------------------------------------------------------
@@ -38,6 +40,7 @@ export function AppNav({
     onTryDemo,
     onSignOut,
     onOpenSettings,
+    onOpenFeedback,
 }: AppNavProps) {
     const navigate = useNavigate();
     const location = useLocation();
@@ -227,6 +230,16 @@ export function AppNav({
                                                     >
                                                         <Settings size={15} strokeWidth={1.75} />
                                                         Settings
+                                                    </button>
+                                                )}
+                                                {onOpenFeedback && (
+                                                    <button
+                                                        onClick={() => { onOpenFeedback(); setMenuOpen(false); }}
+                                                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-text-2 hover:text-text-1 hover:bg-surface-2 rounded-xl transition-colors"
+                                                        role="menuitem"
+                                                    >
+                                                        <MessageSquare size={15} strokeWidth={1.75} />
+                                                        Send Feedback
                                                     </button>
                                                 )}
                                                 {isOnApp && !onOpenSettings && (

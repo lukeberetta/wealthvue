@@ -23,6 +23,7 @@ import { SettingsView } from "../settings/SettingsView";
 import { useDashboard } from "./hooks/useDashboard";
 import { PortfolioInsights, getArchetype } from "./components/PortfolioInsights";
 import { PortfolioAdviceModal } from "./components/PortfolioAdviceModal";
+import { FeedbackModal } from "../feedback/FeedbackModal";
 import { AssetList } from "./components/AssetList";
 import { AddAssetModal } from "./components/AddAssetModal";
 import { EditAssetModal } from "./components/EditAssetModal";
@@ -39,6 +40,7 @@ interface DashboardProps {
 
 export const Dashboard = ({ user, isDemo, onSignIn, onSignOut, onGoHome, onUpdateUser }: DashboardProps) => {
     const [isAdviceModalOpen, setIsAdviceModalOpen] = useState(false);
+    const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
     const [goalAmountInput, setGoalAmountInput] = useState('');
 
     const {
@@ -127,6 +129,7 @@ export const Dashboard = ({ user, isDemo, onSignIn, onSignOut, onGoHome, onUpdat
         onSignIn,
         onSignOut,
         onOpenSettings: () => setCurrentView("settings"),
+        onOpenFeedback: !isDemo ? () => setIsFeedbackModalOpen(true) : undefined,
     };
 
     if (currentView === "settings") {
@@ -423,6 +426,12 @@ export const Dashboard = ({ user, isDemo, onSignIn, onSignOut, onGoHome, onUpdat
                 fxRates={fxRates}
                 archetypeTitle={archetype.title}
                 archetypeSubtitle={archetype.subtitle}
+            />
+
+            <FeedbackModal
+                isOpen={isFeedbackModalOpen}
+                onClose={() => setIsFeedbackModalOpen(false)}
+                user={user}
             />
         </div>
     );
