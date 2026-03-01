@@ -1,4 +1,4 @@
-export type AssetType = "stock" | "crypto" | "vehicle" | "property" | "cash" | "other";
+export type AssetType = "stock" | "crypto" | "commodities" | "etf" | "vehicle" | "property" | "cash" | "other";
 export type ValueSource = "ai_estimate" | "live_price" | "manual";
 export type AIConfidence = "high" | "medium" | "low";
 export type PlanType = "trial" | "pro";

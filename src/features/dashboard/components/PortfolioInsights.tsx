@@ -16,8 +16,10 @@ interface PortfolioInsightsProps {
 
 
 const TYPE_LABELS: Record<string, string> = {
-    stock: "Stocks & ETFs",
+    stock: "Stocks",
+    etf: "ETFs & Funds",
     crypto: "Crypto",
+    commodities: "Commodities",
     vehicle: "Vehicles",
     property: "Property",
     cash: "Cash",
@@ -32,8 +34,10 @@ export interface Archetype {
 export function getArchetype(pct: Record<string, number>): Archetype {
     const crypto = pct.crypto || 0;
     const stock = pct.stock || 0;
+    const etf = pct.etf || 0;
     const property = pct.property || 0;
     const cash = pct.cash || 0;
+    const commodities = pct.commodities || 0;
     const other = pct.other || 0;
     const typeCount = Object.keys(pct).length;
 
@@ -51,15 +55,20 @@ export function getArchetype(pct: Record<string, number>): Archetype {
     // Scale liquid assets to 100% to find their true investing style
     const adjCrypto = investableTotal > 0 ? (crypto / investableTotal) * 100 : crypto;
     const adjStock = investableTotal > 0 ? (stock / investableTotal) * 100 : stock;
+    const adjEtf = investableTotal > 0 ? (etf / investableTotal) * 100 : etf;
     const adjCash = investableTotal > 0 ? (cash / investableTotal) * 100 : cash;
+    const adjCommodities = investableTotal > 0 ? (commodities / investableTotal) * 100 : commodities;
     const adjOther = investableTotal > 0 ? (other / investableTotal) * 100 : other;
 
     // Liquid asset max alloc
-    const maxLiquidAlloc = Math.max(adjCrypto, adjStock, adjCash, adjOther);
+    const maxLiquidAlloc = Math.max(adjCrypto, adjStock, adjEtf, adjCash, adjCommodities, adjOther);
 
     if (adjCrypto >= 60) return { title: "The Crypto Degen", subtitle: "High conviction. High volatility. Zero chill." };
     if (adjCrypto >= 40) return { title: "Digital Maverick", subtitle: "Bullish on the future, one block at a time." };
     if (adjStock >= 70) return { title: "Equity Devotee", subtitle: "You believe in companies. Markets agree — mostly." };
+    if (adjEtf >= 70) return { title: "The Pragmatist", subtitle: "You buy the haystack. Low fees, steady growth." };
+    if ((adjStock + adjEtf) >= 70) return { title: "Market Bull", subtitle: "Broad exposure to equities drives your growth." };
+    if (adjCommodities >= 50) return { title: "The Hard Asset Collector", subtitle: "Gold, silver, and things you can hold." };
 
     // If they still have a large chunk in property but didn't meet investable styles above
     if (property >= 60) return { title: "Property Bull", subtitle: "Bricks over bytes. Slow and steady." };
@@ -89,7 +98,7 @@ function getDiversificationScore(pct: Record<string, number>): { label: string; 
 
 
 function getRiskProfile(pct: Record<string, number>): { label: string; value: 1 | 2 | 3; color: string } {
-    const score = (pct.crypto || 0) * 0.9 + (pct.stock || 0) * 0.5
+    const score = (pct.crypto || 0) * 0.9 + (pct.stock || 0) * 0.5 + (pct.etf || 0) * 0.5 + (pct.commodities || 0) * 0.5
         - (pct.cash || 0) * 0.7 - (pct.property || 0) * 0.4;
     if (score > 40) return { label: "High", value: 3, color: "var(--color-negative)" };
     if (score > 15) return { label: "Medium", value: 2, color: "var(--color-accent)" };
@@ -413,7 +422,7 @@ export const PortfolioInsights = ({ assets, displayCurrency, fxRates, onOpenAdvi
                 const risk = getRiskProfile(pct);
                 const diversification = getDiversificationScore(pct);
                 return (
-                    <div className="lg:col-span-2 bg-surface rounded-2xl p-6 flex flex-col">
+                    <div className="lg:col-span-2 bg-surface rounded-2xl p-6 flex flex-col min-h-[320px]">
                         <h3 className="text-[10px] font-bold text-text-3 uppercase tracking-widest mb-5">Portfolio Profile</h3>
 
                         {/* Archetype identity */}
@@ -436,7 +445,7 @@ export const PortfolioInsights = ({ assets, displayCurrency, fxRates, onOpenAdvi
                         </div>
 
                         {/* Ratings */}
-                        <div className="space-y-4 mt-4">
+                        <div className="space-y-4 mt-4 mb-4">
                             <div>
                                 <div className="flex items-center justify-between mb-2">
                                     <p className="text-[10px] font-bold text-text-3 uppercase tracking-widest">Risk Level</p>

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { LineChart, Coins, Car, Home, Wallet, MoreHorizontal, Sparkles, Plus, Search, Download, X, ChevronDown } from "lucide-react";
+import { LineChart, Coins, Car, Home, Wallet, MoreHorizontal, Sparkles, Plus, Search, Download, X, ChevronDown, Gem, Layers } from "lucide-react";
 import { Asset } from "../../../types";
 import { Button } from "../../../components/ui/Button";
 import { AssetRow } from "./AssetRow";
@@ -22,8 +22,10 @@ interface AssetListProps {
 }
 
 const TYPE_LABELS: Record<string, string> = {
-    stock: "Stocks & ETFs",
+    stock: "Stocks",
+    etf: "ETFs & Funds",
     crypto: "Crypto",
+    commodities: "Commodities",
     vehicle: "Vehicles",
     property: "Property",
     cash: "Cash",
@@ -33,7 +35,9 @@ const TYPE_LABELS: Record<string, string> = {
 const getTypeIcon = (type: string) => {
     switch (type) {
         case "stock": return <LineChart size={10} />;
+        case "etf": return <Layers size={10} />;
         case "crypto": return <Coins size={10} />;
+        case "commodities": return <Gem size={10} />;
         case "vehicle": return <Car size={10} />;
         case "property": return <Home size={10} />;
         case "cash": return <Wallet size={10} />;

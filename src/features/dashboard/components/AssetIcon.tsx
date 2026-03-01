@@ -45,13 +45,17 @@ import {
     Tag,
     Factory,
     Wrench,
-    Cross
+    Cross,
+    Gem,
+    Layers
 } from "lucide-react";
 import { Asset } from "../../../types";
 
 export const TYPE_COLORS: Record<string, string> = {
     stock: '#C96442',
+    etf: '#3A8DA8',
     crypto: '#4A7C59',
+    commodities: '#D4AF37',
     vehicle: '#6B6560',
     property: '#B5534A',
     cash: '#7A6A5E',
@@ -116,7 +120,9 @@ export const getAssetIcon = (asset: Partial<Asset>, size: number = 20, color?: s
     // Default by type fallback
     switch (type) {
         case 'stock': return <LineChart size={size} color={color} />;
+        case 'etf': return <Layers size={size} color={color} />;
         case 'crypto': return <Coins size={size} color={color} />;
+        case 'commodities': return <Gem size={size} color={color} />;
         case 'vehicle': return <Car size={size} color={color} />;
         case 'property': return <Home size={size} color={color} />;
         case 'cash': return <Wallet size={size} color={color} />;

@@ -60,28 +60,31 @@ export const useDashboard = (user: User | null, isDemo: boolean) => {
                 // Auto-refresh prices via Yahoo Finance API
                 let updated = false;
                 const newAssets = await Promise.all(loadedAssets.map(async (asset) => {
-                    if (asset.ticker && (asset.assetType === "stock" || asset.assetType === "crypto")) {
+                    if (asset.ticker && ["stock", "etf", "crypto", "commodities"].includes(asset.assetType)) {
                         let fetchTicker = asset.ticker;
-                        if (asset.assetType === "crypto" && !fetchTicker.includes("-")) {
-                            fetchTicker = `${fetchTicker}-USD`;
-                        }
                         try {
-                            const res = await fetch(`/api/price?ticker=${fetchTicker}`);
-                            if (res.ok) {
-                                const quote = await res.json();
-                                if (quote?.regularMarketPrice && quote.regularMarketPrice !== asset.unitPrice) {
-                                    updated = true;
-                                    const newUnitPrice = quote.regularMarketPrice;
-                                    return {
-                                        ...asset,
-                                        unitPrice: newUnitPrice,
-                                        totalValue: newUnitPrice * asset.quantity,
-                                        totalValueCurrency: quote.currency || asset.unitPriceCurrency,
-                                        unitPriceCurrency: quote.currency || asset.unitPriceCurrency,
-                                        valueSource: "live_price" as const,
-                                        lastRefreshed: new Date().toISOString()
-                                    };
+                            let res = await fetch(`/api/price?ticker=${fetchTicker}`);
+                            let quote = res.ok ? await res.json() : null;
+
+                            if (asset.assetType === "crypto" && !fetchTicker.includes("-") && (!quote || !quote.regularMarketPrice || quote.regularMarketPrice < 1)) {
+                                const fbRes = await fetch(`/api/price?ticker=${fetchTicker}-USD`);
+                                if (fbRes.ok) {
+                                    const fbQuote = await fbRes.json();
+                                    if (fbQuote?.regularMarketPrice) quote = fbQuote;
                                 }
+                            }
+                            if (quote && quote.regularMarketPrice && quote.regularMarketPrice !== asset.unitPrice) {
+                                updated = true;
+                                const newUnitPrice = quote.regularMarketPrice;
+                                return {
+                                    ...asset,
+                                    unitPrice: newUnitPrice,
+                                    totalValue: newUnitPrice * asset.quantity,
+                                    totalValueCurrency: quote.currency || asset.unitPriceCurrency,
+                                    unitPriceCurrency: quote.currency || asset.unitPriceCurrency,
+                                    valueSource: "live_price" as const,
+                                    lastRefreshed: new Date().toISOString()
+                                };
                             }
                         } catch (e) {
                             console.warn("Auto-refresh failed for", asset.ticker);
@@ -250,30 +253,33 @@ export const useDashboard = (user: User | null, isDemo: boolean) => {
 
     const handleRefreshAsset = async (asset: Asset) => {
         if (isDemo || !asset.ticker) return;
-        if (asset.assetType !== "stock" && asset.assetType !== "crypto") return;
+        if (!["stock", "etf", "crypto", "commodities"].includes(asset.assetType)) return;
         setRefreshingAssetId(asset.id);
         try {
             let fetchTicker = asset.ticker;
-            if (asset.assetType === "crypto" && !fetchTicker.includes("-")) {
-                fetchTicker = `${fetchTicker}-USD`;
-            }
-            const res = await fetch(`/api/price?ticker=${fetchTicker}`);
-            if (res.ok) {
-                const quote = await res.json();
-                if (quote?.regularMarketPrice) {
-                    const updated: Asset = {
-                        ...asset,
-                        unitPrice: quote.regularMarketPrice,
-                        totalValue: quote.regularMarketPrice * asset.quantity,
-                        totalValueCurrency: quote.currency || asset.unitPriceCurrency,
-                        unitPriceCurrency: quote.currency || asset.unitPriceCurrency,
-                        valueSource: "live_price",
-                        lastRefreshed: new Date().toISOString()
-                    };
-                    const newAssets = assets.map(a => a.id === asset.id ? updated : a);
-                    setAssets(newAssets);
-                    storage.saveAssets(newAssets);
+            let res = await fetch(`/api/price?ticker=${fetchTicker}`);
+            let quote = res.ok ? await res.json() : null;
+
+            if (asset.assetType === "crypto" && !fetchTicker.includes("-") && (!quote || !quote.regularMarketPrice || quote.regularMarketPrice < 1)) {
+                const fbRes = await fetch(`/api/price?ticker=${fetchTicker}-USD`);
+                if (fbRes.ok) {
+                    const fbQuote = await fbRes.json();
+                    if (fbQuote?.regularMarketPrice) quote = fbQuote;
                 }
+            }
+            if (quote && quote.regularMarketPrice) {
+                const updated: Asset = {
+                    ...asset,
+                    unitPrice: quote.regularMarketPrice,
+                    totalValue: quote.regularMarketPrice * asset.quantity,
+                    totalValueCurrency: quote.currency || asset.unitPriceCurrency,
+                    unitPriceCurrency: quote.currency || asset.unitPriceCurrency,
+                    valueSource: "live_price",
+                    lastRefreshed: new Date().toISOString()
+                };
+                const newAssets = assets.map(a => a.id === asset.id ? updated : a);
+                setAssets(newAssets);
+                storage.saveAssets(newAssets);
             }
         } catch (e) {
             console.warn("Refresh failed for", asset.ticker);
