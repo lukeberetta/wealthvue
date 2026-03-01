@@ -36,26 +36,64 @@ export function getArchetype(pct: Record<string, number>): Archetype {
     const cash = pct.cash || 0;
     const other = pct.other || 0;
     const typeCount = Object.keys(pct).length;
-    const maxAlloc = Math.max(...Object.values(pct));
 
-    if (crypto >= 60) return { title: "The Crypto Degen", subtitle: "High conviction. High volatility. Zero chill." };
-    if (crypto >= 40) return { title: "Digital Maverick", subtitle: "Bullish on the future, one block at a time." };
-    if (stock >= 70) return { title: "Equity Devotee", subtitle: "You believe in companies. Markets agree — mostly." };
-    if (property >= 50) return { title: "Property Bull", subtitle: "Bricks over bytes. Slow and steady." };
-    if (cash >= 60) return { title: "The Cautious Accumulator", subtitle: "Patience is a strategy. Or it should be." };
-    if (typeCount >= 4 && maxAlloc < 40) return { title: "The Diversifier", subtitle: "You've read the books. It shows." };
-    if (other >= 30) return { title: "The Speculator", subtitle: "Unconventional assets, unconventional thinking." };
-    if (stock >= 40 && crypto >= 20) return { title: "Growth Seeker", subtitle: "Balanced between tradition and the frontier." };
+    // Determine the percentage of "investable" (liquid) assets 
+    // This prevents a primary residence from overshadowing actual investment strategies
+    const investableTotal = Object.entries(pct)
+        .filter(([k]) => !['property', 'vehicle'].includes(k))
+        .reduce((sum, [_, v]) => sum + v, 0);
+
+    // If property dominates and they have very little investable assets
+    if (property >= 75 && investableTotal < 15) {
+        return { title: "Property Bull", subtitle: "Bricks over bytes. Slow and steady." };
+    }
+
+    // Scale liquid assets to 100% to find their true investing style
+    const adjCrypto = investableTotal > 0 ? (crypto / investableTotal) * 100 : crypto;
+    const adjStock = investableTotal > 0 ? (stock / investableTotal) * 100 : stock;
+    const adjCash = investableTotal > 0 ? (cash / investableTotal) * 100 : cash;
+    const adjOther = investableTotal > 0 ? (other / investableTotal) * 100 : other;
+
+    // Liquid asset max alloc
+    const maxLiquidAlloc = Math.max(adjCrypto, adjStock, adjCash, adjOther);
+
+    if (adjCrypto >= 60) return { title: "The Crypto Degen", subtitle: "High conviction. High volatility. Zero chill." };
+    if (adjCrypto >= 40) return { title: "Digital Maverick", subtitle: "Bullish on the future, one block at a time." };
+    if (adjStock >= 70) return { title: "Equity Devotee", subtitle: "You believe in companies. Markets agree — mostly." };
+
+    // If they still have a large chunk in property but didn't meet investable styles above
+    if (property >= 60) return { title: "Property Bull", subtitle: "Bricks over bytes. Slow and steady." };
+
+    if (adjCash >= 60) return { title: "The Cautious Accumulator", subtitle: "Patience is a strategy. Or it should be." };
+    if (typeCount >= 4 && maxLiquidAlloc < 40) return { title: "The Diversifier", subtitle: "You've read the books. It shows." };
+    if (adjOther >= 30) return { title: "The Speculator", subtitle: "Unconventional assets, unconventional thinking." };
+    if (adjStock >= 40 && adjCrypto >= 20) return { title: "Growth Seeker", subtitle: "Balanced between tradition and the frontier." };
+
     return { title: "The Balanced Investor", subtitle: "Risk-aware and opportunity-ready." };
+}
+
+
+function getDiversificationScore(pct: Record<string, number>): { label: string; pct: number; color: string } {
+    const values = Object.values(pct);
+    const n = values.length;
+    if (n <= 1) return { label: "Concentrated", pct: 8, color: "var(--color-negative)" };
+    // Herfindahl–Hirschman Index: 1 = fully concentrated, 1/n = perfectly spread
+    const hhi = values.reduce((sum, v) => sum + (v / 100) ** 2, 0);
+    const maxHHI = 1;
+    const minHHI = 1 / n;
+    const score = Math.round(((maxHHI - hhi) / (maxHHI - minHHI)) * 100);
+    if (score >= 70) return { label: "Diversified", pct: score, color: "var(--color-positive)" };
+    if (score >= 40) return { label: "Moderate", pct: score, color: "var(--color-accent)" };
+    return { label: "Concentrated", pct: score, color: "var(--color-negative)" };
 }
 
 
 function getRiskProfile(pct: Record<string, number>): { label: string; value: 1 | 2 | 3; color: string } {
     const score = (pct.crypto || 0) * 0.9 + (pct.stock || 0) * 0.5
         - (pct.cash || 0) * 0.7 - (pct.property || 0) * 0.4;
-    if (score > 40) return { label: "High",   value: 3, color: "var(--color-negative)" };
+    if (score > 40) return { label: "High", value: 3, color: "var(--color-negative)" };
     if (score > 15) return { label: "Medium", value: 2, color: "var(--color-accent)" };
-    return               { label: "Low",    value: 1, color: "var(--color-positive)" };
+    return { label: "Low", value: 1, color: "var(--color-positive)" };
 }
 
 const ACCOUNT_PALETTE = [
@@ -139,11 +177,11 @@ export const PortfolioInsights = ({ assets, displayCurrency, fxRates, onOpenAdvi
 
     // Active display set — switches based on tab
     const displayData = tab === "type" ? chartData : accountData;
-    const displayPct  = tab === "type" ? pct : accountPct;
-    const getColor    = (name: string) => tab === "type"
+    const displayPct = tab === "type" ? pct : accountPct;
+    const getColor = (name: string) => tab === "type"
         ? (TYPE_COLORS[name] || TYPE_COLORS.other)
         : getAccountColor(name);
-    const getLabel    = (name: string) => tab === "type"
+    const getLabel = (name: string) => tab === "type"
         ? (TYPE_LABELS[name] || name)
         : name;
 
@@ -373,12 +411,13 @@ export const PortfolioInsights = ({ assets, displayCurrency, fxRates, onOpenAdvi
             {/* ── Right: Portfolio Profile ── */}
             {(() => {
                 const risk = getRiskProfile(pct);
+                const diversification = getDiversificationScore(pct);
                 return (
                     <div className="lg:col-span-2 bg-surface rounded-2xl p-6 flex flex-col">
                         <h3 className="text-[10px] font-bold text-text-3 uppercase tracking-widest mb-5">Portfolio Profile</h3>
 
                         {/* Archetype identity */}
-                        <div className="flex-1">
+                        <div>
                             <div className="inline-flex items-center gap-1.5 bg-accent/8 border border-accent/20 rounded-full px-2.5 py-1 mb-3">
                                 <div className="w-1.5 h-1.5 rounded-full bg-accent" />
                                 <span className="text-[9px] font-bold text-accent uppercase tracking-widest">Investor Type</span>
@@ -396,30 +435,43 @@ export const PortfolioInsights = ({ assets, displayCurrency, fxRates, onOpenAdvi
                             <p className="text-sm text-text-2 leading-relaxed italic">{archetype.subtitle}</p>
                         </div>
 
-                        {/* Risk level */}
-                        <div className="border-t border-border/60 pt-4 mt-5 mb-5">
-                            <p className="text-[10px] font-bold text-text-3 uppercase tracking-widest mb-2">Risk Level</p>
-                            <div className="flex items-center gap-2">
-                                {([1, 2, 3] as const).map(dot => (
-                                    <div
-                                        key={dot}
-                                        className="w-3 h-3 rounded-full transition-all duration-300"
-                                        style={{
-                                            backgroundColor: dot <= risk.value ? risk.color : "transparent",
-                                            border: `1.5px solid ${dot <= risk.value ? risk.color : "var(--color-border)"}`,
-                                            opacity: dot <= risk.value ? 1 : 0.4,
-                                        }}
+                        {/* Ratings */}
+                        <div className="space-y-4 mt-4">
+                            <div>
+                                <div className="flex items-center justify-between mb-2">
+                                    <p className="text-[10px] font-bold text-text-3 uppercase tracking-widest">Risk Level</p>
+                                    <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: risk.color }}>{risk.label}</span>
+                                </div>
+                                <div className="h-1.5 bg-surface-2 rounded-full overflow-hidden">
+                                    <motion.div
+                                        className="h-full rounded-full"
+                                        style={{ backgroundColor: risk.color }}
+                                        initial={{ width: 0 }}
+                                        animate={{ width: `${(risk.value / 3) * 100}%` }}
+                                        transition={{ duration: 0.6, ease: [0.34, 1.56, 0.64, 1] }}
                                     />
-                                ))}
-                                <span className="text-xs font-semibold ml-0.5" style={{ color: risk.color }}>
-                                    {risk.label}
-                                </span>
+                                </div>
+                            </div>
+                            <div>
+                                <div className="flex items-center justify-between mb-2">
+                                    <p className="text-[10px] font-bold text-text-3 uppercase tracking-widest">Diversification</p>
+                                    <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: diversification.color }}>{diversification.label}</span>
+                                </div>
+                                <div className="h-1.5 bg-surface-2 rounded-full overflow-hidden">
+                                    <motion.div
+                                        className="h-full rounded-full"
+                                        style={{ backgroundColor: diversification.color }}
+                                        initial={{ width: 0 }}
+                                        animate={{ width: `${diversification.pct}%` }}
+                                        transition={{ duration: 0.6, ease: [0.34, 1.56, 0.64, 1], delay: 0.2 }}
+                                    />
+                                </div>
                             </div>
                         </div>
 
                         <button
                             onClick={onOpenAdvice}
-                            className="w-full flex items-center justify-center gap-2 bg-surface-2 hover:bg-surface-2/80 text-text-1 rounded-xl py-3 px-4 text-sm font-medium transition-colors"
+                            className="mt-auto w-full flex items-center justify-center gap-2 bg-surface-2 hover:bg-surface-2/80 text-text-1 rounded-xl py-3 px-4 text-sm font-medium transition-colors"
                         >
                             <Sparkles size={15} className="text-accent" />
                             Analyse Portfolio
