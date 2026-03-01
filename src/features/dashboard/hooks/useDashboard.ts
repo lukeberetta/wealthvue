@@ -119,7 +119,9 @@ export const useDashboard = (user: User | null, isDemo: boolean) => {
         ? convertCurrency(anchorEntry.totalNAV, "USD", displayCurrency, fxRates)
         : totalNAV;
     const change = totalNAV - convertedPrevNAV;
-    const changePercent = (change / (convertedPrevNAV || 1)) * 100;
+    const changePercent = convertedPrevNAV === 0
+        ? (totalNAV > 0 ? 100 : 0)
+        : (change / convertedPrevNAV) * 100;
 
     const handleAddAsset = async () => {
         if (isDemo) return;
