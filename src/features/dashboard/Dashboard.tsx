@@ -321,7 +321,7 @@ export const Dashboard = ({ user, isDemo, onSignIn, onSignOut, onGoHome, onUpdat
 
                 {/* Portfolio Insights */}
                 <div>
-                    <h3 className="text-xl font-serif text-text-1 mb-6">Breakdown</h3>
+                    <h3 className="text-xl font-serif text-text-1 mb-6">Portfolio Snapshot</h3>
                     <PortfolioInsights
                         assets={assets}
                         displayCurrency={displayCurrency}
