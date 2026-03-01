@@ -382,6 +382,26 @@ export const AddAssetModal = ({
 
     useEffect(() => { if (!isOpen) { setImagePreview(null); setGlobalSource(""); } }, [isOpen]);
 
+    const hasAutoFilledSource = useRef(false);
+
+    // Reset auto-fill ref when going back to input
+    useEffect(() => {
+        if (state === "input") {
+            hasAutoFilledSource.current = false;
+        }
+    }, [state]);
+
+    // Pre-fill globalSource from AI extracted source if available
+    useEffect(() => {
+        if (state === "result" && draftAssets.length > 0 && !hasAutoFilledSource.current) {
+            const firstSource = draftAssets.find(a => a.source)?.source;
+            if (firstSource) {
+                setGlobalSource(firstSource);
+                hasAutoFilledSource.current = true;
+            }
+        }
+    }, [state, draftAssets]);
+
     if (!isOpen) return null;
 
     return (
