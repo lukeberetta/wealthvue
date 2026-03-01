@@ -427,9 +427,8 @@ export const PortfolioInsights = ({ assets, displayCurrency, fxRates, onOpenAdvi
 
                         {/* Archetype identity */}
                         <div>
-                            <div className="inline-flex items-center gap-1.5 bg-accent/8 border border-accent/20 rounded-full px-2.5 py-1 mb-3">
-                                <div className="w-1.5 h-1.5 rounded-full bg-accent" />
-                                <span className="text-[9px] font-bold text-accent uppercase tracking-widest">Investor Type</span>
+                            <div className="inline-flex items-center bg-surface-2 border border-border rounded-full px-3 py-0.5 mb-3">
+                                <span className="text-[10px] font-bold text-text-3 uppercase tracking-widest">Investor Type</span>
                             </div>
 
                             <motion.h2
