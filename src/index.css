@@ -14,17 +14,17 @@
 :root,
 :root.dark {
   --color-bg:         #1A1714;   /* warm near-black */
-  --color-surface:    #231F1B;   /* elevated warm dark */
-  --color-surface-2:  #2D2822;   /* second elevation */
-  --color-surface-3:  #38312A;   /* third elevation / hover */
+  --color-surface:    #262119;   /* elevated warm dark */
+  --color-surface-2:  #302A22;   /* second elevation */
+  --color-surface-3:  #3B342B;   /* third elevation / hover */
   --color-accent:     #C96442;   /* terracotta */
-  --color-accent-light: rgba(201,100,66,0.12);
-  --color-text-1:     #F0EBE3;   /* warm off-white */
-  --color-text-2:     #A89F94;   /* warm mid */
-  --color-text-3:     #6B6258;   /* warm muted */
-  --color-border:     #312C25;   /* subtle warm border */
-  --color-positive:   #5D8F6E;   /* muted sage */
-  --color-negative:   #A0504A;   /* muted rose */
+  --color-accent-light: rgba(201,100,66,0.15);
+  --color-text-1:     #F7F3ED;   /* warm off-white */
+  --color-text-2:     #BDB3A7;   /* warm mid */
+  --color-text-3:     #857A6E;   /* warm muted */
+  --color-border:     #3A342C;   /* subtle warm border */
+  --color-positive:   #6BA07C;   /* muted sage */
+  --color-negative:   #B85E58;   /* muted rose */
   --color-overlay:    rgba(8,6,4,0.72);
 }
 
