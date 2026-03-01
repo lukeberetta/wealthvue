@@ -58,6 +58,17 @@ function getRiskProfile(pct: Record<string, number>): { label: string; value: 1 
     return               { label: "Low",    value: 1, color: "var(--color-positive)" };
 }
 
+const ACCOUNT_PALETTE = [
+    '#C96442', '#4A7C59', '#7B6FA8', '#3A8DA8',
+    '#A89240', '#B5534A', '#5A8F7B', '#8F7B5A',
+    '#6B8FA8', '#A87B5A',
+];
+function getAccountColor(name: string): string {
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    return ACCOUNT_PALETTE[Math.abs(hash) % ACCOUNT_PALETTE.length];
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const renderActiveShape = (props: any) => {
     const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill } = props;
@@ -76,6 +87,7 @@ const renderActiveShape = (props: any) => {
 
 export const PortfolioInsights = ({ assets, displayCurrency, fxRates, onOpenAdvice }: PortfolioInsightsProps) => {
     const [activeIndex, setActiveIndex] = useState<number | null>(null);
+    const [tab, setTab] = useState<"type" | "account">("type");
 
     const totalNAV = assets.reduce((sum, a) =>
         sum + convertCurrency(a.totalValue, a.totalValueCurrency, displayCurrency, fxRates), 0);
@@ -109,6 +121,32 @@ export const PortfolioInsights = ({ assets, displayCurrency, fxRates, onOpenAdvi
     const holdingsCount = assets.length;
     const hasLiabilities = totalLiabilities < 0;
 
+    // Account breakdown (excludes liabilities/negative values)
+    const byAccount = assets.reduce((acc, asset) => {
+        const val = convertCurrency(asset.totalValue, asset.totalValueCurrency, displayCurrency, fxRates);
+        if (val <= 0) return acc;
+        const key = asset.source?.trim() || "Unassigned";
+        acc[key] = (acc[key] || 0) + val;
+        return acc;
+    }, {} as Record<string, number>);
+    const accountData = Object.entries(byAccount)
+        .map(([name, value]) => ({ name, value }))
+        .sort((a, b) => b.value - a.value);
+    const accountTotal = accountData.reduce((s, e) => s + e.value, 0);
+    const accountPct = Object.fromEntries(
+        accountData.map(e => [e.name, accountTotal > 0 ? (e.value / accountTotal) * 100 : 0])
+    );
+
+    // Active display set — switches based on tab
+    const displayData = tab === "type" ? chartData : accountData;
+    const displayPct  = tab === "type" ? pct : accountPct;
+    const getColor    = (name: string) => tab === "type"
+        ? (TYPE_COLORS[name] || TYPE_COLORS.other)
+        : getAccountColor(name);
+    const getLabel    = (name: string) => tab === "type"
+        ? (TYPE_LABELS[name] || name)
+        : name;
+
     if (assets.length === 0) {
         return (
             <div className="grid lg:grid-cols-5 gap-6">
@@ -130,14 +168,32 @@ export const PortfolioInsights = ({ assets, displayCurrency, fxRates, onOpenAdvi
         );
     }
 
-    const activeEntry = activeIndex !== null ? chartData[activeIndex] : null;
+    const activeEntry = activeIndex !== null ? displayData[activeIndex] : null;
 
     return (
         <div className="grid lg:grid-cols-5 gap-6">
 
             {/* ── Left: Allocation Breakdown ── */}
             <div className="lg:col-span-3 bg-surface rounded-2xl p-6">
-                <h3 className="text-[10px] font-bold text-text-3 uppercase tracking-widest mb-6">Allocation</h3>
+                <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-[10px] font-bold text-text-3 uppercase tracking-widest">Allocation</h3>
+                    <div className="flex items-center gap-0.5 bg-surface-2 rounded-full p-0.5">
+                        {(["type", "account"] as const).map(t => (
+                            <button
+                                key={t}
+                                onClick={() => { setTab(t); setActiveIndex(null); }}
+                                className={cn(
+                                    "px-2.5 py-1 rounded-full text-[10px] font-bold transition-all duration-200",
+                                    tab === t
+                                        ? "bg-surface text-text-1 shadow-sm"
+                                        : "text-text-3 hover:text-text-2"
+                                )}
+                            >
+                                {t === "type" ? "By Type" : "By Account"}
+                            </button>
+                        ))}
+                    </div>
+                </div>
                 <div className="flex flex-col sm:flex-row gap-6 items-center sm:items-start">
 
                     {/* Donut with center label overlay */}
@@ -145,7 +201,7 @@ export const PortfolioInsights = ({ assets, displayCurrency, fxRates, onOpenAdvi
                         <ResponsiveContainer width="100%" height={180} minWidth={0}>
                             <RePieChart>
                                 <Pie
-                                    data={chartData}
+                                    data={displayData}
                                     cx="50%"
                                     cy="50%"
                                     innerRadius={52}
@@ -161,10 +217,10 @@ export const PortfolioInsights = ({ assets, displayCurrency, fxRates, onOpenAdvi
                                     animationDuration={700}
                                     animationEasing="ease-out"
                                 >
-                                    {chartData.map((entry, index) => (
+                                    {displayData.map((entry, index) => (
                                         <Cell
                                             key={`cell-${index}`}
-                                            fill={TYPE_COLORS[entry.name] || TYPE_COLORS.other}
+                                            fill={getColor(entry.name)}
                                             style={{
                                                 opacity: activeIndex === null || activeIndex === index ? 1 : 0.3,
                                                 transition: "opacity 0.2s ease",
@@ -190,12 +246,12 @@ export const PortfolioInsights = ({ assets, displayCurrency, fxRates, onOpenAdvi
                                     >
                                         <div
                                             className="text-xl font-bold tabular-nums leading-none"
-                                            style={{ color: TYPE_COLORS[activeEntry.name] || TYPE_COLORS.other }}
+                                            style={{ color: getColor(activeEntry.name) }}
                                         >
-                                            {(pct[activeEntry.name] || 0).toFixed(0)}%
+                                            {(displayPct[activeEntry.name] || 0).toFixed(0)}%
                                         </div>
                                         <div className="text-[9px] text-text-3 font-medium mt-1 leading-tight max-w-[72px] text-center">
-                                            {TYPE_LABELS[activeEntry.name] || activeEntry.name}
+                                            {getLabel(activeEntry.name)}
                                         </div>
                                     </motion.div>
                                 ) : (
@@ -208,10 +264,12 @@ export const PortfolioInsights = ({ assets, displayCurrency, fxRates, onOpenAdvi
                                         className="text-center"
                                     >
                                         <div className="text-lg font-bold text-text-1 tabular-nums leading-none">
-                                            {chartData.length}
+                                            {displayData.length}
                                         </div>
                                         <div className="text-[9px] text-text-3 font-medium mt-1">
-                                            {chartData.length === 1 ? "class" : "classes"}
+                                            {tab === "type"
+                                                ? (displayData.length === 1 ? "class" : "classes")
+                                                : (displayData.length === 1 ? "account" : "accounts")}
                                         </div>
                                     </motion.div>
                                 )}
@@ -221,9 +279,9 @@ export const PortfolioInsights = ({ assets, displayCurrency, fxRates, onOpenAdvi
 
                     {/* Breakdown table */}
                     <div className="flex-1 space-y-3 w-full">
-                        {chartData.map((entry, index) => {
-                            const p = pct[entry.name] || 0;
-                            const color = TYPE_COLORS[entry.name] || TYPE_COLORS.other;
+                        {displayData.map((entry, index) => {
+                            const p = displayPct[entry.name] || 0;
+                            const color = getColor(entry.name);
                             const isActive = activeIndex === index;
                             const isDimmed = activeIndex !== null && !isActive;
                             return (
@@ -247,7 +305,7 @@ export const PortfolioInsights = ({ assets, displayCurrency, fxRates, onOpenAdvi
                                                 "font-semibold transition-colors duration-150",
                                                 isActive ? "text-text-1" : "text-text-2"
                                             )}>
-                                                {TYPE_LABELS[entry.name] || entry.name}
+                                                {getLabel(entry.name)}
                                             </span>
                                         </div>
                                         <div className="flex items-center gap-3 tabular-nums">
@@ -273,8 +331,8 @@ export const PortfolioInsights = ({ assets, displayCurrency, fxRates, onOpenAdvi
                             );
                         })}
 
-                        {/* Liabilities row */}
-                        {hasLiabilities && (() => {
+                        {/* Liabilities row — type view only */}
+                        {tab === "type" && hasLiabilities && (() => {
                             const liabPct = positiveTotal > 0 ? (Math.abs(totalLiabilities) / positiveTotal) * 100 : 0;
                             return (
                                 <div className="space-y-1.5">
@@ -303,7 +361,10 @@ export const PortfolioInsights = ({ assets, displayCurrency, fxRates, onOpenAdvi
                         })()}
 
                         <p className="text-[10px] text-text-3 pt-1">
-                            {holdingsCount} holding{holdingsCount !== 1 ? "s" : ""} across {chartData.length} class{chartData.length !== 1 ? "es" : ""}
+                            {tab === "type"
+                                ? `${holdingsCount} holding${holdingsCount !== 1 ? "s" : ""} across ${chartData.length} class${chartData.length !== 1 ? "es" : ""}`
+                                : `${holdingsCount} holding${holdingsCount !== 1 ? "s" : ""} across ${accountData.length} account${accountData.length !== 1 ? "s" : ""}`
+                            }
                         </p>
                     </div>
                 </div>
