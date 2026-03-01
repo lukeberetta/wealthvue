@@ -40,6 +40,7 @@ export const useDashboard = (user: User | null, isDemo: boolean) => {
     const [changePeriod, setChangePeriod] = useState<ChangePeriod>('1D');
     const [goal, setGoalState] = useState<FinancialGoal | null>(null);
     const [isEditingGoal, setIsEditingGoal] = useState(false);
+    const [refreshingAssetId, setRefreshingAssetId] = useState<string | null>(null);
 
     useEffect(() => {
         const loadData = async () => {
@@ -245,6 +246,40 @@ export const useDashboard = (user: User | null, isDemo: boolean) => {
         setIsEditingGoal(false);
     };
 
+    const handleRefreshAsset = async (asset: Asset) => {
+        if (isDemo || !asset.ticker) return;
+        if (asset.assetType !== "stock" && asset.assetType !== "crypto") return;
+        setRefreshingAssetId(asset.id);
+        try {
+            let fetchTicker = asset.ticker;
+            if (asset.assetType === "crypto" && !fetchTicker.includes("-")) {
+                fetchTicker = `${fetchTicker}-USD`;
+            }
+            const res = await fetch(`/api/price?ticker=${fetchTicker}`);
+            if (res.ok) {
+                const quote = await res.json();
+                if (quote?.regularMarketPrice) {
+                    const updated: Asset = {
+                        ...asset,
+                        unitPrice: quote.regularMarketPrice,
+                        totalValue: quote.regularMarketPrice * asset.quantity,
+                        totalValueCurrency: quote.currency || asset.unitPriceCurrency,
+                        unitPriceCurrency: quote.currency || asset.unitPriceCurrency,
+                        valueSource: "live_price",
+                        lastRefreshed: new Date().toISOString()
+                    };
+                    const newAssets = assets.map(a => a.id === asset.id ? updated : a);
+                    setAssets(newAssets);
+                    storage.saveAssets(newAssets);
+                }
+            }
+        } catch (e) {
+            console.warn("Refresh failed for", asset.ticker);
+        } finally {
+            setRefreshingAssetId(null);
+        }
+    };
+
     const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         if (isDemo) return;
         const file = e.target.files?.[0];
@@ -332,6 +367,8 @@ export const useDashboard = (user: User | null, isDemo: boolean) => {
         handleBulkDelete,
         handleUpdateAsset,
         handleDeleteAsset,
-        handleFileUpload
+        handleFileUpload,
+        refreshingAssetId,
+        handleRefreshAsset
     };
 };

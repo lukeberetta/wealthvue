@@ -1,4 +1,5 @@
 import React from "react";
+import { RefreshCw } from "lucide-react";
 import { Asset } from "../../../types";
 import { formatCurrency, cn } from "../../../lib/utils";
 import { convertCurrency } from "../../../lib/fx";
@@ -8,22 +9,28 @@ interface AssetRowProps {
     asset: Asset;
     displayCurrency: string;
     fxRates: { [key: string]: number };
+    totalNAV: number;
     isSelected: boolean;
+    isRefreshing?: boolean;
     onSelect: (id: string, checked: boolean) => void;
     onClick: (asset: Asset) => void;
+    onRefresh?: (asset: Asset) => void;
 }
 
+const canRefresh = (asset: Asset) =>
+    !!asset.ticker && (asset.assetType === "stock" || asset.assetType === "crypto");
 
 export const AssetRow: React.FC<AssetRowProps> = ({
-    asset, displayCurrency, fxRates, isSelected, onSelect, onClick,
+    asset, displayCurrency, fxRates, totalNAV, isSelected, isRefreshing, onSelect, onClick, onRefresh,
 }) => {
     const converted = convertCurrency(asset.totalValue, asset.totalValueCurrency, displayCurrency, fxRates);
     const isLiability = converted < 0;
+    const allocationPct = totalNAV > 0 && converted > 0 ? (converted / totalNAV) * 100 : null;
 
     return (
         <div
             className={cn(
-                "flex items-center gap-3 py-3 px-3 rounded-lg border-b border-border/40 last:border-b-0 transition-colors cursor-pointer",
+                "group flex items-center gap-3 py-3 px-3 rounded-lg border-b border-border/40 last:border-b-0 transition-colors cursor-pointer",
                 isSelected ? "bg-accent/5" : "hover:bg-surface-2/50"
             )}
             onClick={() => onClick(asset)}
@@ -75,10 +82,32 @@ export const AssetRow: React.FC<AssetRowProps> = ({
                 </span>
             </div>
 
-            {/* Value */}
-            <p className={cn("text-sm font-medium tabular-nums text-right w-32 shrink-0", isLiability && "text-negative")}>
-                {formatCurrency(converted, displayCurrency)}
-            </p>
+            {/* Refresh button — visible on hover for ticker assets */}
+            <div className="hidden sm:flex w-6 justify-center shrink-0" onClick={(e) => e.stopPropagation()}>
+                {canRefresh(asset) && onRefresh && (
+                    <button
+                        onClick={() => onRefresh(asset)}
+                        disabled={isRefreshing}
+                        title="Refresh price"
+                        className={cn(
+                            "p-1 rounded-md text-text-3 hover:text-accent hover:bg-accent/10 transition-all duration-150",
+                            isRefreshing ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+                        )}
+                    >
+                        <RefreshCw size={11} className={cn(isRefreshing && "animate-spin")} />
+                    </button>
+                )}
+            </div>
+
+            {/* Value + allocation % */}
+            <div className="text-right w-32 shrink-0">
+                <p className={cn("text-sm font-medium tabular-nums", isLiability && "text-negative")}>
+                    {formatCurrency(converted, displayCurrency)}
+                </p>
+                {allocationPct !== null && (
+                    <p className="text-[9px] text-text-3 tabular-nums">{allocationPct.toFixed(1)}%</p>
+                )}
+            </div>
         </div>
     );
 };
