@@ -1,5 +1,6 @@
 import React from "react";
 import { motion } from "motion/react";
+import { useNavigate } from "react-router-dom";
 import {
     LineChart, Coins, Car, Home, Wallet, MoreHorizontal,
     Check, Upload, Search, User as UserIcon, ArrowRight
@@ -19,6 +20,7 @@ interface LandingPageProps {
 
 export const LandingPage = ({ user, isDemo = false, onSignIn, onTryDemo, onSignOut }: LandingPageProps) => {
     useScrollReveal();
+    const navigate = useNavigate();
 
     return (
         <div className="min-h-screen bg-bg text-text-1 selection:bg-accent/20">
@@ -360,7 +362,7 @@ export const LandingPage = ({ user, isDemo = false, onSignIn, onTryDemo, onSignO
                                         </li>
                                     ))}
                                 </ul>
-                                <button onClick={onSignIn} className="w-full bg-accent text-white py-3 rounded-full text-sm font-medium hover:opacity-88 transition-all">
+                                <button onClick={() => user ? navigate("/app") : onSignIn()} className="w-full bg-accent text-white py-3 rounded-full text-sm font-medium hover:opacity-88 transition-all">
                                     Get Started
                                 </button>
                                 <p className="text-center text-[10px] text-text-3 mt-3">Billed monthly. Cancel anytime.</p>
