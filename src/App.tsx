@@ -4,6 +4,7 @@ import { Routes, Route, useNavigate, useLocation, Navigate } from "react-router-
 import { LandingPage } from "./features/landing/LandingPage";
 import { Dashboard } from "./features/dashboard/Dashboard";
 import { LoginModal } from "./features/auth/LoginModal";
+import { FeedbackModal } from "./features/feedback/FeedbackModal";
 import { useTheme, ThemeMode } from "./hooks/useTheme";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 
@@ -53,10 +54,13 @@ function Inner() {
   const location = useLocation();
 
   const [isLoginModalOpen, setIsLoginModalOpen] = React.useState(false);
+  const [isFeedbackModalOpen, setIsFeedbackModalOpen] = React.useState(false);
 
 const handleTryDemo = () => { if (user) { navigate("/app"); } else { setDemo(true); navigate("/app"); } };
   const handleSignOut = async () => { await signOut(); navigate("/"); };
   const handleGoHome = () => navigate("/");
+  const handleOpenFeedback = !isDemo && !!user ? () => setIsFeedbackModalOpen(true) : undefined;
+  const handleOpenSettings = () => navigate("/app", { state: { openSettings: true } });
 
   return (
     <ThemeContext.Provider value={{ mode, setTheme }}>
@@ -79,6 +83,8 @@ const handleTryDemo = () => { if (user) { navigate("/app"); } else { setDemo(tru
                     onSignIn={() => setIsLoginModalOpen(true)}
                     onTryDemo={handleTryDemo}
                     onSignOut={handleSignOut}
+                    onOpenSettings={user ? handleOpenSettings : undefined}
+                    onOpenFeedback={handleOpenFeedback}
                   />
                 }
               />
@@ -99,6 +105,7 @@ const handleTryDemo = () => { if (user) { navigate("/app"); } else { setDemo(tru
                       onSignOut={handleSignOut}
                       onGoHome={handleGoHome}
                       onUpdateUser={updateUser}
+                      onOpenFeedback={handleOpenFeedback}
                     />
                   )
                 }
@@ -111,6 +118,11 @@ const handleTryDemo = () => { if (user) { navigate("/app"); } else { setDemo(tru
         <LoginModal
           isOpen={isLoginModalOpen}
           onClose={() => setIsLoginModalOpen(false)}
+        />
+        <FeedbackModal
+          isOpen={isFeedbackModalOpen}
+          onClose={() => setIsFeedbackModalOpen(false)}
+          user={user}
         />
       </div>
     </ThemeContext.Provider>

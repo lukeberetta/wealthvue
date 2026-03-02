@@ -242,7 +242,7 @@ export function AppNav({
                                                         Send Feedback
                                                     </button>
                                                 )}
-                                                {isOnApp && !onOpenSettings && (
+                                                {!isOnApp && (
                                                     <button
                                                         onClick={() => { navigate("/app"); setMenuOpen(false); }}
                                                         className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-text-2 hover:text-text-1 hover:bg-surface-2 rounded-xl transition-colors"

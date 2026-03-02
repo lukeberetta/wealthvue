@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
     Plus,
     ArrowUpRight,
@@ -15,13 +15,13 @@ import { FinancialGoal } from "../../types";
 import { User, Asset } from "../../types";
 import { formatCurrency, formatCurrencyCompact, cn } from "../../lib/utils";
 import { Button } from "../../components/ui/Button";
+import { useLocation } from "react-router-dom";
 import { AppNav } from "../../layouts/AppNav";
 import { Footer } from "../../layouts/Footer";
 import { SettingsView } from "../settings/SettingsView";
 import { useDashboard } from "./hooks/useDashboard";
 import { PortfolioInsights, getArchetype } from "./components/PortfolioInsights";
 import { PortfolioAdviceModal } from "./components/PortfolioAdviceModal";
-import { FeedbackModal } from "../feedback/FeedbackModal";
 import { AssetList } from "./components/AssetList";
 import { AddAssetModal } from "./components/AddAssetModal";
 import { EditAssetModal } from "./components/EditAssetModal";
@@ -34,12 +34,13 @@ interface DashboardProps {
     onSignOut: () => void;
     onGoHome: () => void;
     onUpdateUser: (user: User) => void;
+    onOpenFeedback?: () => void;
 }
 
-export const Dashboard = ({ user, isDemo, onSignIn, onSignOut, onGoHome, onUpdateUser }: DashboardProps) => {
+export const Dashboard = ({ user, isDemo, onSignIn, onSignOut, onGoHome, onUpdateUser, onOpenFeedback }: DashboardProps) => {
     const [isAdviceModalOpen, setIsAdviceModalOpen] = useState(false);
-    const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
     const [goalAmountInput, setGoalAmountInput] = useState('');
+    const location = useLocation();
 
     const {
         assets,
@@ -88,6 +89,13 @@ export const Dashboard = ({ user, isDemo, onSignIn, onSignOut, onGoHome, onUpdat
         handleRefreshAsset
     } = useDashboard(user, isDemo);
 
+    useEffect(() => {
+        if ((location.state as { openSettings?: boolean })?.openSettings) {
+            setCurrentView("settings");
+            window.history.replaceState({}, "");
+        }
+    }, []);
+
     const openGoalEditor = (existing: FinancialGoal | null) => {
         setGoalAmountInput(existing ? String(existing.targetAmount) : '');
         setIsEditingGoal(true);
@@ -130,7 +138,7 @@ export const Dashboard = ({ user, isDemo, onSignIn, onSignOut, onGoHome, onUpdat
         onSignIn,
         onSignOut,
         onOpenSettings: () => setCurrentView("settings"),
-        onOpenFeedback: !isDemo ? () => setIsFeedbackModalOpen(true) : undefined,
+        onOpenFeedback: !isDemo ? onOpenFeedback : undefined,
     };
 
     if (currentView === "settings") {
@@ -413,11 +421,6 @@ export const Dashboard = ({ user, isDemo, onSignIn, onSignOut, onGoHome, onUpdat
                 navHistory={navHistory}
             />
 
-            <FeedbackModal
-                isOpen={isFeedbackModalOpen}
-                onClose={() => setIsFeedbackModalOpen(false)}
-                user={user}
-            />
         </div>
     );
 };

@@ -16,9 +16,11 @@ interface LandingPageProps {
     onSignIn: () => void;
     onTryDemo: () => void;
     onSignOut?: () => void;
+    onOpenSettings?: () => void;
+    onOpenFeedback?: () => void;
 }
 
-export const LandingPage = ({ user, isDemo = false, onSignIn, onTryDemo, onSignOut }: LandingPageProps) => {
+export const LandingPage = ({ user, isDemo = false, onSignIn, onTryDemo, onSignOut, onOpenSettings, onOpenFeedback }: LandingPageProps) => {
     useScrollReveal();
     const navigate = useNavigate();
 
@@ -31,6 +33,8 @@ export const LandingPage = ({ user, isDemo = false, onSignIn, onTryDemo, onSignO
                 onSignIn={onSignIn}
                 onTryDemo={onTryDemo}
                 onSignOut={onSignOut}
+                onOpenSettings={onOpenSettings}
+                onOpenFeedback={onOpenFeedback}
             />
 
             <main>
