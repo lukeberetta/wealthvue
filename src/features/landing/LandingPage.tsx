@@ -97,14 +97,14 @@ export const LandingPage = ({ user, isDemo = false, onSignIn, onTryDemo, onSignO
                         </div>
 
                         {/* Right: dashboard mockup */}
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.92, y: 20 }}
-                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                            transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
-                            className="relative hidden lg:block"
-                        >
-                            {/* Warm glow behind the card */}
-                            <div className="absolute -inset-16 bg-accent/6 rounded-full blur-3xl -z-10" />
+                        <div className="relative hidden lg:block">
+                            {/* Warm glow behind the card — kept outside motion.div to avoid compositing teardown glitch */}
+                            <div className="absolute -inset-16 bg-accent/6 rounded-full blur-3xl -z-10" style={{ willChange: "transform" }} />
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.92, y: 20 }}
+                                animate={{ opacity: 1, scale: 1, y: 0 }}
+                                transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
+                            >
                             <div className="bg-surface rounded-2xl border border-border overflow-hidden animate-float shadow-2xl">
                                 {/* Mockup nav */}
                                 <div className="bg-surface-2/50 border-b border-border px-5 py-3.5 flex justify-between items-center">
@@ -167,6 +167,7 @@ export const LandingPage = ({ user, isDemo = false, onSignIn, onTryDemo, onSignO
                                 </div>
                             </div>
                         </motion.div>
+                        </div>
                     </div>
                 </section>
 
