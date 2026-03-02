@@ -41,9 +41,23 @@ interface AuthContextValue {
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 // ---------------------------------------------------------------------------
+// Helper — detect the user's currency from their IP address
+// ---------------------------------------------------------------------------
+async function detectCurrencyFromIP(): Promise<string> {
+    try {
+        const res = await fetch("https://ipapi.co/json/", { signal: AbortSignal.timeout(4000) });
+        if (!res.ok) return "USD";
+        const data = await res.json();
+        return (data.currency as string) || "USD";
+    } catch {
+        return "USD";
+    }
+}
+
+// ---------------------------------------------------------------------------
 // Helper — build the default Firestore profile for a brand-new user
 // ---------------------------------------------------------------------------
-function buildDefaultProfile(fbUser: FirebaseUser): Record<string, unknown> {
+function buildDefaultProfile(fbUser: FirebaseUser, currency: string): Record<string, unknown> {
     const now = new Date();
     const trialEndsAt = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
     const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
@@ -52,7 +66,7 @@ function buildDefaultProfile(fbUser: FirebaseUser): Record<string, unknown> {
         displayName: fbUser.displayName ?? "",
         email: fbUser.email ?? "",
         photoURL: fbUser.photoURL ?? "",
-        defaultCurrency: "USD",
+        defaultCurrency: currency,
         country: "",
         themeMode: "system",
         plan: "trial",
@@ -121,7 +135,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                         setUser(mapFirestoreUser(snap.data() as Record<string, unknown>, fbUser));
                     } else {
                         // Cloud Function hasn't fired yet — create the doc client-side as fallback
-                        const profile = buildDefaultProfile(fbUser);
+                        const currency = await detectCurrencyFromIP();
+                        const profile = buildDefaultProfile(fbUser, currency);
                         await setDoc(userRef, profile);
 
                         // Re-read so Timestamps resolve properly
