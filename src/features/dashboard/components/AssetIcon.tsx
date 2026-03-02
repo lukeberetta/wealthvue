@@ -56,10 +56,10 @@ export const TYPE_COLORS: Record<string, string> = {
     etf: '#3A8DA8',
     crypto: '#4A7C59',
     commodities: '#D4AF37',
-    vehicle: '#6B6560',
+    vehicle: '#5C7A8C',
     property: '#B5534A',
-    cash: '#7A6A5E',
-    other: '#38312A',
+    cash: '#A0916E',
+    other: '#7B6882',
 };
 
 export const getAssetIcon = (asset: Partial<Asset>, size: number = 20, color?: string): React.ReactNode => {
