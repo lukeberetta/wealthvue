@@ -1,9 +1,14 @@
 /// <reference types="vite/client" />
 
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
+import { initializeApp, getApps, getApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
+import { getAnalytics, isSupported } from "firebase/analytics";
 
-// Your web app's Firebase configuration
+// ---------------------------------------------------------------------------
+// Firebase configuration — all values are sourced from environment variables.
+// Copy .env.example to .env.local and fill in your project's credentials.
+// ---------------------------------------------------------------------------
 const firebaseConfig = {
     apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
     authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
@@ -11,11 +16,27 @@ const firebaseConfig = {
     storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
     messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
     appId: import.meta.env.VITE_FIREBASE_APP_ID,
-    measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
+    measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+// ---------------------------------------------------------------------------
+// App — guard against duplicate initialisation during hot-module reloads.
+// ---------------------------------------------------------------------------
+const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 
-export { app, analytics };
+// ---------------------------------------------------------------------------
+// Services
+// ---------------------------------------------------------------------------
+
+/** Firebase Authentication */
+const auth = getAuth(app);
+
+/** Cloud Firestore database */
+const db = getFirestore(app);
+
+/** Google Analytics (only initialised in environments that support it) */
+const analyticsPromise = isSupported().then((supported) =>
+    supported ? getAnalytics(app) : null
+);
+
+export { app, auth, db, analyticsPromise };
