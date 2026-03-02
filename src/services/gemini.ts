@@ -1,8 +1,8 @@
 import { GoogleGenAI } from "@google/genai";
+import { AssetType, ValueSource, AIConfidence } from "../types";
+import { fetchLiveQuote, LIVE_PRICE_TYPES, LiveQuote } from "../lib/priceApi";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
-
-import { AssetType, ValueSource, AIConfidence } from "../types";
 
 export interface ParsedAsset {
   name: string;
@@ -83,9 +83,23 @@ async function callAIWithRotation(
   throw lastError;
 }
 
+function applyQuoteToAsset(asset: ParsedAsset, quote: LiveQuote, preferredCurrency: string): void {
+  asset.unitPrice = quote.regularMarketPrice;
+  asset.unitPriceCurrency = quote.currency || preferredCurrency;
+  asset.totalValue = asset.unitPrice * asset.quantity;
+  asset.totalValueCurrency = asset.unitPriceCurrency;
+  asset.valueSource = "live_price";
+  asset.aiConfidence = "high";
+  asset.aiRationale = "Price fetched live from Yahoo Finance.";
+  if (quote.shortName || quote.longName) {
+    asset.name = (quote.shortName || quote.longName)!;
+  }
+}
+
 export async function parseTextToAsset(text: string, preferredCurrency: string = "ZAR", country: string = "ZA"): Promise<ParsedAsset | null> {
   const systemInstruction = `You are a financial asset parser. The user will describe an asset in plain language.
-Extract structured data and estimate its current market value. If you are uncertain about a company's ticker symbol (e.g. it may have recently IPO'd after your training cutoff), use the Google Search tool to find the correct Yahoo Finance ticker — search for "[company name] stock ticker symbol NYSE NASDAQ". Do NOT use search to find current prices; prices will be fetched separately.
+Extract structured data. If you are uncertain about a company's ticker symbol (e.g. it may have recently IPO'd after your training cutoff), use the Google Search tool to find the correct Yahoo Finance ticker — search for "[company name] stock ticker symbol NYSE NASDAQ". Do NOT use search to find current prices; prices will be fetched separately.
+For assets classified as stock, etf, crypto, or commodities where you return a non-null ticker, set unitPrice and totalValue to 0 — live prices will be fetched from Yahoo Finance automatically. Only provide a real price estimate when assetType is vehicle, property, cash, or other.
 
 Respond ONLY with valid raw JSON in this exact format:
 {
@@ -115,33 +129,9 @@ IMPORTANT CATEGORISATION: If the asset is a Bitcoin ETF or Crypto ETF, explicitl
     const cleanedText = response.text.replace(/```json\n?/, "").replace(/```\n?$/, "").trim();
     const asset = JSON.parse(cleanedText || "null");
 
-    if (asset && asset.ticker && ["stock", "etf", "crypto", "commodities"].includes(asset.assetType)) {
-      let fetchTicker = asset.ticker;
-      try {
-        let res = await fetch(`/api/price?ticker=${fetchTicker}`);
-        let quote = res.ok ? await res.json() : null;
-        if (asset.assetType === "crypto" && !fetchTicker.includes("-") && (!quote || !quote.regularMarketPrice || quote.regularMarketPrice < 1)) {
-          const fbRes = await fetch(`/api/price?ticker=${fetchTicker}-USD`);
-          if (fbRes.ok) {
-            const fbQuote = await fbRes.json();
-            if (fbQuote?.regularMarketPrice) quote = fbQuote;
-          }
-        }
-        if (quote && quote.regularMarketPrice) {
-          asset.unitPrice = quote.regularMarketPrice;
-          asset.unitPriceCurrency = quote.currency || preferredCurrency;
-          asset.totalValue = asset.unitPrice * asset.quantity;
-          asset.totalValueCurrency = asset.unitPriceCurrency;
-          asset.valueSource = "live_price";
-          asset.aiConfidence = "high";
-          asset.aiRationale = `Price fetched live from Yahoo Finance.`;
-          if (quote.shortName || quote.longName) {
-            asset.name = quote.shortName || quote.longName;
-          }
-        }
-      } catch (e) {
-        console.warn("Failed to fetch live price for", asset.ticker);
-      }
+    if (asset && asset.ticker && LIVE_PRICE_TYPES.includes(asset.assetType)) {
+      const quote = await fetchLiveQuote(asset.ticker, asset.assetType);
+      if (quote) applyQuoteToAsset(asset, quote, preferredCurrency);
     }
     return asset;
   } catch (error) {
@@ -192,33 +182,9 @@ IMPORTANT CATEGORISATION: If the asset is a Bitcoin ETF or Crypto ETF, explicitl
 
     // Augment with real prices from Yahoo Finance where possible
     assets = await Promise.all(assets.map(async (asset: ParsedAsset) => {
-      if (asset.ticker && ["stock", "etf", "crypto", "commodities"].includes(asset.assetType)) {
-        let fetchTicker = asset.ticker;
-        try {
-          let res = await fetch(`/api/price?ticker=${fetchTicker}`);
-          let quote = res.ok ? await res.json() : null;
-          if (asset.assetType === "crypto" && !fetchTicker.includes("-") && (!quote || !quote.regularMarketPrice || quote.regularMarketPrice < 1)) {
-            const fbRes = await fetch(`/api/price?ticker=${fetchTicker}-USD`);
-            if (fbRes.ok) {
-              const fbQuote = await fbRes.json();
-              if (fbQuote?.regularMarketPrice) quote = fbQuote;
-            }
-          }
-          if (quote && quote.regularMarketPrice) {
-            asset.unitPrice = quote.regularMarketPrice;
-            asset.unitPriceCurrency = quote.currency || preferredCurrency;
-            asset.totalValue = asset.unitPrice * asset.quantity;
-            asset.totalValueCurrency = asset.unitPriceCurrency;
-            asset.valueSource = "live_price";
-            asset.aiConfidence = "high";
-            asset.aiRationale = `Pricing via real-time market data matching ticker ${asset.ticker}.`;
-            if (quote.shortName || quote.longName) {
-              asset.name = quote.shortName || quote.longName;
-            }
-          }
-        } catch (e) {
-          console.warn("Failed to fetch live price for screenshot asset", asset.ticker);
-        }
+      if (asset.ticker && LIVE_PRICE_TYPES.includes(asset.assetType)) {
+        const quote = await fetchLiveQuote(asset.ticker, asset.assetType);
+        if (quote) applyQuoteToAsset(asset, quote, preferredCurrency);
       }
       return asset;
     }));
@@ -230,13 +196,33 @@ IMPORTANT CATEGORISATION: If the asset is a Bitcoin ETF or Crypto ETF, explicitl
   }
 }
 
-export async function reestimateAssetValue(asset: { name: string; assetType: string; description: string }, preferredCurrency: string = "ZAR", country: string = "ZA"): Promise<{
+export async function reestimateAssetValue(
+  asset: { name: string; assetType: string; description: string; ticker?: string | null; quantity?: number },
+  preferredCurrency: string = "ZAR",
+  country: string = "ZA"
+): Promise<{
   unitPrice: number;
   unitPriceCurrency: string;
   totalValue: number;
   aiConfidence: "high" | "medium" | "low";
   aiRationale: string;
 } | null> {
+  // For tickered assets, try Yahoo Finance first
+  if (asset.ticker && LIVE_PRICE_TYPES.includes(asset.assetType)) {
+    const quote = await fetchLiveQuote(asset.ticker, asset.assetType);
+    if (quote) {
+      const qty = asset.quantity ?? 1;
+      return {
+        unitPrice: quote.regularMarketPrice,
+        unitPriceCurrency: quote.currency,
+        totalValue: quote.regularMarketPrice * qty,
+        aiConfidence: "high",
+        aiRationale: "Price fetched live from Yahoo Finance.",
+      };
+    }
+  }
+
+  // Fall back to AI estimate for non-tickered assets or when Yahoo Finance fails
   const systemInstruction = `Given this asset:
 Name: ${asset.name}
 Type: ${asset.assetType}
