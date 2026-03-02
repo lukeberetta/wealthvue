@@ -54,19 +54,7 @@ function Inner() {
 
   const [isLoginModalOpen, setIsLoginModalOpen] = React.useState(false);
 
-  // Redirect to /app on initial load if already signed in
-  const hasRedirectedRef = React.useRef(false);
-  React.useEffect(() => {
-    if (user && location.pathname === "/" && !hasRedirectedRef.current) {
-      hasRedirectedRef.current = true;
-      navigate("/app", { replace: true });
-    }
-    if (!user) {
-      hasRedirectedRef.current = false;
-    }
-  }, [user, location.pathname, navigate]);
-
-  const handleTryDemo = () => { if (user) { navigate("/app"); } else { setDemo(true); navigate("/app"); } };
+const handleTryDemo = () => { if (user) { navigate("/app"); } else { setDemo(true); navigate("/app"); } };
   const handleSignOut = async () => { await signOut(); navigate("/"); };
   const handleGoHome = () => navigate("/");
 
