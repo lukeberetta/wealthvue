@@ -47,6 +47,8 @@ export const EditAssetModal = ({
                             >
                                 <option value="stock">Stock</option>
                                 <option value="crypto">Crypto</option>
+                                <option value="etf">ETF / Fund</option>
+                                <option value="commodities">Commodities</option>
                                 <option value="vehicle">Vehicle</option>
                                 <option value="property">Property</option>
                                 <option value="cash">Cash</option>

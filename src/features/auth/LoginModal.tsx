@@ -38,7 +38,7 @@ export const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
                     <span className="text-white font-serif font-bold text-4xl leading-none">W</span>
                 </div>
                 <h2 className="text-2xl font-medium mb-2">Welcome to WealthVue</h2>
-                <p className="text-text-secondary mb-8">Sign in to start managing your portfolio.</p>
+                <p className="text-text-2 mb-8">Sign in to start managing your portfolio.</p>
 
                 <button
                     id="btn-google-signin"
@@ -63,8 +63,8 @@ export const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
                     <p className="mt-4 text-sm text-red-500">{error}</p>
                 )}
 
-                <p className="mt-6 text-xs text-text-secondary">
-                    By continuing, you agree to WealthVue's <a href="#" className="underline">Terms of Service</a> and <a href="#" className="underline">Privacy Policy</a>.
+                <p className="mt-6 text-xs text-text-3">
+                    By continuing, you agree to WealthVue's Terms of Service and Privacy Policy.
                 </p>
             </div>
         </Modal>

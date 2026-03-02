@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ArrowLeft, CreditCard, Trash2, LogOut, Palette, ChevronDown } from "lucide-react";
+import { ArrowLeft, CreditCard, Trash2, LogOut, Palette, ChevronDown, AlertTriangle } from "lucide-react";
 import { User } from "../../types";
 import { Card } from "../../components/ui/Card";
 import { Button } from "../../components/ui/Button";
@@ -15,6 +15,11 @@ interface SettingsViewProps {
 
 export const SettingsView = ({ user, onSignOut, onBack, onUpdateUser }: SettingsViewProps) => {
     const [displayName, setDisplayName] = useState(user?.displayName ?? "");
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+    const trialDaysRemaining = user?.trialEndsAt
+        ? Math.max(0, Math.ceil((new Date(user.trialEndsAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
+        : null;
 
     const handleCurrencyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         if (user) onUpdateUser({ ...user, displayName, defaultCurrency: e.target.value });
@@ -149,7 +154,13 @@ export const SettingsView = ({ user, onSignOut, onBack, onUpdateUser }: Settings
                         </div>
                         <div>
                             <p className="font-medium text-text-1 text-sm capitalize">{user?.plan} Plan</p>
-                            <p className="text-xs text-text-3">Your trial ends in 18 days.</p>
+                            {user?.plan === "trial" && trialDaysRemaining !== null && (
+                                <p className="text-xs text-text-3">
+                                    {trialDaysRemaining > 0
+                                        ? `Your trial ends in ${trialDaysRemaining} day${trialDaysRemaining === 1 ? "" : "s"}.`
+                                        : "Your trial has ended."}
+                                </p>
+                            )}
                         </div>
                     </div>
                     <Button variant="secondary" className="text-sm rounded-full px-5 py-2">Upgrade to Pro</Button>
@@ -160,16 +171,36 @@ export const SettingsView = ({ user, onSignOut, onBack, onUpdateUser }: Settings
             <section className="space-y-3">
                 <h3 className="text-[10px] font-bold text-negative uppercase tracking-[0.18em]">Danger Zone</h3>
                 <Card className="p-6 border-negative/20 bg-negative/5">
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <p className="font-medium text-negative text-sm">Delete Account</p>
-                            <p className="text-xs text-text-3 mt-0.5">Permanently removes all your data and assets.</p>
+                    {!showDeleteConfirm ? (
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="font-medium text-negative text-sm">Delete Account</p>
+                                <p className="text-xs text-text-3 mt-0.5">Permanently removes all your data and assets.</p>
+                            </div>
+                            <Button variant="ghost" className="text-negative hover:bg-negative/10 flex items-center gap-2 text-sm" onClick={() => setShowDeleteConfirm(true)}>
+                                <Trash2 size={15} />
+                                Delete
+                            </Button>
                         </div>
-                        <Button variant="ghost" className="text-negative hover:bg-negative/10 flex items-center gap-2 text-sm">
-                            <Trash2 size={15} />
-                            Delete
-                        </Button>
-                    </div>
+                    ) : (
+                        <div className="space-y-4">
+                            <div className="flex gap-3">
+                                <AlertTriangle className="text-negative shrink-0 mt-0.5" size={16} />
+                                <div>
+                                    <p className="font-medium text-negative text-sm">Are you sure?</p>
+                                    <p className="text-xs text-text-3 mt-0.5 leading-relaxed">This will sign you out and your account data will be permanently deleted. This cannot be undone.</p>
+                                </div>
+                            </div>
+                            <div className="flex gap-3 justify-end">
+                                <Button variant="secondary" className="text-sm px-4 py-2 rounded-xl" onClick={() => setShowDeleteConfirm(false)}>
+                                    Cancel
+                                </Button>
+                                <Button variant="ghost" className="text-negative hover:bg-negative/10 text-sm px-4 py-2 rounded-xl" onClick={onSignOut}>
+                                    Yes, delete my account
+                                </Button>
+                            </div>
+                        </div>
+                    )}
                 </Card>
             </section>
 
