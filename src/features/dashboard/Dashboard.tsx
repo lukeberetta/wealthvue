@@ -3,7 +3,6 @@ import {
     Plus,
     ArrowUpRight,
     ArrowDownRight,
-    Trash2,
     Loader2,
     Target,
     Pencil,
@@ -334,18 +333,8 @@ export const Dashboard = ({ user, isDemo, onSignIn, onSignOut, onGoHome, onUpdat
 
                 {/* Asset list */}
                 <div>
-                    <div className="flex items-center justify-between mb-6">
+                    <div className="mb-6">
                         <h3 className="text-xl font-serif text-text-1">Holdings</h3>
-                        {selectedAssetIds.length > 0 && (
-                            <Button
-                                variant="ghost"
-                                onClick={isDemo ? onSignIn : handleBulkDelete}
-                                className="text-negative hover:bg-negative/5 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider py-1.5 px-3 rounded-lg"
-                            >
-                                <Trash2 size={13} />
-                                Delete ({selectedAssetIds.length})
-                            </Button>
-                        )}
                     </div>
                     <AssetList
                         assets={sortedAssets}
@@ -368,6 +357,7 @@ export const Dashboard = ({ user, isDemo, onSignIn, onSignOut, onGoHome, onUpdat
                         onRefreshAsset={isDemo ? undefined : handleRefreshAsset}
                         sortBy={sortBy}
                         onSortChange={setSortBy}
+                        onBulkDelete={isDemo ? onSignIn : handleBulkDelete}
                     />
                 </div>
             </main>

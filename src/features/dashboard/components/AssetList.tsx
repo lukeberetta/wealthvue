@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { LineChart, Coins, Car, Home, Wallet, MoreHorizontal, Sparkles, Plus, Search, Download, X, ChevronDown, Gem, Layers } from "lucide-react";
+import { LineChart, Coins, Car, Home, Wallet, MoreHorizontal, Sparkles, Plus, Search, Download, X, ChevronDown, Gem, Layers, Trash2 } from "lucide-react";
 import { Asset } from "../../../types";
 import { Button } from "../../../components/ui/Button";
 import { AssetRow } from "./AssetRow";
@@ -19,6 +19,7 @@ interface AssetListProps {
     onRefreshAsset?: (asset: Asset) => void;
     sortBy: 'value_desc' | 'value_asc' | 'name_asc';
     onSortChange: (sort: 'value_desc' | 'value_asc' | 'name_asc') => void;
+    onBulkDelete?: () => void;
 }
 
 const TYPE_LABELS: Record<string, string> = {
@@ -58,6 +59,7 @@ export const AssetList = ({
     onRefreshAsset,
     sortBy,
     onSortChange,
+    onBulkDelete,
 }: AssetListProps) => {
     const [searchQuery, setSearchQuery] = useState('');
     const [accountFilter, setAccountFilter] = useState<string | null>(null);
@@ -188,11 +190,22 @@ export const AssetList = ({
                     <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-text-3" size={12} />
                 </div>
 
-                {/* Export — pushed to the far right */}
+                {/* Delete selected — pushed to the far right */}
+                {selectedAssetIds.length > 0 && onBulkDelete && (
+                    <button
+                        onClick={onBulkDelete}
+                        className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-negative hover:bg-negative/5 border border-negative/20 transition-all"
+                    >
+                        <Trash2 size={12} />
+                        Delete ({selectedAssetIds.length})
+                    </button>
+                )}
+
+                {/* Export */}
                 <button
                     onClick={handleExportCSV}
                     title="Export as CSV"
-                    className="ml-auto p-1.5 rounded-lg text-text-3 hover:text-text-1 hover:bg-surface-2 border border-border transition-all"
+                    className={cn("p-1.5 rounded-lg text-text-3 hover:text-text-1 hover:bg-surface-2 border border-border transition-all", selectedAssetIds.length === 0 && "ml-auto")}
                 >
                     <Download size={13} />
                 </button>
