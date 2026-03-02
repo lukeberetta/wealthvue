@@ -2,9 +2,22 @@ import React, { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { Asset, User, NAVHistoryEntry, FinancialGoal } from "../../../types";
 import { storage } from "../../../services/storage";
+import {
+    loadAssets,
+    saveAsset,
+    saveAssets,
+    deleteAsset,
+    deleteAssets,
+    loadNAVHistory,
+    saveNAVSnapshot,
+    loadGoal,
+    saveGoal as firestoreSaveGoal,
+    clearGoal as firestoreClearGoal,
+} from "../../../services/firestoreService";
 import { fetchFXRates, convertCurrency } from "../../../lib/fx";
 import { parseTextToAsset, parseScreenshotToAssets } from "../../../services/gemini";
 import { fetchLiveQuote, LIVE_PRICE_TYPES } from "../../../services/priceApi";
+import { useAuth } from "../../../contexts/AuthContext";
 
 type ChangePeriod = '1D' | '1W' | '1M' | 'All';
 
@@ -21,6 +34,9 @@ function getPeriodAnchor(history: NAVHistoryEntry[], period: ChangePeriod): NAVH
 }
 
 export const useDashboard = (user: User | null, isDemo: boolean) => {
+    const { firebaseUser } = useAuth();
+    const uid = firebaseUser?.uid ?? null;
+
     const [assets, setAssets] = useState<Asset[]>([]);
     const [navHistory, setNavHistory] = useState<NAVHistoryEntry[]>([]);
     const [displayCurrency, setDisplayCurrency] = useState(user?.defaultCurrency || "ZAR");
@@ -43,22 +59,44 @@ export const useDashboard = (user: User | null, isDemo: boolean) => {
     const [isEditingGoal, setIsEditingGoal] = useState(false);
     const [refreshingAssetId, setRefreshingAssetId] = useState<string | null>(null);
 
+    // -------------------------------------------------------------------------
+    // Initial data load
+    // -------------------------------------------------------------------------
     useEffect(() => {
         const loadData = async () => {
             setIsLoading(true);
             const rates = await fetchFXRates();
             setFxRates(rates.rates);
 
-            const loadedAssets = storage.getAssets(isDemo);
-            const loadedHistory = storage.getNAVHistory(isDemo);
+            let loadedAssets: Asset[];
+            let loadedHistory: NAVHistoryEntry[];
+            let loadedGoal: FinancialGoal | null;
+
+            if (isDemo) {
+                // Demo: read static local data — never touches Firestore
+                loadedAssets = storage.getAssets(true);
+                loadedHistory = storage.getNAVHistory(true);
+                loadedGoal = storage.getGoal(true);
+            } else if (uid) {
+                // Real user: load from Firestore
+                [loadedAssets, loadedHistory, loadedGoal] = await Promise.all([
+                    loadAssets(uid),
+                    loadNAVHistory(uid),
+                    loadGoal(uid),
+                ]);
+            } else {
+                loadedAssets = [];
+                loadedHistory = [];
+                loadedGoal = null;
+            }
 
             setAssets(loadedAssets);
             setNavHistory(loadedHistory);
-            setGoalState(storage.getGoal(isDemo));
+            setGoalState(loadedGoal);
             setIsLoading(false);
 
-            if (!isDemo && user) {
-                // Auto-refresh prices via Yahoo Finance API
+            // Auto-refresh live prices + write daily NAV snapshot (real users only)
+            if (!isDemo && uid) {
                 let updated = false;
                 const newAssets = await Promise.all(loadedAssets.map(async (asset) => {
                     if (asset.ticker && LIVE_PRICE_TYPES.includes(asset.assetType)) {
@@ -81,7 +119,9 @@ export const useDashboard = (user: User | null, isDemo: boolean) => {
 
                 if (updated) {
                     setAssets(newAssets);
-                    storage.saveAssets(newAssets);
+                    // Batch-save only the assets that changed
+                    const changed = newAssets.filter((a, i) => a !== loadedAssets[i]);
+                    await saveAssets(uid, changed);
                 }
 
                 const today = new Date().toISOString().split('T')[0];
@@ -91,15 +131,18 @@ export const useDashboard = (user: User | null, isDemo: boolean) => {
                     const totalNAV = navAssets.reduce((acc, asset) => {
                         return acc + convertCurrency(asset.totalValue, asset.totalValueCurrency, "USD", rates.rates);
                     }, 0);
-                    const newHistory = [...loadedHistory, { date: today, totalNAV, displayCurrency: "ZAR" }];
-                    setNavHistory(newHistory);
-                    storage.saveNAVHistory(newHistory);
+                    const entry: NAVHistoryEntry = { date: today, totalNAV, displayCurrency: "USD" };
+                    setNavHistory(prev => [...prev, entry]);
+                    await saveNAVSnapshot(uid, entry);
                 }
             }
         };
         loadData();
-    }, [isDemo, user]);
+    }, [isDemo, uid]);
 
+    // -------------------------------------------------------------------------
+    // Derived values
+    // -------------------------------------------------------------------------
     const totalNAV = assets.reduce((acc, asset) => {
         return acc + convertCurrency(asset.totalValue, asset.totalValueCurrency, displayCurrency, fxRates);
     }, 0);
@@ -113,6 +156,9 @@ export const useDashboard = (user: User | null, isDemo: boolean) => {
         ? (totalNAV > 0 ? 100 : 0)
         : (change / convertedPrevNAV) * 100;
 
+    // -------------------------------------------------------------------------
+    // Handlers
+    // -------------------------------------------------------------------------
     const handleAddAsset = async () => {
         if (isDemo) return;
         setIsAnalyzing(true);
@@ -136,9 +182,10 @@ export const useDashboard = (user: User | null, isDemo: boolean) => {
                     inputMethod: 'text'
                 } as Asset]);
             }
-        } catch (e: any) {
+        } catch (e: unknown) {
             console.error(e);
-            if (e.message?.includes("quota") || e.status === "RESOURCE_EXHAUSTED" || e.message?.includes("429")) {
+            const err = e as { message?: string; status?: string };
+            if (err.message?.includes("quota") || err.status === "RESOURCE_EXHAUSTED" || err.message?.includes("429")) {
                 setAnalysisError("AI Quota Exceeded. Please wait a minute or upgrade your plan to continue.");
             } else {
                 setAnalysisError("Failed to analyze text. Please try describing it differently.");
@@ -148,8 +195,11 @@ export const useDashboard = (user: User | null, isDemo: boolean) => {
         }
     };
 
-    const handleSaveDrafts = (globalSource?: string) => {
+    const handleSaveDrafts = async (globalSource?: string) => {
+        if (!uid) return;
         let updatedAssets = [...assets];
+        const newToSave: Asset[] = [];
+        const updatedToSave: Asset[] = [];
 
         (draftAssets as Asset[]).forEach(draft => {
             const existingIdx = updatedAssets.findIndex(a =>
@@ -168,7 +218,7 @@ export const useDashboard = (user: User | null, isDemo: boolean) => {
                 if (sourceToUse) sources.add(sourceToUse);
                 const combinedSource = Array.from(sources).join(", ");
 
-                updatedAssets[existingIdx] = {
+                const merged = {
                     ...existing,
                     quantity: newQuantity,
                     totalValue: newTotalValue,
@@ -176,25 +226,34 @@ export const useDashboard = (user: User | null, isDemo: boolean) => {
                     updatedAt: new Date().toISOString(),
                     aiRationale: `Combined holdings. ${existing.aiRationale || ""} ${draft.aiRationale || ""}`.trim()
                 };
+                updatedAssets[existingIdx] = merged;
+                updatedToSave.push(merged);
             } else {
-                updatedAssets.push(sourceToUse ? { ...draft, source: sourceToUse } : draft);
+                const toAdd = sourceToUse ? { ...draft, source: sourceToUse } : draft;
+                updatedAssets.push(toAdd);
+                newToSave.push(toAdd);
             }
         });
 
         setAssets(updatedAssets);
-        storage.saveAssets(updatedAssets);
         setDraftAssets([]);
         setIsAddModalOpen(false);
         setInputText("");
+
+        // Persist to Firestore (fire-and-forget — UI already updated)
+        await Promise.all([
+            saveAssets(uid, newToSave),
+            saveAssets(uid, updatedToSave),
+        ]);
     };
 
-    const handleBulkDelete = () => {
-        if (isDemo) return;
+    const handleBulkDelete = async () => {
+        if (isDemo || !uid) return;
         const newAssets = assets.filter(a => !selectedAssetIds.includes(a.id));
         setAssets(newAssets);
-        storage.saveAssets(newAssets);
         setSelectedAssetIds([]);
         setIsSelectMode(false);
+        await deleteAssets(uid, selectedAssetIds);
     };
 
     const sortedAssets = [...assets].sort((a, b) => {
@@ -211,34 +270,34 @@ export const useDashboard = (user: User | null, isDemo: boolean) => {
         return a.name.localeCompare(b.name);
     });
 
-    const handleUpdateAsset = (updated: Asset) => {
+    const handleUpdateAsset = async (updated: Asset) => {
         const newAssets = assets.map(a => a.id === updated.id ? updated : a);
         setAssets(newAssets);
-        storage.saveAssets(newAssets);
         setIsEditModalOpen(false);
+        if (uid) await saveAsset(uid, updated);
     };
 
-    const handleDeleteAsset = (id: string) => {
+    const handleDeleteAsset = async (id: string) => {
         const newAssets = assets.filter(a => a.id !== id);
         setAssets(newAssets);
-        storage.saveAssets(newAssets);
         setIsEditModalOpen(false);
+        if (uid) await deleteAsset(uid, id);
     };
 
-    const handleSaveGoal = (newGoal: FinancialGoal) => {
+    const handleSaveGoal = async (newGoal: FinancialGoal) => {
         setGoalState(newGoal);
-        storage.saveGoal(newGoal);
         setIsEditingGoal(false);
+        if (uid) await firestoreSaveGoal(uid, newGoal);
     };
 
-    const handleClearGoal = () => {
+    const handleClearGoal = async () => {
         setGoalState(null);
-        storage.clearGoal();
         setIsEditingGoal(false);
+        if (uid) await firestoreClearGoal(uid);
     };
 
     const handleRefreshAsset = async (asset: Asset) => {
-        if (isDemo || !asset.ticker) return;
+        if (isDemo || !asset.ticker || !uid) return;
         if (!LIVE_PRICE_TYPES.includes(asset.assetType)) return;
         setRefreshingAssetId(asset.id);
         try {
@@ -253,9 +312,8 @@ export const useDashboard = (user: User | null, isDemo: boolean) => {
                     valueSource: "live_price",
                     lastRefreshed: new Date().toISOString(),
                 };
-                const newAssets = assets.map(a => a.id === asset.id ? updated : a);
-                setAssets(newAssets);
-                storage.saveAssets(newAssets);
+                setAssets(prev => prev.map(a => a.id === asset.id ? updated : a));
+                await saveAsset(uid, updated);
             }
         } finally {
             setRefreshingAssetId(null);
@@ -291,9 +349,10 @@ export const useDashboard = (user: User | null, isDemo: boolean) => {
                         inputMethod: 'screenshot'
                     } as Asset;
                 }));
-            } catch (e: any) {
+            } catch (e: unknown) {
                 console.error(e);
-                if (e.message?.includes("quota") || e.status === "RESOURCE_EXHAUSTED" || e.message?.includes("429")) {
+                const err = e as { message?: string; status?: string };
+                if (err.message?.includes("quota") || err.status === "RESOURCE_EXHAUSTED" || err.message?.includes("429")) {
                     setAnalysisError("AI Quota Exceeded. Please wait a minute before trying again.");
                 } else {
                     setAnalysisError("Failed to process screenshot. The image might be too large or unclear.");
@@ -351,6 +410,8 @@ export const useDashboard = (user: User | null, isDemo: boolean) => {
         handleDeleteAsset,
         handleFileUpload,
         refreshingAssetId,
-        handleRefreshAsset
+        handleRefreshAsset,
+        isAccountMenuOpen,
+        setIsAccountMenuOpen,
     };
 };
