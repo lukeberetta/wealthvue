@@ -250,19 +250,46 @@ All currency fields MUST be valid ISO 4217 codes.`;
 }
 
 export async function analyzePortfolio(
-  breakdown: { assetType: string; value: number; pct: number }[],
+  breakdown: { assetType: string; value: number; pct: number; count: number }[],
   totalNAV: number,
-  currency: string
+  currency: string,
+  assetDetails: { name: string; ticker: string | null; assetType: string; valuePct: number }[],
+  goal: { targetAmount: number; currency: string; progressPct: number } | null,
+  navTrend: { change: number; changePct: number; period: string } | null
 ): Promise<{ summary: string; advice: string[] } | null> {
-  const breakdownTable = breakdown
-    .map(b => `- ${b.assetType}: ${b.pct.toFixed(1)}% (${currency} ${b.value.toLocaleString(undefined, { maximumFractionDigits: 0 })})`)
+  // Group individual holdings by type so we can list them under each row
+  const holdingsByType: Record<string, { name: string; ticker: string | null; valuePct: number }[]> = {};
+  for (const detail of assetDetails) {
+    if (!holdingsByType[detail.assetType]) holdingsByType[detail.assetType] = [];
+    holdingsByType[detail.assetType].push({ name: detail.name, ticker: detail.ticker, valuePct: detail.valuePct });
+  }
+
+  const breakdownBlock = [...breakdown]
+    .sort((a, b) => b.pct - a.pct)
+    .map(b => {
+      const typeLabel = b.assetType.charAt(0).toUpperCase() + b.assetType.slice(1);
+      const holdings = holdingsByType[b.assetType] || [];
+      const holdingsStr = holdings
+        .map(h => `${h.ticker ? `${h.name} (${h.ticker})` : h.name} ${h.valuePct.toFixed(1)}%`)
+        .join(", ");
+      return `- ${typeLabel}: ${b.pct.toFixed(1)}% (${currency} ${b.value.toLocaleString(undefined, { maximumFractionDigits: 0 })} | ${b.count} holding${b.count !== 1 ? "s" : ""})${holdingsStr ? `\n    ${holdingsStr}` : ""}`;
+    })
     .join("\n");
 
-  const systemInstruction = `You are a sharp, senior wealth advisor — precise, direct, and never generic. You are analyzing a client's investment portfolio.
+  const trendLine = navTrend
+    ? `\nPortfolio trend (past ${navTrend.period}): ${navTrend.change >= 0 ? "+" : ""}${currency} ${Math.abs(navTrend.change).toLocaleString(undefined, { maximumFractionDigits: 0 })} (${navTrend.changePct >= 0 ? "+" : ""}${navTrend.changePct.toFixed(2)}%)`
+    : "";
 
-Portfolio breakdown (${currency}):
-${breakdownTable}
-Total NAV: ${currency} ${totalNAV.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+  const goalLine = goal
+    ? `\nFinancial goal: ${goal.currency} ${goal.targetAmount.toLocaleString(undefined, { maximumFractionDigits: 0 })} — ${goal.progressPct.toFixed(1)}% achieved`
+    : "";
+
+  const systemInstruction = `You are a sharp, senior wealth advisor — precise, direct, and never generic. You are analysing a real client's portfolio.
+
+Total Net Worth: ${currency} ${totalNAV.toLocaleString(undefined, { maximumFractionDigits: 0 })}${trendLine}${goalLine}
+
+Portfolio composition:
+${breakdownBlock}
 
 Respond ONLY with valid JSON in this exact format:
 {
@@ -271,13 +298,13 @@ Respond ONLY with valid JSON in this exact format:
 }
 
 Rules:
-- "summary": 2–3 sentences. Be specific about this portfolio's actual composition and risk profile. Do NOT use clichés like "diversification is key" — say something that only applies to THIS portfolio.
-- "advice": exactly 3–4 items. Each must be a concrete, specific recommendation that references this portfolio's actual numbers or types. No vague platitudes. Write like you're advising a real client — confident, informed, and slightly direct.
+- "summary": 2–3 sentences. Reference specific holdings or tickers by name. Say something that only applies to THIS portfolio.
+- "advice": exactly 3–4 items. Each must name specific assets, tickers, or allocation values from above. Be direct and opinionated — say what to do and why, not just what to consider.
 - Do NOT wrap in markdown. Raw JSON only.`;
 
   try {
     const contents = `Analyse this portfolio and return the JSON.`;
-    const response = await callAIWithRotation(contents, systemInstruction, false);
+    const response = await callAIWithRotation(contents, systemInstruction, true);
     const cleanedText = response.text.replace(/```json\n?/, "").replace(/```\n?$/, "").trim();
     return JSON.parse(cleanedText || "null");
   } catch (error) {

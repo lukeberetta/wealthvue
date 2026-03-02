@@ -44,6 +44,7 @@ export const Dashboard = ({ user, isDemo, onSignIn, onSignOut, onGoHome, onUpdat
 
     const {
         assets,
+        navHistory,
         displayCurrency,
         setDisplayCurrency,
         fxRates,
@@ -418,6 +419,8 @@ export const Dashboard = ({ user, isDemo, onSignIn, onSignOut, onGoHome, onUpdat
                 fxRates={fxRates}
                 archetypeTitle={archetype.title}
                 archetypeSubtitle={archetype.subtitle}
+                goal={goal}
+                navHistory={navHistory}
             />
 
             <FeedbackModal
