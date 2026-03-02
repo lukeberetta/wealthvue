@@ -70,13 +70,29 @@ export function AppNav({
         >
             {/* Demo banner */}
             {isDemo && isOnApp && (
-                <div className="bg-accent text-white py-2 text-center text-xs font-bold uppercase tracking-widest shrink-0">
-                    DEMO MODE ·{" "}
-                    <button onClick={onSignIn} className="underline hover:no-underline">
-                        Sign in
-                    </button>{" "}
-                    to track your real assets
-                </div>
+                <button onClick={onSignIn} className="bg-accent text-white py-2 shrink-0 overflow-hidden w-full cursor-pointer hover:bg-accent/90 transition-colors">
+                    <div
+                        className="flex whitespace-nowrap text-xs font-bold uppercase tracking-widest"
+                        style={{ animation: "ticker 35s linear infinite" }}
+                    >
+                        {[0, 1].map(i => (
+                            <span key={i}>
+                                You're exploring WealthVue in demo mode
+                                &nbsp;&nbsp;·&nbsp;&nbsp;
+                                Sign in free to track your real portfolio
+                                &nbsp;&nbsp;·&nbsp;&nbsp;
+                                AI-powered asset entry — stocks, crypto, property &amp; more
+                                &nbsp;&nbsp;·&nbsp;&nbsp;
+                                Live FX conversion across 30+ currencies
+                                &nbsp;&nbsp;·&nbsp;&nbsp;
+                                See your true net worth in real time
+                                &nbsp;&nbsp;·&nbsp;&nbsp;
+                                Create your free account →
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            </span>
+                        ))}
+                    </div>
+                </button>
             )}
             <div className="max-w-[1120px] mx-auto w-full px-6 flex items-center justify-between py-4 shrink-0">
 
