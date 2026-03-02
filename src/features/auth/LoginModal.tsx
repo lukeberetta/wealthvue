@@ -1,23 +1,34 @@
 import React, { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { Modal } from "../../components/ui/Modal";
+import { useAuth } from "../../contexts/AuthContext";
 
 interface LoginModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onSignIn: () => void;
 }
 
-export const LoginModal = ({ isOpen, onClose, onSignIn }: LoginModalProps) => {
+export const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
+    const { signInWithGoogle } = useAuth();
     const [isSigningIn, setIsSigningIn] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
-    const handleSignIn = () => {
+    const handleSignIn = async () => {
         setIsSigningIn(true);
-        setTimeout(() => {
-            onSignIn();
-            setIsSigningIn(false);
+        setError(null);
+        try {
+            await signInWithGoogle();
             onClose();
-        }, 1500);
+        } catch (err: unknown) {
+            console.error("Google sign-in failed:", err);
+            // Don't show an error for user-cancelled popups
+            const code = (err as { code?: string })?.code;
+            if (code !== "auth/popup-closed-by-user" && code !== "auth/cancelled-popup-request") {
+                setError("Sign-in failed. Please try again.");
+            }
+        } finally {
+            setIsSigningIn(false);
+        }
     };
 
     return (
@@ -30,6 +41,7 @@ export const LoginModal = ({ isOpen, onClose, onSignIn }: LoginModalProps) => {
                 <p className="text-text-secondary mb-8">Sign in to start managing your portfolio.</p>
 
                 <button
+                    id="btn-google-signin"
                     onClick={handleSignIn}
                     disabled={isSigningIn}
                     className="w-full flex items-center justify-center gap-3 bg-white text-gray-900 border border-border hover:bg-gray-50 transition-colors py-3 rounded-lg font-medium shadow-sm disabled:opacity-50"
@@ -46,6 +58,10 @@ export const LoginModal = ({ isOpen, onClose, onSignIn }: LoginModalProps) => {
                     )}
                     {isSigningIn ? "Signing in..." : "Continue with Google"}
                 </button>
+
+                {error && (
+                    <p className="mt-4 text-sm text-red-500">{error}</p>
+                )}
 
                 <p className="mt-6 text-xs text-text-secondary">
                     By continuing, you agree to WealthVue's <a href="#" className="underline">Terms of Service</a> and <a href="#" className="underline">Privacy Policy</a>.

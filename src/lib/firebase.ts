@@ -1,12 +1,12 @@
 /// <reference types="vite/client" />
 
 import { initializeApp, getApps, getApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import { getAuth, connectAuthEmulator } from "firebase/auth";
+import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
 import { getAnalytics, isSupported } from "firebase/analytics";
 
 // ---------------------------------------------------------------------------
-// Firebase configuration — all values are sourced from environment variables.
+// Firebase configuration — all values sourced from environment variables.
 // Copy .env.example to .env.local and fill in your project's credentials.
 // ---------------------------------------------------------------------------
 const firebaseConfig = {
@@ -38,5 +38,16 @@ const db = getFirestore(app);
 const analyticsPromise = isSupported().then((supported) =>
     supported ? getAnalytics(app) : null
 );
+
+// ---------------------------------------------------------------------------
+// Emulator connections
+// Set VITE_USE_EMULATOR=true in your .env to connect to the local emulator suite.
+// Run: firebase emulators:start
+// ---------------------------------------------------------------------------
+if (import.meta.env.VITE_USE_EMULATOR === "true") {
+    connectAuthEmulator(auth, "http://localhost:9099", { disableWarnings: false });
+    connectFirestoreEmulator(db, "localhost", 8080);
+    console.info("[WealthVue] 🔧 Connected to Firebase Emulator Suite");
+}
 
 export { app, auth, db, analyticsPromise };

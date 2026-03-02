@@ -1,16 +1,17 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Routes, Route, useNavigate, useLocation, Navigate } from "react-router-dom";
-import { storage } from "./services/storage";
-import { User } from "./types";
 import { LandingPage } from "./features/landing/LandingPage";
 import { Dashboard } from "./features/dashboard/Dashboard";
 import { LoginModal } from "./features/auth/LoginModal";
 import { useTheme, ThemeMode } from "./hooks/useTheme";
+import { AuthProvider, useAuth } from "./contexts/AuthContext";
 
 // ---------------------------------------------------------------------------
 // Theme context — consumed by nav and settings
 // ---------------------------------------------------------------------------
+import { createContext, useContext } from "react";
+
 interface ThemeContextValue {
   mode: ThemeMode;
   setTheme: (m: ThemeMode) => void;
@@ -22,63 +23,47 @@ export const ThemeContext = createContext<ThemeContextValue>({
 export const useThemeContext = () => useContext(ThemeContext);
 
 // ---------------------------------------------------------------------------
-// App
+// Protected route — allows access if signed in OR in demo mode
 // ---------------------------------------------------------------------------
-export default function App() {
+function AppRoute() {
+  const { user, isDemo, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-bg flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!user && !isDemo) {
+    return <Navigate to="/" replace />;
+  }
+
+  return null; // renders the Dashboard below via the outer Routes
+}
+
+// ---------------------------------------------------------------------------
+// Inner app — must be inside AuthProvider so useAuth() works
+// ---------------------------------------------------------------------------
+function Inner() {
   const { mode, setTheme } = useTheme();
-
-  const [user, setUser] = useState<User | null>(null);
-  const [isDemo, setIsDemo] = useState(false);
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-
+  const { user, isDemo, loading, setDemo, signOut, updateUser } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
-  useEffect(() => {
-    const savedUser = storage.getUser();
-    if (savedUser) {
-      setUser(savedUser);
-      if (window.location.pathname === "/") {
-        navigate("/app", { replace: true });
-      }
+  const [isLoginModalOpen, setIsLoginModalOpen] = React.useState(false);
+
+  // Redirect to /app once signed in from the landing page
+  React.useEffect(() => {
+    if (user && location.pathname === "/") {
+      navigate("/app", { replace: true });
     }
-  }, []);
+  }, [user, location.pathname, navigate]);
 
-  const handleSignIn = async () => {
-    let countryCode = "ZA"; // Default
-    try {
-      const response = await fetch("https://ipapi.co/json/");
-      if (response.ok) {
-        const data = await response.json();
-        if (data.country) {
-          countryCode = data.country;
-        }
-      }
-    } catch (e) {
-      console.warn("Could not fetch IP data, defaulting country.", e);
-    }
-
-    const mockUser: User = {
-      displayName: "Alex Morgan",
-      email: "alex@example.com",
-      photoURL: "https://api.dicebear.com/7.x/avataaars/svg?seed=Alex",
-      defaultCurrency: "ZAR",
-      country: countryCode,
-      plan: "trial",
-      trialStartDate: new Date().toISOString(),
-      trialEndsAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-      createdAt: new Date().toISOString(),
-    };
-    storage.saveUser(mockUser);
-    setUser(mockUser);
-    setIsDemo(false);
-    navigate("/app");
-  };
-
-  const handleTryDemo = () => { setIsDemo(true); navigate("/app"); };
-  const handleSignOut = () => { storage.clearUser(); setUser(null); setIsDemo(false); navigate("/"); };
+  const handleTryDemo = () => { setDemo(true); navigate("/app"); };
+  const handleSignOut = async () => { await signOut(); navigate("/"); };
   const handleGoHome = () => navigate("/");
-  const handleUpdateUser = (updatedUser: User) => { setUser(updatedUser); storage.saveUser(updatedUser); };
 
   return (
     <ThemeContext.Provider value={{ mode, setTheme }}>
@@ -101,19 +86,28 @@ export default function App() {
                     onSignIn={() => setIsLoginModalOpen(true)}
                     onTryDemo={handleTryDemo}
                     onSignOut={handleSignOut}
-                  />}
+                  />
+                }
               />
               <Route
                 path="/app"
                 element={
-                  <Dashboard
-                    user={user}
-                    isDemo={isDemo}
-                    onSignIn={() => setIsLoginModalOpen(true)}
-                    onSignOut={handleSignOut}
-                    onGoHome={handleGoHome}
-                    onUpdateUser={handleUpdateUser}
-                  />
+                  loading ? (
+                    <div className="min-h-screen bg-bg flex items-center justify-center">
+                      <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin" />
+                    </div>
+                  ) : (!user && !isDemo) ? (
+                    <Navigate to="/" replace />
+                  ) : (
+                    <Dashboard
+                      user={user}
+                      isDemo={isDemo}
+                      onSignIn={() => setIsLoginModalOpen(true)}
+                      onSignOut={handleSignOut}
+                      onGoHome={handleGoHome}
+                      onUpdateUser={updateUser}
+                    />
+                  )
                 }
               />
               <Route path="*" element={<Navigate to="/" replace />} />
@@ -124,9 +118,19 @@ export default function App() {
         <LoginModal
           isOpen={isLoginModalOpen}
           onClose={() => setIsLoginModalOpen(false)}
-          onSignIn={handleSignIn}
         />
       </div>
     </ThemeContext.Provider>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// App — wraps everything in AuthProvider
+// ---------------------------------------------------------------------------
+export default function App() {
+  return (
+    <AuthProvider>
+      <Inner />
+    </AuthProvider>
   );
 }
