@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { ArrowLeft, CreditCard, Trash2, LogOut, Palette, ChevronDown } from "lucide-react";
 import { User } from "../../types";
 import { Card } from "../../components/ui/Card";
@@ -14,12 +14,20 @@ interface SettingsViewProps {
 }
 
 export const SettingsView = ({ user, onSignOut, onBack, onUpdateUser }: SettingsViewProps) => {
+    const [displayName, setDisplayName] = useState(user?.displayName ?? "");
+
     const handleCurrencyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        if (user) onUpdateUser({ ...user, defaultCurrency: e.target.value });
+        if (user) onUpdateUser({ ...user, displayName, defaultCurrency: e.target.value });
     };
 
     const handleCountryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        if (user) onUpdateUser({ ...user, country: e.target.value });
+        if (user) onUpdateUser({ ...user, displayName, country: e.target.value });
+    };
+
+    const handleDisplayNameBlur = () => {
+        if (user && displayName !== user.displayName) {
+            onUpdateUser({ ...user, displayName });
+        }
     };
 
     const SUPPORTED_COUNTRIES = [
@@ -52,12 +60,12 @@ export const SettingsView = ({ user, onSignOut, onBack, onUpdateUser }: Settings
                     <div className="flex items-center gap-4">
                         <div className={cn(
                             "w-14 h-14 rounded-full flex items-center justify-center text-xl font-bold shrink-0",
-                            user?.displayName ? avatarPalette(user.displayName) : "bg-surface-2 text-text-3"
+                            displayName ? avatarPalette(displayName) : "bg-surface-2 text-text-3"
                         )}>
-                            {user?.displayName ? getInitials(user.displayName) : ""}
+                            {displayName ? getInitials(displayName) : ""}
                         </div>
                         <div>
-                            <p className="font-medium text-text-1">{user?.displayName}</p>
+                            <p className="font-medium text-text-1">{displayName || user?.displayName}</p>
                             <p className="text-sm text-text-3">{user?.email}</p>
                         </div>
                     </div>
@@ -66,7 +74,9 @@ export const SettingsView = ({ user, onSignOut, onBack, onUpdateUser }: Settings
                             <label className="text-[10px] uppercase font-bold text-text-3 tracking-wider">Display Name</label>
                             <input
                                 className="w-full bg-surface-2 border border-border rounded-xl px-3 py-2 text-sm text-text-1 focus:outline-none focus:ring-2 focus:ring-accent/20"
-                                defaultValue={user?.displayName}
+                                value={displayName}
+                                onChange={(e) => setDisplayName(e.target.value)}
+                                onBlur={handleDisplayNameBlur}
                             />
                         </div>
                         <div className="space-y-1.5">

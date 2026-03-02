@@ -185,7 +185,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setIsDemo(false);
     };
 
-    const updateUser = (updated: User) => setUser(updated);
+    const updateUser = (updated: User) => {
+        setUser(updated);
+        if (firebaseUser) {
+            const userRef = doc(db, "users", firebaseUser.uid);
+            setDoc(userRef, {
+                displayName: updated.displayName,
+                defaultCurrency: updated.defaultCurrency,
+                country: updated.country,
+                updatedAt: serverTimestamp(),
+            }, { merge: true }).catch((err) => {
+                console.error("Failed to persist user profile update:", err);
+            });
+        }
+    };
 
     return (
         <AuthContext.Provider
