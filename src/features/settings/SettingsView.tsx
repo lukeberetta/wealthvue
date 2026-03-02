@@ -45,7 +45,7 @@ export const SettingsView = ({ user, onSignOut, onBack, onUpdateUser }: Settings
     ];
 
     return (
-        <div className="max-w-2xl mx-auto w-full py-10 px-6 space-y-10">
+        <div className="max-w-2xl mx-auto w-full py-10 space-y-10">
             {/* Header */}
             <div className="flex items-center gap-4">
                 <button
@@ -125,7 +125,7 @@ export const SettingsView = ({ user, onSignOut, onBack, onUpdateUser }: Settings
             <section className="space-y-3">
                 <h3 className="text-[10px] font-bold text-text-3 uppercase tracking-[0.18em]">Appearance</h3>
                 <Card className="p-6">
-                    <div className="flex items-start justify-between gap-8">
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between sm:gap-8">
                         <div className="flex items-start gap-3">
                             <div className="w-9 h-9 rounded-xl bg-accent-light flex items-center justify-center text-accent shrink-0 mt-0.5">
                                 <Palette size={17} />
@@ -137,7 +137,7 @@ export const SettingsView = ({ user, onSignOut, onBack, onUpdateUser }: Settings
                                 </p>
                             </div>
                         </div>
-                        <div className="shrink-0 pt-0.5">
+                        <div className="shrink-0 sm:pt-0.5">
                             <ThemeToggle variant="labeled" />
                         </div>
                     </div>

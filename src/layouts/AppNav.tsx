@@ -126,12 +126,12 @@ export function AppNav({
                     <ThemeToggle variant="compact" />
 
                     {/* Separator */}
-                    <div className="w-px h-4 bg-border mx-0.5" />
+                    <div className="hidden sm:block w-px h-4 bg-border mx-0.5" />
 
                     {/* Currency selector — only when inside app */}
                     {displayCurrency && fxRates && onDisplayCurrencyChange && (
                         <>
-                            <div className="relative">
+                            <div className="relative hidden sm:block">
                                 <select
                                     value={displayCurrency}
                                     onChange={e => onDisplayCurrencyChange(e.target.value)}
@@ -147,7 +147,7 @@ export function AppNav({
                                     className="absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none text-text-3"
                                 />
                             </div>
-                            <div className="w-px h-4 bg-border mx-0.5" />
+                            <div className="hidden sm:block w-px h-4 bg-border mx-0.5" />
                         </>
                     )}
 

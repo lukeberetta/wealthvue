@@ -174,7 +174,7 @@ export const Dashboard = ({ user, isDemo, onSignIn, onSignOut, onGoHome, onUpdat
                             <p className="text-[10px] font-bold text-text-3 uppercase tracking-[0.22em] mb-3">
                                 Total Net Worth
                             </p>
-                            <h2 className="text-6xl md:text-7xl font-serif tabular-nums text-text-1 leading-none">
+                            <h2 className="text-[clamp(1.5rem,9vw,4.5rem)] md:text-7xl font-serif tabular-nums text-text-1 leading-none">
                                 <AnimatedNumber value={totalNAV} format={(n) => formatCurrency(n, displayCurrency)} />
                             </h2>
 

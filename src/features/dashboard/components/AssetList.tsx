@@ -141,7 +141,7 @@ export const AssetList = ({
             {/* Toolbar: search → account → sort → export */}
             <div className="flex items-center gap-2 mb-6 flex-wrap">
                 {/* Search */}
-                <div className="relative">
+                <div className="relative hidden sm:block">
                     <Search size={11} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-text-3 pointer-events-none" />
                     <input
                         value={searchQuery}
@@ -197,7 +197,7 @@ export const AssetList = ({
                         className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-negative hover:bg-negative/5 border border-negative/20 transition-all"
                     >
                         <Trash2 size={12} />
-                        Delete ({selectedAssetIds.length})
+                        <span className="hidden sm:inline">Delete </span>({selectedAssetIds.length})
                     </button>
                 )}
 
@@ -205,7 +205,7 @@ export const AssetList = ({
                 <button
                     onClick={handleExportCSV}
                     title="Export as CSV"
-                    className={cn("p-1.5 rounded-lg text-text-3 hover:text-text-1 hover:bg-surface-2 border border-border transition-all", selectedAssetIds.length === 0 && "ml-auto")}
+                    className={cn("hidden sm:block p-1.5 rounded-lg text-text-3 hover:text-text-1 hover:bg-surface-2 border border-border transition-all", selectedAssetIds.length === 0 && "ml-auto")}
                 >
                     <Download size={13} />
                 </button>
