@@ -2,9 +2,9 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
 import { ChevronDown, Settings, LogOut, LayoutDashboard, Globe, MessageSquare } from "lucide-react";
-import { User } from "../../types";
-import { cn, getInitials, avatarPalette } from "../../lib/utils";
-import { ThemeToggle } from "./ThemeToggle";
+import { User } from "../types";
+import { cn, getInitials, avatarPalette } from "../lib/utils";
+import { ThemeToggle } from "../components/ui/ThemeToggle";
 
 // ---------------------------------------------------------------------------
 // Props

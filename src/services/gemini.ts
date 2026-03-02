@@ -1,6 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
 import { AssetType, ValueSource, AIConfidence } from "../types";
-import { fetchLiveQuote, LIVE_PRICE_TYPES, LiveQuote } from "../lib/priceApi";
+import { fetchLiveQuote, LIVE_PRICE_TYPES, LiveQuote } from "./priceApi";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
 

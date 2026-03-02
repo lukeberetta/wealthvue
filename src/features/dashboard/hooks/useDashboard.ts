@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { Asset, User, NAVHistoryEntry, FinancialGoal } from "../../../types";
-import { storage } from "../../../lib/storage";
+import { storage } from "../../../services/storage";
 import { fetchFXRates, convertCurrency } from "../../../lib/fx";
 import { parseTextToAsset, parseScreenshotToAssets } from "../../../services/gemini";
-import { fetchLiveQuote, LIVE_PRICE_TYPES } from "../../../lib/priceApi";
+import { fetchLiveQuote, LIVE_PRICE_TYPES } from "../../../services/priceApi";
 
 type ChangePeriod = '1D' | '1W' | '1M' | 'All';
 

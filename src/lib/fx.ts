@@ -1,4 +1,4 @@
-import { storage } from "./storage";
+import { storage } from "../services/storage";
 import { FXCache } from "../types";
 
 const BASE_URL = "https://api.frankfurter.app";
@@ -35,10 +35,10 @@ export function convertCurrency(
   rates: { [key: string]: number }
 ): number {
   if (from === to) return amount;
-  
+
   // All rates are relative to USD
   const amountInUSD = from === "USD" ? amount : amount / (rates[from] || 1);
   const result = to === "USD" ? amountInUSD : amountInUSD * (rates[to] || 1);
-  
+
   return result;
 }

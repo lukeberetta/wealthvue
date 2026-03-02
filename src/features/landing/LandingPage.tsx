@@ -6,8 +6,8 @@ import {
 } from "lucide-react";
 import { cn } from "../../lib/utils";
 import { useScrollReveal } from "../../hooks/useScrollReveal";
-import { AppNav } from "../../components/ui/AppNav";
-import { Footer } from "../../components/ui/Footer";
+import { AppNav } from "../../layouts/AppNav";
+import { Footer } from "../../layouts/Footer";
 
 interface LandingPageProps {
     user: import("../../types").User | null;

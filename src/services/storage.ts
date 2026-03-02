@@ -1,5 +1,5 @@
 import { User, Asset, NAVHistoryEntry, FXCache, FinancialGoal } from "../types";
-import { DEMO_USER, DEMO_ASSETS, DEMO_NAV_HISTORY, DEMO_GOAL } from "./demoData";
+import { DEMO_USER, DEMO_ASSETS, DEMO_NAV_HISTORY, DEMO_GOAL } from "../data/demoData";
 
 const KEYS = {
   USER: "wealthvue_user",

@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Routes, Route, useNavigate, useLocation, Navigate } from "react-router-dom";
-import { storage } from "./lib/storage";
+import { storage } from "./services/storage";
 import { User } from "./types";
 import { LandingPage } from "./features/landing/LandingPage";
 import { Dashboard } from "./features/dashboard/Dashboard";
