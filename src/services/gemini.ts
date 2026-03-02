@@ -84,8 +84,8 @@ async function callAIWithRotation(
 }
 
 export async function parseTextToAsset(text: string, preferredCurrency: string = "ZAR", country: string = "ZA"): Promise<ParsedAsset | null> {
-  const systemInstruction = `You are a financial asset parser. The user will describe an asset in plain language. 
-Extract structured data and estimate its current market value. DO NOT search the internet for exact prices of stocks/crypto if a ticker is identified.
+  const systemInstruction = `You are a financial asset parser. The user will describe an asset in plain language.
+Extract structured data and estimate its current market value. If you are uncertain about a company's ticker symbol (e.g. it may have recently IPO'd after your training cutoff), use the Google Search tool to find the correct Yahoo Finance ticker — search for "[company name] stock ticker symbol NYSE NASDAQ". Do NOT use search to find current prices; prices will be fetched separately.
 
 Respond ONLY with valid raw JSON in this exact format:
 {
@@ -103,14 +103,15 @@ Respond ONLY with valid raw JSON in this exact format:
   "aiRationale": string,
   "description": string
 }
-IMPORTANT: The "source" field MUST only contain institutional names like "Robinhood", "Binance", or "Chase" if explicitly mentioned by the user. 
+IMPORTANT: The "source" field MUST only contain institutional names like "Robinhood", "Binance", or "Chase" if explicitly mentioned by the user.
 IMPORTANT: The "ticker" field MUST be a valid Yahoo Finance ticker symbol. For direct cryptocurrencies (like Bitcoin), it MUST end with "-USD" (e.g., "BTC-USD", "ETH-USD"). For ETFs (like Crypto ETFs or Gold ETFs), use the exact stock ticker (e.g., "IBIT", "IAUM"). For non-US stocks, include the appropriate exchange suffix (e.g., ".JO" for Johannesburg).
-Never include any text outside the JSON object. All currency fields MUST be valid ISO 4217 codes. 
+IMPORTANT: For stocks, ALWAYS provide a best-effort ticker symbol — never return null just because you are uncertain. Your training data has a cutoff date and may be wrong about a company's public/private status. If the user says they own shares in a company, treat it as publicly traded regardless of what your training data says. Do NOT state a company is private if the user is describing owning shares in it. For companies you believe recently IPO'd or whose ticker you are unsure of, infer the most likely ticker using short common abbreviations (2–4 characters, e.g., "Figma" → "FIG", "Stripe" → "STRP"). Only return null for ticker if the asset is clearly not a stock (e.g., personal property, vehicle, cash). When guessing a ticker, set aiConfidence to "low" and note in aiRationale that the ticker is inferred and may need verification.
+Never include any text outside the JSON object. All currency fields MUST be valid ISO 4217 codes.
 IMPORTANT: Valuations should be in ${preferredCurrency}. Make sure to estimate local market value in the country code ${country}.
 IMPORTANT CATEGORISATION: If the asset is a Bitcoin ETF or Crypto ETF, explicitly classify 'assetType' as "crypto". If the asset is a Gold ETF, Silver ETF, or other precious metal ETF/fund, strictly classify 'assetType' as "commodities". If the asset is a standard Index Fund, Mutual Fund, or ETF (e.g. S&P 500 ETF), strictly classify 'assetType' as "etf".`;
 
   try {
-    const response = await callAIWithRotation(text, systemInstruction, false); // Removed live search capability
+    const response = await callAIWithRotation(text, systemInstruction, true);
     const cleanedText = response.text.replace(/```json\n?/, "").replace(/```\n?$/, "").trim();
     const asset = JSON.parse(cleanedText || "null");
 
@@ -132,7 +133,11 @@ IMPORTANT CATEGORISATION: If the asset is a Bitcoin ETF or Crypto ETF, explicitl
           asset.totalValue = asset.unitPrice * asset.quantity;
           asset.totalValueCurrency = asset.unitPriceCurrency;
           asset.valueSource = "live_price";
+          asset.aiConfidence = "high";
           asset.aiRationale = `Price fetched live from Yahoo Finance.`;
+          if (quote.shortName || quote.longName) {
+            asset.name = quote.shortName || quote.longName;
+          }
         }
       } catch (e) {
         console.warn("Failed to fetch live price for", asset.ticker);
@@ -205,7 +210,11 @@ IMPORTANT CATEGORISATION: If the asset is a Bitcoin ETF or Crypto ETF, explicitl
             asset.totalValue = asset.unitPrice * asset.quantity;
             asset.totalValueCurrency = asset.unitPriceCurrency;
             asset.valueSource = "live_price";
+            asset.aiConfidence = "high";
             asset.aiRationale = `Pricing via real-time market data matching ticker ${asset.ticker}.`;
+            if (quote.shortName || quote.longName) {
+              asset.name = quote.shortName || quote.longName;
+            }
           }
         } catch (e) {
           console.warn("Failed to fetch live price for screenshot asset", asset.ticker);
