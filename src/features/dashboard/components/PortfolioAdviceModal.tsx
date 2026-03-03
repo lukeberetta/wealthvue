@@ -1,10 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { Sparkles, AlertTriangle, ArrowRight } from "lucide-react";
+import { Sparkles, AlertTriangle, ArrowRight, RefreshCw } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { Modal } from "../../../components/ui/Modal";
 import { Asset, NAVHistoryEntry, FinancialGoal } from "../../../types";
 import { analyzePortfolio } from "../../../services/gemini";
 import { convertCurrency } from "../../../lib/fx";
+import { useAuth } from "../../../contexts/AuthContext";
+import {
+    loadCachedAnalysis,
+    saveCachedAnalysis,
+} from "../../../services/firestoreService";
 
 interface PortfolioAdviceModalProps {
     isOpen: boolean;
@@ -18,6 +23,8 @@ interface PortfolioAdviceModalProps {
     goal: FinancialGoal | null;
     navHistory: NAVHistoryEntry[];
 }
+
+const CACHE_TTL_HOURS = 24;
 
 const ANALYSIS_MESSAGES = [
     "Reviewing your holdings…",
@@ -51,6 +58,29 @@ function AnalysisMessages() {
     );
 }
 
+/**
+ * Compute a short deterministic string from the portfolio's asset-type
+ * allocation percentages (rounded to the nearest whole-percent).
+ * When this string changes, the cache is considered stale regardless of age.
+ */
+function computePortfolioHash(
+    breakdown: { assetType: string; pct: number }[]
+): string {
+    return [...breakdown]
+        .sort((a, b) => a.assetType.localeCompare(b.assetType))
+        .map(b => `${b.assetType}:${Math.round(b.pct)}`)
+        .join("|");
+}
+
+function formatAgeLabel(isoDate: string): string {
+    const ageMs = Date.now() - new Date(isoDate).getTime();
+    const hours = Math.floor(ageMs / (1000 * 60 * 60));
+    const minutes = Math.floor(ageMs / (1000 * 60));
+    if (hours >= 1) return `${hours}h ago`;
+    if (minutes >= 1) return `${minutes}m ago`;
+    return "just now";
+}
+
 export const PortfolioAdviceModal = ({
     isOpen,
     onClose,
@@ -63,34 +93,61 @@ export const PortfolioAdviceModal = ({
     goal,
     navHistory,
 }: PortfolioAdviceModalProps) => {
+    const { firebaseUser } = useAuth();
+    const uid = firebaseUser?.uid ?? null;
+
     const [isLoading, setIsLoading] = useState(false);
     const [result, setResult] = useState<{ summary: string; advice: string[] } | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const [cachedAt, setCachedAt] = useState<string | null>(null); // ISO date if result came from cache
+    const [refreshTrigger, setRefreshTrigger] = useState(0);
 
     useEffect(() => {
-        if (!isOpen || result) return;
+        if (!isOpen) return;
+        // If we already have a result in state and this isn't a manual refresh,
+        // keep showing it without re-fetching.
+        if (result && refreshTrigger === 0) return;
 
         const run = async () => {
             setIsLoading(true);
             setError(null);
-            try {
-                // Aggregate by type with per-type counts
-                const byType: Record<string, number> = {};
-                const countByType: Record<string, number> = {};
-                for (const asset of assets) {
-                    const val = convertCurrency(asset.totalValue, asset.totalValueCurrency, displayCurrency, fxRates);
-                    byType[asset.assetType] = (byType[asset.assetType] || 0) + val;
-                    countByType[asset.assetType] = (countByType[asset.assetType] || 0) + 1;
+            setCachedAt(null);
+
+            // ---- Build the portfolio breakdown (needed for hash + AI call) ----
+            const byType: Record<string, number> = {};
+            const countByType: Record<string, number> = {};
+            for (const asset of assets) {
+                const val = convertCurrency(asset.totalValue, asset.totalValueCurrency, displayCurrency, fxRates);
+                byType[asset.assetType] = (byType[asset.assetType] || 0) + val;
+                countByType[asset.assetType] = (countByType[asset.assetType] || 0) + 1;
+            }
+
+            const breakdown = Object.entries(byType).map(([assetType, value]) => ({
+                assetType,
+                value,
+                pct: totalNAV > 0 ? (value / totalNAV) * 100 : 0,
+                count: countByType[assetType] || 0,
+            }));
+
+            const currentHash = computePortfolioHash(breakdown);
+
+            // ---- Check Firestore cache (only for authenticated users) ----
+            if (uid && refreshTrigger === 0) {
+                const cached = await loadCachedAnalysis(uid);
+                if (cached) {
+                    const ageMs = Date.now() - new Date(cached.generatedAt).getTime();
+                    const ttlMs = CACHE_TTL_HOURS * 60 * 60 * 1000;
+                    if (cached.portfolioHash === currentHash && ageMs < ttlMs) {
+                        setResult({ summary: cached.summary, advice: cached.advice });
+                        setCachedAt(cached.generatedAt);
+                        setIsLoading(false);
+                        return;
+                    }
                 }
+            }
 
-                const breakdown = Object.entries(byType).map(([assetType, value]) => ({
-                    assetType,
-                    value,
-                    pct: totalNAV > 0 ? (value / totalNAV) * 100 : 0,
-                    count: countByType[assetType] || 0,
-                }));
-
-                // Individual asset details, sorted by value descending, capped at 15
+            // ---- Full AI analysis ----
+            try {
                 const assetDetails = assets
                     .map(a => ({
                         name: a.name,
@@ -103,18 +160,17 @@ export const PortfolioAdviceModal = ({
                     .sort((a, b) => b.valuePct - a.valuePct)
                     .slice(0, 15);
 
-                // 30-day NAV trend (history stored in USD, convert to display currency)
                 let navTrend: { change: number; changePct: number; period: string } | null = null;
                 if (navHistory.length >= 2) {
                     const sorted = [...navHistory].sort((a, b) => a.date.localeCompare(b.date));
                     const latest = sorted[sorted.length - 1];
                     const cutoff = new Date();
                     cutoff.setDate(cutoff.getDate() - 30);
-                    const cutoffStr = cutoff.toISOString().split('T')[0];
+                    const cutoffStr = cutoff.toISOString().split("T")[0];
                     const anchor = sorted.filter(e => e.date <= cutoffStr).at(-1) ?? sorted[0];
                     if (anchor.totalNAV > 0 && latest !== anchor) {
-                        const latestDisplay = convertCurrency(latest.totalNAV, 'USD', displayCurrency, fxRates);
-                        const anchorDisplay = convertCurrency(anchor.totalNAV, 'USD', displayCurrency, fxRates);
+                        const latestDisplay = convertCurrency(latest.totalNAV, "USD", displayCurrency, fxRates);
+                        const anchorDisplay = convertCurrency(anchor.totalNAV, "USD", displayCurrency, fxRates);
                         navTrend = {
                             change: latestDisplay - anchorDisplay,
                             changePct: ((latest.totalNAV - anchor.totalNAV) / anchor.totalNAV) * 100,
@@ -123,7 +179,6 @@ export const PortfolioAdviceModal = ({
                     }
                 }
 
-                // Goal progress
                 let goalContext: { targetAmount: number; currency: string; progressPct: number } | null = null;
                 if (goal) {
                     const targetInDisplay = convertCurrency(goal.targetAmount, goal.currency, displayCurrency, fxRates);
@@ -135,9 +190,23 @@ export const PortfolioAdviceModal = ({
                 }
 
                 const data = await analyzePortfolio(breakdown, totalNAV, displayCurrency, assetDetails, goalContext, navTrend);
+                if (!data) throw new Error("No analysis returned");
+
                 setResult(data);
-            } catch (e: any) {
-                if (e.message?.includes("quota") || e.status === "RESOURCE_EXHAUSTED" || e.message?.includes("429")) {
+                setCachedAt(null); // fresh result — no "cached" badge
+
+                // Persist to Firestore in the background
+                if (uid) {
+                    saveCachedAnalysis(uid, {
+                        summary: data.summary,
+                        advice: data.advice,
+                        generatedAt: new Date().toISOString(),
+                        portfolioHash: currentHash,
+                    });
+                }
+            } catch (e: unknown) {
+                const err = e as { message?: string; status?: string };
+                if (err.message?.includes("quota") || err.status === "RESOURCE_EXHAUSTED" || err.message?.includes("429")) {
                     setError("AI quota exceeded. Please wait a moment and try again.");
                 } else {
                     setError("Couldn't generate analysis right now. Please try again.");
@@ -148,13 +217,20 @@ export const PortfolioAdviceModal = ({
         };
 
         run();
-    }, [isOpen]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [isOpen, refreshTrigger]);
 
-    // Reset on close so next open triggers a fresh call
+    // Keep result visible between open/close cycles — only reset on manual refresh
     const handleClose = () => {
-        setResult(null);
         setError(null);
         onClose();
+    };
+
+    const handleRefresh = () => {
+        setResult(null);
+        setCachedAt(null);
+        setError(null);
+        setRefreshTrigger(prev => prev + 1);
     };
 
     return (
@@ -185,42 +261,73 @@ export const PortfolioAdviceModal = ({
 
                 {/* Error */}
                 {!isLoading && error && (
-                    <div className="flex items-start gap-3 p-4 bg-negative/8 border border-negative/20 rounded-xl">
-                        <AlertTriangle size={16} className="text-negative shrink-0 mt-0.5" />
-                        <p className="text-sm text-text-2">{error}</p>
+                    <div className="space-y-3">
+                        <div className="flex items-start gap-3 p-4 bg-negative/8 border border-negative/20 rounded-xl">
+                            <AlertTriangle size={16} className="text-negative shrink-0 mt-0.5" />
+                            <p className="text-sm text-text-2">{error}</p>
+                        </div>
+                        <button
+                            onClick={handleRefresh}
+                            className="flex items-center gap-1.5 text-xs text-text-3 hover:text-text-2 transition-colors"
+                        >
+                            <RefreshCw size={12} />
+                            Try again
+                        </button>
                     </div>
                 )}
 
                 {/* Results */}
                 {!isLoading && result && (
-                    <>
-                        {/* Summary */}
-                        <div>
-                            <p className="text-[10px] font-bold text-text-3 uppercase tracking-widest mb-3">Summary</p>
-                            <p className="text-sm text-text-1 leading-relaxed">{result.summary}</p>
-                        </div>
+                    <AnimatePresence mode="wait">
+                        <motion.div
+                            key="results"
+                            initial={{ opacity: 0, y: 6 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.25 }}
+                            className="space-y-5"
+                        >
+                            {/* Summary */}
+                            <div>
+                                <p className="text-[10px] font-bold text-text-3 uppercase tracking-widest mb-3">Summary</p>
+                                <p className="text-sm text-text-1 leading-relaxed">{result.summary}</p>
+                            </div>
 
-                        <div className="border-t border-border" />
+                            <div className="border-t border-border" />
 
-                        {/* Advice */}
-                        <div>
-                            <p className="text-[10px] font-bold text-text-3 uppercase tracking-widest mb-4">What to focus on</p>
-                            <ul className="space-y-3">
-                                {result.advice.map((item, i) => (
-                                    <li key={i} className="flex items-start gap-3">
-                                        <div className="w-5 h-5 rounded-full bg-accent/10 flex items-center justify-center shrink-0 mt-0.5">
-                                            <ArrowRight size={10} className="text-accent" />
-                                        </div>
-                                        <p className="text-sm text-text-1 leading-relaxed">{item}</p>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
+                            {/* Advice */}
+                            <div>
+                                <p className="text-[10px] font-bold text-text-3 uppercase tracking-widest mb-4">What to focus on</p>
+                                <ul className="space-y-3">
+                                    {result.advice.map((item, i) => (
+                                        <li key={i} className="flex items-start gap-3">
+                                            <div className="w-5 h-5 rounded-full bg-accent/10 flex items-center justify-center shrink-0 mt-0.5">
+                                                <ArrowRight size={10} className="text-accent" />
+                                            </div>
+                                            <p className="text-sm text-text-1 leading-relaxed">{item}</p>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
 
-                        <p className="text-[10px] text-text-3 pt-2 border-t border-border/50">
-                            AI-generated analysis based on your current portfolio. Not financial advice.
-                        </p>
-                    </>
+                            {/* Footer — cache badge + refresh */}
+                            <div className="flex items-center justify-between pt-2 border-t border-border/50">
+                                <p className="text-[10px] text-text-3">
+                                    {cachedAt
+                                        ? `Analysed ${formatAgeLabel(cachedAt)} · cached`
+                                        : "AI-generated analysis · not financial advice"}
+                                </p>
+                                <button
+                                    onClick={handleRefresh}
+                                    disabled={isLoading}
+                                    className="flex items-center gap-1 text-[10px] text-text-3 hover:text-accent transition-colors disabled:opacity-40"
+                                    title="Run fresh analysis"
+                                >
+                                    <RefreshCw size={10} />
+                                    Refresh
+                                </button>
+                            </div>
+                        </motion.div>
+                    </AnimatePresence>
                 )}
             </div>
         </Modal>

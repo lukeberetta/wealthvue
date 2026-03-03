@@ -26,6 +26,40 @@ import { db } from "../lib/firebase";
 import { Asset, NAVHistoryEntry, FinancialGoal, FXCache } from "../types";
 
 // ---------------------------------------------------------------------------
+// Cached Portfolio Analysis
+// ---------------------------------------------------------------------------
+
+export interface CachedPortfolioAnalysis {
+    summary: string;
+    advice: string[];
+    generatedAt: string;   // ISO 8601
+    portfolioHash: string; // invalidated when portfolio composition changes
+}
+
+/** Load the cached AI portfolio analysis for a user. Returns null if absent. */
+export async function loadCachedAnalysis(uid: string): Promise<CachedPortfolioAnalysis | null> {
+    try {
+        const snap = await getDoc(doc(db, "users", uid));
+        if (!snap.exists()) return null;
+        return (snap.data().cachedAnalysis as CachedPortfolioAnalysis | null) ?? null;
+    } catch {
+        return null;
+    }
+}
+
+/** Persist a fresh AI analysis result to the user document. Fire-and-forget safe. */
+export async function saveCachedAnalysis(uid: string, analysis: CachedPortfolioAnalysis): Promise<void> {
+    try {
+        await updateDoc(doc(db, "users", uid), {
+            cachedAnalysis: analysis,
+            updatedAt: serverTimestamp(),
+        });
+    } catch (err) {
+        console.warn("Could not save analysis cache to Firestore:", err);
+    }
+}
+
+// ---------------------------------------------------------------------------
 // Assets
 // ---------------------------------------------------------------------------
 
