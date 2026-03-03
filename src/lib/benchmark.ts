@@ -20,7 +20,8 @@ export async function fetchSP500History(): Promise<SP500DataPoint[]> {
     if (cached) return cached;
 
     // 2. Server-side fetch (no CORS)
-    const res = await fetch("/api/sp500", {
+    const apiBase = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? "";
+    const res = await fetch(`${apiBase}/api/sp500`, {
         signal: AbortSignal.timeout(15_000),
     });
     if (!res.ok) {
