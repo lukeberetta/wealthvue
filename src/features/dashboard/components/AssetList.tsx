@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useDebounce } from "../../../hooks/useDebounce";
 import { LineChart, Coins, Car, Home, Wallet, MoreHorizontal, Sparkles, Plus, Search, Download, X, ChevronDown, Gem, Layers, Trash2 } from "lucide-react";
 import { Asset } from "../../../types";
 import { Button } from "../../../components/ui/Button";
@@ -61,7 +62,8 @@ export const AssetList = ({
     onSortChange,
     onBulkDelete,
 }: AssetListProps) => {
-    const [searchQuery, setSearchQuery] = useState('');
+    const [searchInput, setSearchInput] = useState('');
+    const searchQuery = useDebounce(searchInput, 300);
     const [accountFilter, setAccountFilter] = useState<string | null>(null);
 
     if (assets.length === 0) {
@@ -144,14 +146,14 @@ export const AssetList = ({
                 <div className="relative hidden sm:block">
                     <Search size={11} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-text-3 pointer-events-none" />
                     <input
-                        value={searchQuery}
-                        onChange={e => setSearchQuery(e.target.value)}
+                        value={searchInput}
+                        onChange={e => setSearchInput(e.target.value)}
                         placeholder="Search..."
                         className="bg-surface-2 border border-border rounded-lg pl-7 pr-6 py-1.5 text-xs text-text-1 placeholder:text-text-3 focus:outline-none focus:ring-2 focus:ring-accent/20 w-36"
                     />
-                    {searchQuery && (
+                    {searchInput && (
                         <button
-                            onClick={() => setSearchQuery('')}
+                            onClick={() => setSearchInput('')}
                             className="absolute right-2 top-1/2 -translate-y-1/2 text-text-3 hover:text-text-1 transition-colors"
                         >
                             <X size={11} />
