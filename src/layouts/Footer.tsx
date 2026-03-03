@@ -16,7 +16,7 @@ export const Footer = () => (
                 rel="noopener noreferrer"
                 className="group flex items-center gap-1.5 text-xs text-text-3 hover:text-text-1 transition-colors duration-200"
             >
-                <span>crafted by</span>
+                <span>Vibe coded by</span>
                 <span className="font-medium text-text-2 group-hover:text-accent transition-colors duration-200">
                     Luke Beretta
                 </span>
