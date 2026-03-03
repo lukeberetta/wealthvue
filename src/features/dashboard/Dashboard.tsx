@@ -182,8 +182,8 @@ export const Dashboard = ({ user, isDemo, onSignIn, onSignOut, onGoHome, onUpdat
                             </h2>
 
                             {/* Period selector + change badge */}
-                            <div className="flex items-center gap-3 mt-5 flex-wrap">
-                                <div className="flex items-center gap-0.5 bg-surface-2 rounded-full p-0.5">
+                            <div className="flex items-center justify-between gap-3 mt-5">
+                                <div className="flex items-center gap-0.5 bg-surface-2 rounded-full p-0.5 shrink-0">
                                     {(['1D', '1W', '1M', 'All'] as const).map(p => (
                                         <button
                                             key={p}
@@ -198,22 +198,24 @@ export const Dashboard = ({ user, isDemo, onSignIn, onSignOut, onGoHome, onUpdat
                                     ))}
                                 </div>
 
-                                <div className={cn(
-                                    "flex items-center gap-1 px-2.5 py-1 rounded-full text-sm font-medium",
-                                    change >= 0 ? "bg-positive/10 text-positive" : "bg-negative/10 text-negative"
-                                )}>
-                                    {change >= 0 ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
-                                    <span className="tabular-nums">
-                                        {formatCurrencyCompact(Math.abs(change), displayCurrency)} ({Math.abs(changePercent).toFixed(2)}%)
+                                <div className="flex items-center gap-2 min-w-0">
+                                    <div className={cn(
+                                        "flex items-center gap-1 px-2.5 py-1 rounded-full text-sm font-medium shrink-0",
+                                        change >= 0 ? "bg-positive/10 text-positive" : "bg-negative/10 text-negative"
+                                    )}>
+                                        {change >= 0 ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
+                                        <span className="tabular-nums">
+                                            <span className="hidden sm:inline">{formatCurrencyCompact(Math.abs(change), displayCurrency)} </span>
+                                            ({Math.abs(changePercent).toFixed(2)}%)
+                                        </span>
+                                    </div>
+                                    <span className="hidden sm:inline text-text-3 font-normal text-xs shrink-0">
+                                        {changePeriod === '1D' ? 'since yesterday'
+                                            : changePeriod === '1W' ? 'past week'
+                                                : changePeriod === '1M' ? 'past month'
+                                                    : 'all time'}
                                     </span>
                                 </div>
-
-                                <span className="text-text-3 font-normal text-xs">
-                                    {changePeriod === '1D' ? 'since yesterday'
-                                        : changePeriod === '1W' ? 'past week'
-                                            : changePeriod === '1M' ? 'past month'
-                                                : 'all time'}
-                                </span>
                             </div>
                         </div>
 
