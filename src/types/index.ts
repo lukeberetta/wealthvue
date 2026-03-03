@@ -3,6 +3,13 @@ export type ValueSource = "ai_estimate" | "live_price" | "manual";
 export type AIConfidence = "high" | "medium" | "low";
 export type PlanType = "trial" | "pro";
 
+export interface AIUsage {
+  totalCalls: number;
+  monthlyCallCount: number;
+  currentMonth: string; // "YYYY-MM"
+  lastCalledAt: string | null;
+}
+
 export interface User {
   displayName: string;
   email: string;
@@ -13,6 +20,7 @@ export interface User {
   trialStartDate: string;
   trialEndsAt: string;
   createdAt: string;
+  aiUsage?: AIUsage;
 }
 
 export interface Asset {

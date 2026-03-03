@@ -21,9 +21,57 @@ import {
     query,
     orderBy,
     limit,
+    increment,
 } from "firebase/firestore";
 import { db } from "../lib/firebase";
-import { Asset, NAVHistoryEntry, FinancialGoal, FXCache } from "../types";
+import { Asset, NAVHistoryEntry, FinancialGoal, FXCache, AIUsage } from "../types";
+
+// ---------------------------------------------------------------------------
+// AI Usage Tracking
+// ---------------------------------------------------------------------------
+
+/** Read the current AI usage counters for a user. Returns null on error. */
+export async function loadAIUsage(uid: string): Promise<AIUsage | null> {
+    try {
+        const snap = await getDoc(doc(db, "users", uid));
+        if (!snap.exists()) return null;
+        return (snap.data().aiUsage as AIUsage | null) ?? null;
+    } catch {
+        return null;
+    }
+}
+
+/**
+ * Atomically increment AI usage counters.
+ * Resets monthlyCallCount if the month has rolled over.
+ * Fire-and-forget safe — swallows errors silently.
+ */
+export async function incrementAIUsage(uid: string): Promise<void> {
+    try {
+        const currentMonth = new Date().toISOString().slice(0, 7); // "YYYY-MM"
+        const snap = await getDoc(doc(db, "users", uid));
+        if (!snap.exists()) return;
+        const usage = snap.data().aiUsage as AIUsage | undefined;
+
+        if (!usage || usage.currentMonth !== currentMonth) {
+            // Month rolled over — reset monthly counter
+            await updateDoc(doc(db, "users", uid), {
+                "aiUsage.currentMonth": currentMonth,
+                "aiUsage.monthlyCallCount": 1,
+                "aiUsage.totalCalls": increment(1),
+                "aiUsage.lastCalledAt": serverTimestamp(),
+            });
+        } else {
+            await updateDoc(doc(db, "users", uid), {
+                "aiUsage.totalCalls": increment(1),
+                "aiUsage.monthlyCallCount": increment(1),
+                "aiUsage.lastCalledAt": serverTimestamp(),
+            });
+        }
+    } catch (err) {
+        console.warn("Could not increment AI usage:", err);
+    }
+}
 
 // ---------------------------------------------------------------------------
 // Cached Portfolio Analysis

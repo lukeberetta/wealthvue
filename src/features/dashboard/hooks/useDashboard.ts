@@ -14,12 +14,14 @@ import {
     loadGoal,
     saveGoal as firestoreSaveGoal,
     clearGoal as firestoreClearGoal,
+    incrementAIUsage,
 } from "../../../services/firestoreService";
 import { fetchFXRates, convertCurrency } from "../../../lib/fx";
 import { parseTextToAsset, parseScreenshotToAssets } from "../../../services/gemini";
 import { fetchLiveQuote, LIVE_PRICE_TYPES } from "../../../services/priceApi";
 import { useAuth } from "../../../contexts/AuthContext";
 import { useToast } from "../../../components/ui/Toast";
+import { usePlan } from "../../../hooks/usePlan";
 
 type ChangePeriod = '1D' | '1W' | '1M' | 'All';
 
@@ -39,6 +41,7 @@ export const useDashboard = (user: User | null, isDemo: boolean) => {
     const { firebaseUser } = useAuth();
     const uid = firebaseUser?.uid ?? null;
     const { addToast } = useToast();
+    const planStatus = usePlan(user, isDemo);
 
     const [assets, setAssets] = useState<Asset[]>([]);
     const [navHistory, setNavHistory] = useState<NAVHistoryEntry[]>([]);
@@ -100,9 +103,17 @@ export const useDashboard = (user: User | null, isDemo: boolean) => {
 
             // Auto-refresh live prices + write daily NAV snapshot (real users only)
             if (!isDemo && uid) {
+                const REFRESH_THRESHOLD_MS = 15 * 60 * 1000; // 15 minutes
+                const now = Date.now();
                 let updated = false;
                 const newAssets = await Promise.all(loadedAssets.map(async (asset) => {
                     if (asset.ticker && LIVE_PRICE_TYPES.includes(asset.assetType)) {
+                        // Skip if price is still fresh
+                        const lastRefreshedMs = asset.lastRefreshed
+                            ? new Date(asset.lastRefreshed).getTime()
+                            : 0;
+                        if (now - lastRefreshedMs < REFRESH_THRESHOLD_MS) return asset;
+
                         const quote = await fetchLiveQuote(asset.ticker, asset.assetType);
                         if (quote && quote.regularMarketPrice !== asset.unitPrice) {
                             updated = true;
@@ -119,6 +130,7 @@ export const useDashboard = (user: User | null, isDemo: boolean) => {
                     }
                     return asset;
                 }));
+
 
                 if (updated) {
                     setAssets(newAssets);
@@ -164,6 +176,14 @@ export const useDashboard = (user: User | null, isDemo: boolean) => {
     // -------------------------------------------------------------------------
     const handleAddAsset = async () => {
         if (isDemo) return;
+
+        // Plan gate check
+        const gateReason = planStatus.checkAIGate();
+        if (gateReason) {
+            setAnalysisError(`${planStatus.gateTitle(gateReason)}: ${planStatus.gateBody(gateReason)}`);
+            return;
+        }
+
         setIsAnalyzing(true);
         setAnalysisError(null);
         try {
@@ -184,6 +204,9 @@ export const useDashboard = (user: User | null, isDemo: boolean) => {
                     updatedAt: new Date().toISOString(),
                     inputMethod: 'text'
                 } as Asset]);
+
+                // Increment usage counter in the background
+                if (uid) incrementAIUsage(uid);
             }
         } catch (e: unknown) {
             console.error(e);
@@ -355,6 +378,13 @@ export const useDashboard = (user: User | null, isDemo: boolean) => {
         const file = e.target.files?.[0];
         if (!file) return;
 
+        // Plan gate check
+        const gateReason = planStatus.checkAIGate();
+        if (gateReason) {
+            setAnalysisError(`${planStatus.gateTitle(gateReason)}: ${planStatus.gateBody(gateReason)}`);
+            return;
+        }
+
         setIsAnalyzing(true);
         setAnalysisError(null);
         const reader = new FileReader();
@@ -379,6 +409,9 @@ export const useDashboard = (user: User | null, isDemo: boolean) => {
                         inputMethod: 'screenshot'
                     } as Asset;
                 }));
+
+                // Increment usage counter in the background
+                if (uid) incrementAIUsage(uid);
             } catch (e: unknown) {
                 console.error(e);
                 const err = e as { message?: string; status?: string };
@@ -400,6 +433,7 @@ export const useDashboard = (user: User | null, isDemo: boolean) => {
         displayCurrency,
         setDisplayCurrency,
         fxRates,
+        planStatus,
         isAddModalOpen,
         setIsAddModalOpen,
         isEditModalOpen,

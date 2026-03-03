@@ -26,10 +26,11 @@ export interface ParsedAsset {
  * We rotate through all available Flash models to maximize daily quota.
  */
 const AVAILABLE_MODELS = [
-  "gemini-3-flash-preview",
-  "gemini-2.5-flash-lite",
-  "gemini-2.5-flash"
+  "gemini-2.5-flash-lite",   // cheapest — try first ($0.10/$0.40 per 1M)
+  "gemini-2.5-flash",        // mid-tier fallback ($0.30/$2.50 per 1M)
+  "gemini-3-flash-preview",  // highest quality, last resort ($0.50/$3.00 per 1M)
 ];
+
 
 async function callAIWithRotation(
   contents: any,

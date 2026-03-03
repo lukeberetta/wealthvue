@@ -109,6 +109,14 @@ function mapFirestoreUser(
         trialStartDate: toISO(data.trialStartDate),
         trialEndsAt: toISO(data.trialEndsAt),
         createdAt: toISO(data.createdAt),
+        aiUsage: data.aiUsage
+            ? {
+                totalCalls: data.aiUsage.totalCalls ?? 0,
+                monthlyCallCount: data.aiUsage.monthlyCallCount ?? 0,
+                currentMonth: data.aiUsage.currentMonth ?? "",
+                lastCalledAt: data.aiUsage.lastCalledAt ?? null,
+            }
+            : undefined,
     };
 }
 
