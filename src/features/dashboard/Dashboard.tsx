@@ -182,7 +182,7 @@ export const Dashboard = ({ user, isDemo, onSignIn, onSignOut, onGoHome, onUpdat
                             </h2>
 
                             {/* Period selector + change badge */}
-                            <div className="flex items-center justify-between gap-3 mt-5">
+                            <div className="flex items-center gap-3 mt-5">
                                 <div className="flex items-center gap-0.5 bg-surface-2 rounded-full p-0.5 shrink-0">
                                     {(['1D', '1W', '1M', 'All'] as const).map(p => (
                                         <button
