@@ -416,7 +416,7 @@ export const Dashboard = ({ user, isDemo, onSignIn, onSignOut, onGoHome, onUpdat
                     />
                 </div>
                 {/* Mobile FAB — sticky so it stays above the footer */}
-                <div className="md:hidden sticky bottom-6 flex justify-center pointer-events-none">
+                <div className="md:hidden sticky bottom-4 flex justify-center pointer-events-none">
                     <motion.button
                         className="pointer-events-auto w-fit z-40 flex items-center h-12 bg-accent text-white rounded-full px-5 text-sm font-semibold shadow-lg shadow-accent/30"
                         onClick={isDemo ? onSignIn : () => setIsAddModalOpen(true)}
