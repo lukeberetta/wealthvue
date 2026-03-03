@@ -66,8 +66,6 @@ src/
     storage.ts                     # localStorage CRUD — used only for demo mode
     fx.ts                          # fetchFXRates(), convertCurrency() — caches in Firestore + localStorage
     utils.ts                       # cn(), formatCurrency(), formatCompactNumber()
-    benchmark.ts                   # fetchSP500History() — S&P 500 via CORS proxy, cached in localStorage
-
   data/
     demoData.ts                    # DEMO_USER, DEMO_ASSETS, DEMO_NAV_HISTORY, DEMO_GOAL
 

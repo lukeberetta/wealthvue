@@ -23,7 +23,7 @@ import {
     limit,
     increment,
 } from "firebase/firestore";
-import { db, auth } from "../lib/firebase";
+import { db } from "../lib/firebase";
 import { Asset, NAVHistoryEntry, FinancialGoal, FXCache, AIUsage } from "../types";
 
 // ---------------------------------------------------------------------------
@@ -262,44 +262,6 @@ export async function saveFXCache(cache: FXCache): Promise<void> {
         });
     } catch (err) {
         console.warn("Could not write FX cache to Firestore:", err);
-    }
-}
-
-// ---------------------------------------------------------------------------
-// S&P 500 Benchmark Cache (shared across all users via sp500Cache/latest)
-// ---------------------------------------------------------------------------
-
-const SP500_CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
-
-/** Read the shared S&P 500 cache from Firestore. Returns null if stale or missing. */
-export async function loadSP500Cache(): Promise<{ date: string; close: number }[] | null> {
-    try {
-        const snap = await getDoc(doc(db, "sp500Cache", "latest"));
-        if (!snap.exists()) return null;
-        const data = snap.data();
-        const fetchedAt: Date =
-            data.fetchedAt instanceof Timestamp
-                ? data.fetchedAt.toDate()
-                : new Date(data.fetchedAt);
-        if (Date.now() - fetchedAt.getTime() > SP500_CACHE_TTL_MS) return null; // stale
-        return data.points as { date: string; close: number }[];
-    } catch {
-        return null;
-    }
-}
-
-/** Write fresh S&P 500 data to the shared Firestore cache. Fire-and-forget safe. */
-export async function saveSP500Cache(
-    points: { date: string; close: number }[]
-): Promise<void> {
-    if (!auth.currentUser) return;
-    try {
-        await setDoc(doc(db, "sp500Cache", "latest"), {
-            points,
-            fetchedAt: serverTimestamp(),
-        });
-    } catch (err) {
-        console.warn("Could not write S&P 500 cache to Firestore:", err);
     }
 }
 

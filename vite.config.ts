@@ -30,30 +30,6 @@ const yahooFinancePlugin = () => ({
       }
     });
 
-    server.middlewares.use('/api/sp500', async (_req: any, res: any) => {
-      const fiveYearsAgo = new Date();
-      fiveYearsAgo.setFullYear(fiveYearsAgo.getFullYear() - 5);
-      try {
-        const history = await yahooFinance.historical(
-          '^GSPC',
-          { period1: fiveYearsAgo, period2: new Date(), interval: '1d' },
-          { validateResult: false },
-        );
-        const data = (history as any[])
-          .map((h) => ({
-            date: (h.date as Date).toISOString().split('T')[0],
-            close: (h.adjClose ?? h.close) as number,
-          }))
-          .filter((h) => h.close != null && !isNaN(h.close))
-          .sort((a: any, b: any) => a.date.localeCompare(b.date));
-        res.setHeader('Content-Type', 'application/json');
-        res.end(JSON.stringify({ data }));
-      } catch (error: any) {
-        console.error('[vite/sp500]', error);
-        res.statusCode = 500;
-        res.end(JSON.stringify({ error: error.message }));
-      }
-    });
   },
 });
 

@@ -28,40 +28,6 @@ const db = admin.firestore();
 setGlobalOptions({maxInstances: 10});
 
 /**
- * sp500 — returns 5 years of daily S&P 500 (^GSPC) closing prices.
- * GET /api/sp500
- * Response: { data: { date: string; close: number }[] }
- */
-export const sp500 = onRequest({cors: true}, async (_req, res) => {
-  const fiveYearsAgo = new Date();
-  fiveYearsAgo.setFullYear(fiveYearsAgo.getFullYear() - 5);
-
-  try {
-    const history = await yahooFinance.historical("^GSPC", {
-      period1: fiveYearsAgo,
-      period2: new Date(),
-      interval: "1d",
-    }, {validateResult: false});
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const data = (history as any[])
-      .map((h) => ({
-        date: (h.date as Date).toISOString().split("T")[0],
-        close: (h.adjClose ?? h.close) as number,
-      }))
-      .filter((h) => h.close != null && !isNaN(h.close))
-      .sort((a, b) => a.date.localeCompare(b.date));
-
-    res.json({data});
-  } catch (err) {
-    logger.warn("[sp500] Failed to fetch historical data", err);
-    const message = err instanceof Error ?
-      err.message : "Failed to fetch S&P 500 history";
-    res.status(500).json({error: message});
-  }
-});
-
-/**
  * price — proxies Yahoo Finance quote lookups for the frontend.
  * GET /price?ticker=AAPL
  */
