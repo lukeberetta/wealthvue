@@ -415,6 +415,28 @@ export const Dashboard = ({ user, isDemo, onSignIn, onSignOut, onGoHome, onUpdat
                         onBulkDelete={isDemo ? onSignIn : handleBulkDelete}
                     />
                 </div>
+                {/* Mobile FAB — sticky so it stays above the footer */}
+                <div className="md:hidden sticky bottom-6 flex justify-center pointer-events-none">
+                    <motion.button
+                        className="pointer-events-auto w-fit z-40 flex items-center h-12 bg-accent text-white rounded-full px-5 text-sm font-semibold shadow-lg shadow-accent/30"
+                        onClick={isDemo ? onSignIn : () => setIsAddModalOpen(true)}
+                        whileTap={{ scale: 0.95 }}
+                        aria-label="Add Asset"
+                    >
+                        <Plus size={17} />
+                        <motion.span
+                            animate={{
+                                maxWidth: fabLabelVisible ? 100 : 0,
+                                opacity: fabLabelVisible ? 1 : 0,
+                                paddingLeft: fabLabelVisible ? 8 : 0,
+                            }}
+                            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                            style={{ overflow: "hidden", whiteSpace: "nowrap", display: "inline-block" }}
+                        >
+                            Add Asset
+                        </motion.span>
+                    </motion.button>
+                </div>
             </main>
 
             <Footer />
@@ -467,27 +489,6 @@ export const Dashboard = ({ user, isDemo, onSignIn, onSignOut, onGoHome, onUpdat
                 goal={goal}
                 navHistory={navHistory}
             />
-
-            {/* Mobile FAB */}
-            <motion.button
-                className="md:hidden fixed bottom-6 left-0 right-0 mx-auto w-fit z-40 flex items-center h-12 bg-accent text-white rounded-full px-5 text-sm font-semibold shadow-lg shadow-accent/30"
-                onClick={isDemo ? onSignIn : () => setIsAddModalOpen(true)}
-                whileTap={{ scale: 0.95 }}
-                aria-label="Add Asset"
-            >
-                <Plus size={17} />
-                <motion.span
-                    animate={{
-                        maxWidth: fabLabelVisible ? 100 : 0,
-                        opacity: fabLabelVisible ? 1 : 0,
-                        paddingLeft: fabLabelVisible ? 8 : 0,
-                    }}
-                    transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                    style={{ overflow: "hidden", whiteSpace: "nowrap", display: "inline-block" }}
-                >
-                    Add Asset
-                </motion.span>
-            </motion.button>
 
         </div>
     );
