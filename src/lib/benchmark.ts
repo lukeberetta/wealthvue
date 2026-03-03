@@ -20,8 +20,10 @@ export async function fetchSP500History(): Promise<SP500DataPoint[]> {
     if (cached) return cached;
 
     // 2. Server-side fetch (no CORS)
-    const apiBase = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? "";
-    const res = await fetch(`${apiBase}/api/sp500`, {
+    const _apiBase = (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? "";
+    // Firebase Hosting rewrites live at /api/sp500; direct Cloud Function URLs live at /sp500
+    const sp500Url = _apiBase ? `${_apiBase}/sp500` : "/api/sp500";
+    const res = await fetch(sp500Url, {
         signal: AbortSignal.timeout(15_000),
     });
     if (!res.ok) {
