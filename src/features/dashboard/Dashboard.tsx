@@ -23,7 +23,7 @@ import { useDashboard } from "./hooks/useDashboard";
 import { PortfolioInsights, getArchetype } from "./components/PortfolioInsights";
 import { PortfolioAdviceModal } from "./components/PortfolioAdviceModal";
 import { AssetList } from "./components/AssetList";
-import { NAVChart } from "./components/NAVChart";
+import { NAVChart, PERIODS, Period } from "./components/NAVChart";
 import { AddAssetModal } from "./components/AddAssetModal";
 import { EditAssetModal } from "./components/EditAssetModal";
 import { convertCurrency } from "../../lib/fx";
@@ -40,6 +40,7 @@ interface DashboardProps {
 
 export const Dashboard = ({ user, isDemo, onSignIn, onSignOut, onGoHome, onUpdateUser, onOpenFeedback }: DashboardProps) => {
     const [isAdviceModalOpen, setIsAdviceModalOpen] = useState(false);
+    const [navPeriod, setNavPeriod] = useState<Period>("1M");
     const [goalAmountInput, setGoalAmountInput] = useState('');
     const location = useLocation();
 
@@ -343,12 +344,31 @@ export const Dashboard = ({ user, isDemo, onSignIn, onSignOut, onGoHome, onUpdat
 
                 {/* NAV History Chart */}
                 <div>
-                    <h3 className="text-xl font-serif text-text-1 mb-6">Performance</h3>
+                    <div className="flex items-center justify-between mb-6">
+                        <h3 className="text-xl font-serif text-text-1">Performance</h3>
+                        <div className="flex items-center gap-0.5 bg-surface-2 rounded-full p-0.5">
+                            {PERIODS.map(p => (
+                                <button
+                                    key={p}
+                                    onClick={() => setNavPeriod(p)}
+                                    className={cn(
+                                        "px-3 py-1 rounded-full text-xs font-bold transition-all duration-200",
+                                        navPeriod === p
+                                            ? "bg-surface text-text-1 shadow-sm"
+                                            : "text-text-3 hover:text-text-2"
+                                    )}
+                                >
+                                    {p}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
                     <NAVChart
                         navHistory={navHistory}
                         displayCurrency={displayCurrency}
                         fxRates={fxRates}
                         onResetTracking={isDemo ? undefined : handleResetTracking}
+                        period={navPeriod}
                     />
                 </div>
 

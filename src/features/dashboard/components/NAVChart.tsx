@@ -18,11 +18,12 @@ interface NAVChartProps {
     displayCurrency: string;
     fxRates: { [key: string]: number };
     onResetTracking?: () => Promise<void>;
+    period: Period;
 }
 
-type Period = "1W" | "1M" | "3M" | "All";
+export type Period = "1W" | "1M" | "3M" | "All";
+export const PERIODS: Period[] = ["1W", "1M", "3M", "All"];
 
-const PERIODS: Period[] = ["1W", "1M", "3M", "All"];
 
 function periodLabel(p: Period) {
     return { "1W": "1 Week", "1M": "1 Month", "3M": "3 Months", "All": "All Time" }[p];
@@ -67,8 +68,7 @@ function CustomTooltip({ active, payload, displayCurrency }: any) {
     );
 }
 
-export const NAVChart = ({ navHistory, displayCurrency, fxRates, onResetTracking }: NAVChartProps) => {
-    const [period, setPeriod] = useState<Period>("1M");
+export const NAVChart = ({ navHistory, displayCurrency, fxRates, onResetTracking, period }: NAVChartProps) => {
     const [resetArmed, setResetArmed] = useState(false);
     const [isResetting, setIsResetting] = useState(false);
 
@@ -141,41 +141,21 @@ export const NAVChart = ({ navHistory, displayCurrency, fxRates, onResetTracking
     return (
         <div className="bg-surface rounded-2xl p-6">
             {/* Header */}
-            <div className="flex items-center justify-between mb-5">
-                <div className="flex items-center gap-3">
+            {!isEmpty && (
+                <div className="flex items-center gap-3 mb-5">
                     <h3 className="text-[10px] font-bold text-text-3 uppercase tracking-widest">
                         Net Worth History
                     </h3>
-                    {!isEmpty && (
-                        <span className={cn(
-                            "text-[10px] font-bold tabular-nums px-2 py-0.5 rounded-full",
-                            isUp
-                                ? "text-positive bg-positive/10"
-                                : "text-negative bg-negative/10"
-                        )}>
-                            {isUp ? "+" : ""}{periodChangePct.toFixed(2)}% · {periodLabel(period)}
-                        </span>
-                    )}
+                    <span className={cn(
+                        "text-[10px] font-bold tabular-nums px-2 py-0.5 rounded-full",
+                        isUp
+                            ? "text-positive bg-positive/10"
+                            : "text-negative bg-negative/10"
+                    )}>
+                        {isUp ? "+" : ""}{periodChangePct.toFixed(2)}% · {periodLabel(period)}
+                    </span>
                 </div>
-
-                {/* Period selector */}
-                <div className="flex items-center gap-0.5 bg-surface-2 rounded-full p-0.5">
-                    {PERIODS.map(p => (
-                        <button
-                            key={p}
-                            onClick={() => setPeriod(p)}
-                            className={cn(
-                                "px-3 py-1 rounded-full text-[10px] font-bold transition-all duration-200",
-                                period === p
-                                    ? "bg-surface text-text-1 shadow-sm"
-                                    : "text-text-3 hover:text-text-2"
-                            )}
-                        >
-                            {p}
-                        </button>
-                    ))}
-                </div>
-            </div>
+            )}
 
             {/* Empty state */}
             {isEmpty ? (
@@ -218,7 +198,8 @@ export const NAVChart = ({ navHistory, displayCurrency, fxRates, onResetTracking
                             tick={{ fill: "var(--color-text-3)", fontSize: 10, fontFamily: "DM Sans" }}
                             tickLine={false}
                             axisLine={false}
-                            width={68}
+                            tickCount={4}
+                            width={62}
                         />
                         <Tooltip
                             content={<CustomTooltip displayCurrency={displayCurrency} />}
