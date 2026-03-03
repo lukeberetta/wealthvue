@@ -84,25 +84,13 @@ export const useDashboard = (user: User | null, isDemo: boolean) => {
                 return;
             }
 
-            const rates = await fetchFXRates();
+            const [rates, loadedAssets, loadedHistory, loadedGoal] = await Promise.all([
+                fetchFXRates(),
+                uid ? loadAssets(uid) : Promise.resolve([]),
+                uid ? loadNAVHistory(uid) : Promise.resolve([]),
+                uid ? loadGoal(uid) : Promise.resolve(null),
+            ]);
             setFxRates(rates.rates);
-
-            let loadedAssets: Asset[];
-            let loadedHistory: NAVHistoryEntry[];
-            let loadedGoal: FinancialGoal | null;
-
-            if (uid) {
-                // Real user: load from Firestore
-                [loadedAssets, loadedHistory, loadedGoal] = await Promise.all([
-                    loadAssets(uid),
-                    loadNAVHistory(uid),
-                    loadGoal(uid),
-                ]);
-            } else {
-                loadedAssets = [];
-                loadedHistory = [];
-                loadedGoal = null;
-            }
 
             setAssets(loadedAssets);
             setNavHistory(loadedHistory);
