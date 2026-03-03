@@ -85,7 +85,7 @@ export const SettingsView = ({ user, onSignOut, onBack, onUpdateUser }: Settings
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1.5">
-                            <label className="text-[10px] uppercase font-bold text-text-3 tracking-wider">Display Name</label>
+                            <label className="text-[10px] uppercase font-bold text-text-3 tracking-widest">Display Name</label>
                             <input
                                 className="w-full bg-surface-2 border border-border rounded-xl px-3 py-2 text-sm text-text-1 focus:outline-none focus:ring-2 focus:ring-accent/20"
                                 value={displayName}
@@ -94,7 +94,7 @@ export const SettingsView = ({ user, onSignOut, onBack, onUpdateUser }: Settings
                             />
                         </div>
                         <div className="space-y-1.5">
-                            <label className="text-[10px] uppercase font-bold text-text-3 tracking-wider">Default Currency</label>
+                            <label className="text-[10px] uppercase font-bold text-text-3 tracking-widest">Default Currency</label>
                             <div className="relative">
                                 <select
                                     className="appearance-none w-full bg-surface-2 border border-border rounded-xl px-3 py-2 pr-10 text-sm text-text-1 focus:outline-none focus:ring-2 focus:ring-accent/20"
@@ -112,7 +112,7 @@ export const SettingsView = ({ user, onSignOut, onBack, onUpdateUser }: Settings
                             </div>
                         </div>
                         <div className="space-y-1.5">
-                            <label className="text-[10px] uppercase font-bold text-text-3 tracking-wider">Country Location</label>
+                            <label className="text-[10px] uppercase font-bold text-text-3 tracking-widest">Country Location</label>
                             <div className="relative">
                                 <select
                                     className="appearance-none w-full bg-surface-2 border border-border rounded-xl px-3 py-2 pr-10 text-sm text-text-1 focus:outline-none focus:ring-2 focus:ring-accent/20"

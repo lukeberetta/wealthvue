@@ -118,7 +118,7 @@ function EditableNumber({
 
     return (
         <div className="text-right">
-            {label && <p className="text-[9px] text-text-3 font-bold uppercase tracking-widest mb-0.5">{label}</p>}
+            {label && <p className="text-[10px] text-text-3 font-bold uppercase tracking-widest mb-0.5">{label}</p>}
             {editing ? (
                 <div className="flex items-center justify-end gap-1">
                     <span className="text-[10px] text-text-3">{currency}</span>
@@ -406,11 +406,9 @@ export const AddAssetModal = ({
 
     return (
         <div
-            className="fixed inset-0 z-50 flex items-center justify-center p-4"
-            style={{ background: "rgba(10,8,6,0.55)" }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
             onClick={e => { if (e.target === e.currentTarget && state === "input") onClose(); }}
         >
-            <div className="absolute inset-0 backdrop-blur-sm pointer-events-none" />
 
             <AnimatePresence mode="wait">
                 <motion.div
@@ -419,7 +417,7 @@ export const AddAssetModal = ({
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={reduced ? {} : { opacity: 0, scale: 0.96, y: 24 }}
                     transition={{ duration: 0.38, ease: [0.16, 1, 0.3, 1] }}
-                    className="relative bg-surface w-full max-w-xl rounded-3xl shadow-2xl overflow-hidden z-10"
+                    className="relative bg-surface w-full max-w-xl rounded-2xl shadow-2xl overflow-hidden z-10"
                     role="dialog"
                     aria-modal="true"
                     aria-label="Add Asset"
@@ -675,7 +673,7 @@ export const AddAssetModal = ({
                                         value={globalSource}
                                         onChange={e => setGlobalSource(e.target.value)}
                                         placeholder="e.g. Fidelity, Vanguard..."
-                                        className="w-full bg-surface-2/60 border border-border rounded-xl text-text-1 placeholder:text-text-3/60 text-sm px-4 py-3 focus:outline-none focus:border-accent/40 focus:bg-surface-2 transition-all"
+                                        className="w-full bg-surface-2 border border-border rounded-xl text-text-1 placeholder:text-text-3 text-sm px-4 py-3 focus:outline-none focus:ring-2 focus:ring-accent/20 transition-all"
                                     />
                                 </div>
 
