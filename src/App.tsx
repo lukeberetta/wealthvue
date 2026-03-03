@@ -7,6 +7,7 @@ import { LoginModal } from "./features/auth/LoginModal";
 import { FeedbackModal } from "./features/feedback/FeedbackModal";
 import { useTheme, ThemeMode } from "./hooks/useTheme";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import { ToastProvider } from "./components/ui/Toast";
 
 // ---------------------------------------------------------------------------
 // Theme context — consumed by nav and settings
@@ -135,7 +136,9 @@ const handleTryDemo = () => { if (user) { navigate("/app"); } else { setDemo(tru
 export default function App() {
   return (
     <AuthProvider>
-      <Inner />
+      <ToastProvider>
+        <Inner />
+      </ToastProvider>
     </AuthProvider>
   );
 }

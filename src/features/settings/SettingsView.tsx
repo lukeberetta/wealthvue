@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useToast } from "../../components/ui/Toast";
 import { ArrowLeft, CreditCard, Trash2, LogOut, Palette, ChevronDown, AlertTriangle } from "lucide-react";
 import { User } from "../../types";
 import { Card } from "../../components/ui/Card";
@@ -16,22 +17,30 @@ interface SettingsViewProps {
 export const SettingsView = ({ user, onSignOut, onBack, onUpdateUser }: SettingsViewProps) => {
     const [displayName, setDisplayName] = useState(user?.displayName ?? "");
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const { addToast } = useToast();
 
     const trialDaysRemaining = user?.trialEndsAt
         ? Math.max(0, Math.ceil((new Date(user.trialEndsAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
         : null;
 
     const handleCurrencyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        if (user) onUpdateUser({ ...user, displayName, defaultCurrency: e.target.value });
+        if (user) {
+            onUpdateUser({ ...user, displayName, defaultCurrency: e.target.value });
+            addToast(`Currency changed to ${e.target.value}`);
+        }
     };
 
     const handleCountryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        if (user) onUpdateUser({ ...user, displayName, country: e.target.value });
+        if (user) {
+            onUpdateUser({ ...user, displayName, country: e.target.value });
+            addToast("Country updated");
+        }
     };
 
     const handleDisplayNameBlur = () => {
         if (user && displayName !== user.displayName) {
             onUpdateUser({ ...user, displayName });
+            addToast("Name saved");
         }
     };
 

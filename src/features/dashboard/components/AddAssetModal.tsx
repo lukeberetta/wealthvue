@@ -211,7 +211,7 @@ function DraftCard({
                                 className="font-medium text-sm text-text-1 bg-transparent border-b border-accent/40 focus:outline-none w-full"
                             />
                         ) : (
-                            <h3 className="font-medium text-sm text-text-1 group-hover:text-accent transition-colors truncate">
+                            <h3 className="font-sans font-medium text-sm text-text-1 group-hover:text-accent transition-colors truncate">
                                 {name}
                                 <span className="ml-1 opacity-0 group-hover:opacity-40 transition-opacity font-sans font-normal text-xs">✎</span>
                             </h3>

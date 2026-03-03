@@ -18,6 +18,7 @@ import { fetchFXRates, convertCurrency } from "../../../lib/fx";
 import { parseTextToAsset, parseScreenshotToAssets } from "../../../services/gemini";
 import { fetchLiveQuote, LIVE_PRICE_TYPES } from "../../../services/priceApi";
 import { useAuth } from "../../../contexts/AuthContext";
+import { useToast } from "../../../components/ui/Toast";
 
 type ChangePeriod = '1D' | '1W' | '1M' | 'All';
 
@@ -36,6 +37,7 @@ function getPeriodAnchor(history: NAVHistoryEntry[], period: ChangePeriod): NAVH
 export const useDashboard = (user: User | null, isDemo: boolean) => {
     const { firebaseUser } = useAuth();
     const uid = firebaseUser?.uid ?? null;
+    const { addToast } = useToast();
 
     const [assets, setAssets] = useState<Asset[]>([]);
     const [navHistory, setNavHistory] = useState<NAVHistoryEntry[]>([]);
@@ -240,6 +242,9 @@ export const useDashboard = (user: User | null, isDemo: boolean) => {
         setIsAddModalOpen(false);
         setInputText("");
 
+        const count = draftAssets.length;
+        addToast(`${count} asset${count !== 1 ? "s" : ""} added to portfolio`);
+
         // Persist to Firestore (fire-and-forget — UI already updated)
         await Promise.all([
             saveAssets(uid, newToSave),
@@ -249,10 +254,12 @@ export const useDashboard = (user: User | null, isDemo: boolean) => {
 
     const handleBulkDelete = async () => {
         if (isDemo || !uid) return;
+        const count = selectedAssetIds.length;
         const newAssets = assets.filter(a => !selectedAssetIds.includes(a.id));
         setAssets(newAssets);
         setSelectedAssetIds([]);
         setIsSelectMode(false);
+        addToast(`${count} asset${count !== 1 ? "s" : ""} removed`, "info");
         await deleteAssets(uid, selectedAssetIds);
     };
 
@@ -274,6 +281,7 @@ export const useDashboard = (user: User | null, isDemo: boolean) => {
         const newAssets = assets.map(a => a.id === updated.id ? updated : a);
         setAssets(newAssets);
         setIsEditModalOpen(false);
+        addToast("Asset updated");
         if (uid) await saveAsset(uid, updated);
     };
 
@@ -281,18 +289,21 @@ export const useDashboard = (user: User | null, isDemo: boolean) => {
         const newAssets = assets.filter(a => a.id !== id);
         setAssets(newAssets);
         setIsEditModalOpen(false);
+        addToast("Asset removed", "info");
         if (uid) await deleteAsset(uid, id);
     };
 
     const handleSaveGoal = async (newGoal: FinancialGoal) => {
         setGoalState(newGoal);
         setIsEditingGoal(false);
+        addToast("Goal saved");
         if (uid) await firestoreSaveGoal(uid, newGoal);
     };
 
     const handleClearGoal = async () => {
         setGoalState(null);
         setIsEditingGoal(false);
+        addToast("Goal removed", "info");
         if (uid) await firestoreClearGoal(uid);
     };
 
@@ -313,7 +324,10 @@ export const useDashboard = (user: User | null, isDemo: boolean) => {
                     lastRefreshed: new Date().toISOString(),
                 };
                 setAssets(prev => prev.map(a => a.id === asset.id ? updated : a));
+                addToast(`Price refreshed for ${asset.name}`);
                 await saveAsset(uid, updated);
+            } else {
+                addToast("No live price available", "info");
             }
         } finally {
             setRefreshingAssetId(null);
