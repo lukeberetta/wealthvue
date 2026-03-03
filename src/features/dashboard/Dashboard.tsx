@@ -305,24 +305,24 @@ export const Dashboard = ({ user, isDemo, onSignIn, onSignOut, onGoHome, onUpdat
                                                 />
                                             </div>
                                             <div className="flex items-center justify-between">
-                                                <p className="text-xs text-text-3 tabular-nums">
-                                                    {formatCurrencyCompact(totalNAV, displayCurrency)} of {formatCurrencyCompact(convertedTarget, displayCurrency)}
-                                                    {' '}
-                                                    <span className="text-text-2 font-medium">({(progress * 100).toFixed(1)}%)</span>
-                                                    {remaining > 0 && (
-                                                        <> · {formatCurrencyCompact(remaining, displayCurrency)} to go</>
-                                                    )}
-                                                </p>
                                                 <div className="flex items-center gap-1.5">
-                                                    <Target size={11} className="text-text-3" />
-                                                    <button
-                                                        onClick={isDemo ? onSignIn : () => openGoalEditor(goal)}
-                                                        className="text-text-3 hover:text-accent transition-colors"
-                                                        aria-label="Edit goal"
-                                                    >
-                                                        <Pencil size={11} />
-                                                    </button>
+                                                    <Target size={11} className="text-text-3 shrink-0" />
+                                                    <p className="text-xs text-text-3 tabular-nums">
+                                                        {formatCurrencyCompact(totalNAV, displayCurrency)} of {formatCurrencyCompact(convertedTarget, displayCurrency)}
+                                                        {' '}
+                                                        <span className="text-text-2 font-medium">({(progress * 100).toFixed(1)}%)</span>
+                                                        {remaining > 0 && (
+                                                            <> · {formatCurrencyCompact(remaining, displayCurrency)} to go</>
+                                                        )}
+                                                    </p>
                                                 </div>
+                                                <button
+                                                    onClick={isDemo ? onSignIn : () => openGoalEditor(goal)}
+                                                    className="text-text-3 hover:text-accent transition-colors shrink-0"
+                                                    aria-label="Edit goal"
+                                                >
+                                                    <Pencil size={11} />
+                                                </button>
                                             </div>
                                         </>
                                     );
