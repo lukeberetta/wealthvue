@@ -71,6 +71,18 @@ export const useDashboard = (user: User | null, isDemo: boolean) => {
     useEffect(() => {
         const loadData = async () => {
             setIsLoading(true);
+
+            if (isDemo) {
+                // Demo: read static local data instantly — never touches Firestore
+                setAssets(storage.getAssets(true));
+                setNavHistory(storage.getNAVHistory(true));
+                setGoalState(storage.getGoal(true));
+                setIsLoading(false);
+                // Fetch FX rates in the background (non-blocking)
+                fetchFXRates().then(rates => setFxRates(rates.rates));
+                return;
+            }
+
             const rates = await fetchFXRates();
             setFxRates(rates.rates);
 
@@ -78,12 +90,7 @@ export const useDashboard = (user: User | null, isDemo: boolean) => {
             let loadedHistory: NAVHistoryEntry[];
             let loadedGoal: FinancialGoal | null;
 
-            if (isDemo) {
-                // Demo: read static local data — never touches Firestore
-                loadedAssets = storage.getAssets(true);
-                loadedHistory = storage.getNAVHistory(true);
-                loadedGoal = storage.getGoal(true);
-            } else if (uid) {
+            if (uid) {
                 // Real user: load from Firestore
                 [loadedAssets, loadedHistory, loadedGoal] = await Promise.all([
                     loadAssets(uid),
