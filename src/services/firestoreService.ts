@@ -23,7 +23,7 @@ import {
     limit,
     increment,
 } from "firebase/firestore";
-import { db } from "../lib/firebase";
+import { db, auth } from "../lib/firebase";
 import { Asset, NAVHistoryEntry, FinancialGoal, FXCache, AIUsage } from "../types";
 
 // ---------------------------------------------------------------------------
@@ -292,6 +292,7 @@ export async function loadSP500Cache(): Promise<{ date: string; close: number }[
 export async function saveSP500Cache(
     points: { date: string; close: number }[]
 ): Promise<void> {
+    if (!auth.currentUser) return;
     try {
         await setDoc(doc(db, "sp500Cache", "latest"), {
             points,
