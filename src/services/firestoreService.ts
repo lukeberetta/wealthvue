@@ -126,6 +126,15 @@ export async function loadNAVHistory(uid: string): Promise<NAVHistoryEntry[]> {
     });
 }
 
+/** Delete ALL nav history entries for the given user (used for "reset tracking"). */
+export async function clearNAVHistory(uid: string): Promise<void> {
+    const snap = await getDocs(collection(db, "users", uid, "navHistory"));
+    if (snap.empty) return;
+    const batch = writeBatch(db);
+    snap.docs.forEach(d => batch.delete(d.ref));
+    await batch.commit();
+}
+
 /** Write today's NAV snapshot (last-write-wins per day). */
 export async function saveNAVSnapshot(
     uid: string,

@@ -23,6 +23,7 @@ import { useDashboard } from "./hooks/useDashboard";
 import { PortfolioInsights, getArchetype } from "./components/PortfolioInsights";
 import { PortfolioAdviceModal } from "./components/PortfolioAdviceModal";
 import { AssetList } from "./components/AssetList";
+import { NAVChart } from "./components/NAVChart";
 import { AddAssetModal } from "./components/AddAssetModal";
 import { EditAssetModal } from "./components/EditAssetModal";
 import { convertCurrency } from "../../lib/fx";
@@ -86,7 +87,8 @@ export const Dashboard = ({ user, isDemo, onSignIn, onSignOut, onGoHome, onUpdat
         handleDeleteAsset,
         handleFileUpload,
         refreshingAssetId,
-        handleRefreshAsset
+        handleRefreshAsset,
+        handleResetTracking,
     } = useDashboard(user, isDemo);
 
     useEffect(() => {
@@ -336,6 +338,17 @@ export const Dashboard = ({ user, isDemo, onSignIn, onSignOut, onGoHome, onUpdat
                         displayCurrency={displayCurrency}
                         fxRates={fxRates}
                         onOpenAdvice={isDemo ? onSignIn : () => setIsAdviceModalOpen(true)}
+                    />
+                </div>
+
+                {/* NAV History Chart */}
+                <div>
+                    <h3 className="text-xl font-serif text-text-1 mb-6">Performance</h3>
+                    <NAVChart
+                        navHistory={navHistory}
+                        displayCurrency={displayCurrency}
+                        fxRates={fxRates}
+                        onResetTracking={isDemo ? undefined : handleResetTracking}
                     />
                 </div>
 

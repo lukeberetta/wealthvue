@@ -10,6 +10,7 @@ import {
     deleteAssets,
     loadNAVHistory,
     saveNAVSnapshot,
+    clearNAVHistory,
     loadGoal,
     saveGoal as firestoreSaveGoal,
     clearGoal as firestoreClearGoal,
@@ -307,6 +308,21 @@ export const useDashboard = (user: User | null, isDemo: boolean) => {
         if (uid) await firestoreClearGoal(uid);
     };
 
+    const handleResetTracking = async () => {
+        if (!uid) return;
+        // Wipe all existing history from Firestore
+        await clearNAVHistory(uid);
+        // Write a fresh snapshot from today's current assets
+        const today = new Date().toISOString().split("T")[0];
+        const totalNAVInUSD = assets.reduce((acc, asset) => {
+            return acc + convertCurrency(asset.totalValue, asset.totalValueCurrency, "USD", fxRates);
+        }, 0);
+        const entry: NAVHistoryEntry = { date: today, totalNAV: totalNAVInUSD, displayCurrency: "USD" };
+        setNavHistory([entry]);
+        await saveNAVSnapshot(uid, entry);
+        addToast("Tracking reset — starting fresh from today");
+    };
+
     const handleRefreshAsset = async (asset: Asset) => {
         if (isDemo || !asset.ticker || !uid) return;
         if (!LIVE_PRICE_TYPES.includes(asset.assetType)) return;
@@ -425,6 +441,7 @@ export const useDashboard = (user: User | null, isDemo: boolean) => {
         handleFileUpload,
         refreshingAssetId,
         handleRefreshAsset,
+        handleResetTracking,
         isAccountMenuOpen,
         setIsAccountMenuOpen,
     };
