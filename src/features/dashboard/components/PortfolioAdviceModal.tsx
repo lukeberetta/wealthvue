@@ -28,10 +28,10 @@ const CACHE_TTL_HOURS = 24;
 
 const ANALYSIS_MESSAGES = [
     "Reviewing your holdings…",
-    "Looking up market conditions…",
-    "Assessing risk and allocation…",
+    "Checking market conditions…",
+    "Assessing risk…",
     "Crunching the numbers…",
-    "Writing personalised insights…",
+    "Writing insights…",
 ];
 
 function AnalysisMessages() {
