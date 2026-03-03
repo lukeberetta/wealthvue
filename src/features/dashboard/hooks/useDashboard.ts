@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { Asset, User, NAVHistoryEntry, FinancialGoal } from "../../../types";
 import { storage } from "../../../services/storage";
+import { DEMO_FX_RATES } from "../../../data/demoData";
 import {
     loadAssets,
     saveAsset,
@@ -46,7 +47,7 @@ export const useDashboard = (user: User | null, isDemo: boolean) => {
     const [assets, setAssets] = useState<Asset[]>([]);
     const [navHistory, setNavHistory] = useState<NAVHistoryEntry[]>([]);
     const [displayCurrency, setDisplayCurrency] = useState(user?.defaultCurrency || "ZAR");
-    const [fxRates, setFxRates] = useState<{ [key: string]: number }>({ USD: 1 });
+    const [fxRates, setFxRates] = useState<{ [key: string]: number }>(() => isDemo ? DEMO_FX_RATES : { USD: 1 });
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);

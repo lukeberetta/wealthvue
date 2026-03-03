@@ -1,5 +1,5 @@
 import React from "react";
-import { RefreshCw } from "lucide-react";
+import { RefreshCw, Check } from "lucide-react";
 import { Asset } from "../../../types";
 import { formatCurrency, cn } from "../../../lib/utils";
 import { convertCurrency } from "../../../lib/fx";
@@ -37,22 +37,20 @@ export const AssetRow: React.FC<AssetRowProps> = ({
         >
             {/* Checkbox */}
             <div className="w-5 shrink-0" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
-                <div className="relative w-4 h-4">
+                <label className="block w-4 h-4 cursor-pointer">
                     <input
                         type="checkbox"
                         checked={isSelected}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => onSelect(asset.id, e.target.checked)}
-                        className={cn(
-                            "appearance-none w-4 h-4 rounded border cursor-pointer transition-all",
-                            isSelected ? "bg-accent border-accent" : "bg-surface-2 border-border hover:border-text-3"
-                        )}
+                        className="sr-only"
                     />
-                    {isSelected && (
-                        <svg className="absolute inset-0 w-4 h-4 text-white pointer-events-none" viewBox="0 0 16 16" fill="currentColor">
-                            <path d="M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z"/>
-                        </svg>
-                    )}
-                </div>
+                    <div className={cn(
+                        "w-4 h-4 rounded border flex items-center justify-center transition-all",
+                        isSelected ? "bg-accent border-accent" : "bg-surface-2 border-border hover:border-text-3"
+                    )}>
+                        {isSelected && <Check size={10} strokeWidth={3} className="text-white" />}
+                    </div>
+                </label>
             </div>
 
             {/* Icon */}

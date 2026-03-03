@@ -346,3 +346,17 @@ export const DEMO_GOAL: FinancialGoal = {
   targetAmount: 10000000,
   currency: "ZAR",
 };
+
+// Hardcoded FX rates (USD base) used as initial state in demo mode.
+// Prevents a jarring layout shift when live rates load and ZAR assets
+// stop being treated as 1:1 with USD.
+export const DEMO_FX_RATES: { [key: string]: number } = {
+  USD: 1,
+  ZAR: 18.9,
+  EUR: 0.92,
+  GBP: 0.79,
+  AUD: 1.54,
+  CAD: 1.36,
+  JPY: 149.5,
+  CHF: 0.88,
+};
