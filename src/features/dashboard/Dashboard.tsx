@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
     Plus,
     ArrowUpRight,
@@ -42,6 +42,8 @@ export const Dashboard = ({ user, isDemo, onSignIn, onSignOut, onGoHome, onUpdat
     const [isAdviceModalOpen, setIsAdviceModalOpen] = useState(false);
     const [navPeriod, setNavPeriod] = useState<Period>("1M");
     const [goalAmountInput, setGoalAmountInput] = useState('');
+    const [fabLabelVisible, setFabLabelVisible] = useState(true);
+    const lastScrollY = useRef(0);
     const location = useLocation();
 
     const {
@@ -97,6 +99,16 @@ export const Dashboard = ({ user, isDemo, onSignIn, onSignOut, onGoHome, onUpdat
             setCurrentView("settings");
             window.history.replaceState({}, "");
         }
+    }, []);
+
+    useEffect(() => {
+        const onScroll = () => {
+            const y = window.scrollY;
+            setFabLabelVisible(y <= lastScrollY.current || y < 60);
+            lastScrollY.current = y;
+        };
+        window.addEventListener("scroll", onScroll, { passive: true });
+        return () => window.removeEventListener("scroll", onScroll);
     }, []);
 
     const openGoalEditor = (existing: FinancialGoal | null) => {
@@ -219,7 +231,7 @@ export const Dashboard = ({ user, isDemo, onSignIn, onSignOut, onGoHome, onUpdat
                             </div>
                         </div>
 
-                        <div className="flex gap-3">
+                        <div className="hidden md:flex gap-3">
                             <Button
                                 onClick={isDemo ? onSignIn : () => setIsAddModalOpen(true)}
                                 className="flex items-center gap-2 rounded-full px-5 py-2 text-sm"
@@ -455,6 +467,27 @@ export const Dashboard = ({ user, isDemo, onSignIn, onSignOut, onGoHome, onUpdat
                 goal={goal}
                 navHistory={navHistory}
             />
+
+            {/* Mobile FAB */}
+            <motion.button
+                className="md:hidden fixed bottom-6 left-0 right-0 mx-auto w-fit z-40 flex items-center h-12 bg-accent text-white rounded-full px-5 text-sm font-semibold shadow-lg shadow-accent/30"
+                onClick={isDemo ? onSignIn : () => setIsAddModalOpen(true)}
+                whileTap={{ scale: 0.95 }}
+                aria-label="Add Asset"
+            >
+                <Plus size={17} />
+                <motion.span
+                    animate={{
+                        maxWidth: fabLabelVisible ? 100 : 0,
+                        opacity: fabLabelVisible ? 1 : 0,
+                        paddingLeft: fabLabelVisible ? 8 : 0,
+                    }}
+                    transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                    style={{ overflow: "hidden", whiteSpace: "nowrap", display: "inline-block" }}
+                >
+                    Add Asset
+                </motion.span>
+            </motion.button>
 
         </div>
     );
