@@ -67,6 +67,8 @@ src/
     fx.ts                          # fetchFXRates(), convertCurrency() — caches in Firestore + localStorage
     utils.ts                       # cn(), formatCurrency(), formatCompactNumber()
     benchmark.ts                   # fetchSP500History() — S&P 500 via CORS proxy, cached in localStorage
+
+  data/
     demoData.ts                    # DEMO_USER, DEMO_ASSETS, DEMO_NAV_HISTORY, DEMO_GOAL
 
   services/
@@ -147,9 +149,9 @@ VITE_USE_EMULATOR=true   # optional — connects to local emulators
 ## AI / Gemini Service
 
 Model rotation order (falls back on 429 / RESOURCE_EXHAUSTED):
-1. `gemini-3-flash-preview`
-2. `gemini-2.5-flash-lite`
-3. `gemini-2.5-flash`
+1. `gemini-2.5-flash-lite` (cheapest, tried first)
+2. `gemini-2.5-flash` (mid-tier fallback)
+3. `gemini-3-flash-preview` (highest quality, last resort)
 
 Key functions in `src/services/gemini.ts`:
 - `parseTextToAsset(text)` — natural language → structured Asset with live price (Google Search tool)
