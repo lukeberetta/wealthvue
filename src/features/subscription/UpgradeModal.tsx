@@ -36,6 +36,7 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({ isOpen, onClose, rea
     const handleUpgrade = () => {
         if (user && firebaseUser) {
             openCheckout(user.email, firebaseUser.uid);
+            onClose();
         }
     };
 

@@ -9,6 +9,13 @@ import { initializePaddle, Paddle } from "@paddle/paddle-js";
 
 let paddle: Paddle | undefined;
 
+/** Fired when a Paddle checkout completes successfully. Set via setOnCheckoutComplete. */
+let checkoutCompleteHandler: (() => void) | undefined;
+
+export function setOnCheckoutComplete(handler: () => void): void {
+    checkoutCompleteHandler = handler;
+}
+
 /**
  * Initialise Paddle once on app load.
  * Uses sandbox environment while VITE_PADDLE_ENVIRONMENT === "sandbox".
@@ -27,6 +34,11 @@ export async function initPaddle(): Promise<void> {
     paddle = await initializePaddle({
         environment: isSandbox ? "sandbox" : "production",
         token,
+        eventCallback: (event) => {
+            if (event.name === "checkout.completed") {
+                checkoutCompleteHandler?.();
+            }
+        },
     });
 }
 

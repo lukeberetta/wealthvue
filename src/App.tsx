@@ -1,6 +1,7 @@
 import React from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Routes, Route, useNavigate, useLocation, Navigate } from "react-router-dom";
+import { Crown } from "lucide-react";
 import { LandingPage } from "./features/landing/LandingPage";
 import { Dashboard } from "./features/dashboard/Dashboard";
 import { LoginModal } from "./features/auth/LoginModal";
@@ -11,6 +12,8 @@ import { RefundPage } from "./features/legal/RefundPage";
 import { useTheme, ThemeMode } from "./hooks/useTheme";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { ToastProvider } from "./components/ui/Toast";
+import { setOnCheckoutComplete } from "./services/paddleService";
+import { Button } from "./components/ui/Button";
 
 // ---------------------------------------------------------------------------
 // Theme context — consumed by nav and settings
@@ -53,12 +56,21 @@ function AppRoute() {
 // ---------------------------------------------------------------------------
 function Inner() {
   const { mode, setTheme } = useTheme();
-  const { user, firebaseUser, isDemo, loading, setDemo, signOut, updateUser } = useAuth();
+  const { user, firebaseUser, isDemo, loading, setDemo, signOut, updateUser, refreshUser } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
   const [isLoginModalOpen, setIsLoginModalOpen] = React.useState(false);
   const [isFeedbackModalOpen, setIsFeedbackModalOpen] = React.useState(false);
+  const [showUpgradeSuccess, setShowUpgradeSuccess] = React.useState(false);
+
+  React.useEffect(() => {
+    setOnCheckoutComplete(() => {
+      setShowUpgradeSuccess(true);
+      // Delay refresh to give the webhook time to update Firestore
+      setTimeout(() => refreshUser(), 4000);
+    });
+  }, [refreshUser]);
 
 const handleTryDemo = () => { if (user) { navigate("/app"); } else { setDemo(true); navigate("/app"); } };
   const handleSignOut = async () => { await signOut(); navigate("/"); };
@@ -132,6 +144,38 @@ const handleTryDemo = () => { if (user) { navigate("/app"); } else { setDemo(tru
           onClose={() => setIsFeedbackModalOpen(false)}
           user={user}
         />
+
+        {showUpgradeSuccess && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+            onClick={() => setShowUpgradeSuccess(false)}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.92, y: 24 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+              className="bg-surface border border-border rounded-2xl shadow-2xl w-full max-w-sm p-8 flex flex-col items-center text-center gap-5"
+              onClick={(e: React.MouseEvent) => e.stopPropagation()}
+            >
+              <div className="w-16 h-16 rounded-2xl bg-accent-light flex items-center justify-center">
+                <Crown size={28} className="text-accent" />
+              </div>
+              <div className="space-y-2">
+                <h2 className="font-serif text-2xl text-text-1">You're on Pro</h2>
+                <p className="text-sm text-text-3 leading-relaxed">
+                  Payment confirmed. All Pro features are now unlocked — enjoy the full WealthVue experience.
+                </p>
+              </div>
+              <Button
+                variant="primary"
+                className="w-full"
+                onClick={() => setShowUpgradeSuccess(false)}
+              >
+                Let's go
+              </Button>
+            </motion.div>
+          </div>
+        )}
       </div>
     </ThemeContext.Provider>
   );

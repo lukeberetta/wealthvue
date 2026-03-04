@@ -33,6 +33,7 @@ interface AuthContextValue {
     signOut: () => Promise<void>;
     setDemo: (value: boolean) => void;
     updateUser: (user: User) => void;
+    refreshUser: () => Promise<void>;
 }
 
 // ---------------------------------------------------------------------------
@@ -117,6 +118,8 @@ function mapFirestoreUser(
                 lastCalledAt: data.aiUsage.lastCalledAt ?? null,
             }
             : undefined,
+        paddleSubscriptionId: data.paddleSubscriptionId ?? undefined,
+        paddleCancelAt: data.paddleCancelAt ?? undefined,
     };
 }
 
@@ -193,6 +196,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setIsDemo(false);
     };
 
+    const refreshUser = async () => {
+        if (!firebaseUser) return;
+        try {
+            const snap = await getDoc(doc(db, "users", firebaseUser.uid));
+            if (snap.exists()) {
+                setUser(mapFirestoreUser(snap.data() as Record<string, unknown>, firebaseUser));
+            }
+        } catch (err) {
+            console.error("Failed to refresh user profile:", err);
+        }
+    };
+
     const updateUser = (updated: User) => {
         setUser(updated);
         if (firebaseUser) {
@@ -219,6 +234,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 signOut,
                 setDemo: setIsDemo,
                 updateUser,
+                refreshUser,
             }}
         >
             {children}
