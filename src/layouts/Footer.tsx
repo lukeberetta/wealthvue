@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 export const Footer = () => (
     <footer className="border-t border-border bg-bg">
@@ -8,6 +9,12 @@ export const Footer = () => (
                 <span className="font-serif text-sm text-accent font-semibold">WealthVue</span>
                 <span className="text-border select-none">·</span>
                 <span className="text-xs text-text-3">© {new Date().getFullYear()}</span>
+                <span className="text-border select-none">·</span>
+                <Link to="/terms" className="text-xs text-text-3 hover:text-text-1 transition-colors">Terms</Link>
+                <span className="text-border select-none">·</span>
+                <Link to="/privacy" className="text-xs text-text-3 hover:text-text-1 transition-colors">Privacy</Link>
+                <span className="text-border select-none">·</span>
+                <Link to="/refund" className="text-xs text-text-3 hover:text-text-1 transition-colors">Refunds</Link>
             </div>
 
             <a
