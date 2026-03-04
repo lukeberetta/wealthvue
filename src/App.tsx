@@ -5,6 +5,9 @@ import { LandingPage } from "./features/landing/LandingPage";
 import { Dashboard } from "./features/dashboard/Dashboard";
 import { LoginModal } from "./features/auth/LoginModal";
 import { FeedbackModal } from "./features/feedback/FeedbackModal";
+import { TermsPage } from "./features/legal/TermsPage";
+import { PrivacyPage } from "./features/legal/PrivacyPage";
+import { RefundPage } from "./features/legal/RefundPage";
 import { useTheme, ThemeMode } from "./hooks/useTheme";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { ToastProvider } from "./components/ui/Toast";
@@ -111,6 +114,9 @@ const handleTryDemo = () => { if (user) { navigate("/app"); } else { setDemo(tru
                   )
                 }
               />
+              <Route path="/terms" element={<TermsPage />} />
+              <Route path="/privacy" element={<PrivacyPage />} />
+              <Route path="/refund" element={<RefundPage />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </motion.div>
