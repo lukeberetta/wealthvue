@@ -3,33 +3,30 @@ import { X, Zap, Check } from "lucide-react";
 import { Button } from "../../components/ui/Button";
 import { openCheckout } from "../../services/paddleService";
 import { useAuth } from "../../contexts/AuthContext";
-import { useSubscription } from "../../hooks/useSubscription";
 
 interface UpgradeModalProps {
     isOpen: boolean;
     onClose: () => void;
-    /** Optional reason to show at the top (e.g. "You've used all your AI credits") */
-    reason?: string;
 }
 
 const TRIAL_FEATURES = [
-    "Full dashboard & portfolio tracking",
-    "Net worth history (90 days)",
-    "Financial goal tracking",
+    "Full portfolio & net worth tracking",
     "Multi-currency & FX support",
-    "10 AI credits",
+    "Financial goal tracking",
+    "Net worth history (30 days)",
+    "10 AI credits — one-time",
 ];
 
 const PRO_FEATURES = [
-    "Everything in Trial",
-    "50 AI credits / month (renewable)",
+    "Everything in Trial, forever",
+    "50 AI credits / month — renewed monthly",
+    "Unlimited net worth history",
     "Priority support",
     "Export to CSV",
 ];
 
-export const UpgradeModal: React.FC<UpgradeModalProps> = ({ isOpen, onClose, reason }) => {
+export const UpgradeModal: React.FC<UpgradeModalProps> = ({ isOpen, onClose }) => {
     const { user, firebaseUser } = useAuth();
-    const { aiCreditsRemaining, aiCreditLimit } = useSubscription();
 
     if (!isOpen) return null;
 
@@ -45,91 +42,71 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({ isOpen, onClose, rea
             className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
             onClick={(e: React.MouseEvent<HTMLDivElement>) => { if (e.target === e.currentTarget) onClose(); }}
         >
-            {/* Modal */}
-            <div className="w-full max-w-lg bg-surface border border-border rounded-2xl shadow-2xl overflow-hidden">
+            <div className="w-full max-w-2xl bg-surface border border-border rounded-2xl shadow-2xl overflow-hidden">
                 {/* Header */}
-                <div className="relative px-6 pt-6 pb-4 border-b border-border">
+                <div className="relative flex items-center justify-between px-6 pt-5 pb-4 border-b border-border">
+                    <div className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-lg bg-accent-light flex items-center justify-center text-accent">
+                            <Zap size={15} />
+                        </div>
+                        <h2 className="font-serif text-xl text-text-1">Upgrade to Pro</h2>
+                    </div>
                     <button
                         onClick={onClose}
-                        className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full text-text-3 hover:text-text-1 hover:bg-surface-2 transition-colors"
+                        className="w-8 h-8 flex items-center justify-center rounded-full text-text-3 hover:text-text-1 hover:bg-surface-2 transition-colors"
                         aria-label="Close"
                     >
                         <X size={16} />
                     </button>
-                    <div className="flex items-center gap-3 mb-1">
-                        <div className="w-9 h-9 rounded-xl bg-accent-light flex items-center justify-center text-accent">
-                            <Zap size={17} />
-                        </div>
-                        <h2 className="font-serif text-2xl text-text-1">Upgrade to Pro</h2>
-                    </div>
-                    {reason && (
-                        <p className="text-sm text-text-3 mt-2">{reason}</p>
-                    )}
-                    {!reason && (
-                        <p className="text-sm text-text-3 mt-1">
-                            {aiCreditsRemaining === 0
-                                ? `You've used all ${aiCreditLimit} of your AI credits.`
-                                : "Unlock unlimited access to WealthVue."}
-                        </p>
-                    )}
                 </div>
 
-                {/* Plan comparison */}
-                <div className="p-6 grid grid-cols-2 gap-4">
-                    {/* Trial column */}
-                    <div className="rounded-xl border border-border bg-surface-2 p-4 space-y-3">
-                        <div>
-                            <p className="text-[10px] font-bold text-text-3 uppercase tracking-widest">Trial</p>
-                            <p className="text-xl font-semibold text-text-1 mt-0.5">Free</p>
-                            <p className="text-xs text-text-3">30 days</p>
+                {/* Cards */}
+                <div className="p-6 grid grid-cols-2 gap-5">
+                    {/* Trial card */}
+                    <div className="bg-surface-2 p-8 rounded-2xl border border-border flex flex-col">
+                        <p className="text-[10px] font-bold text-text-3 uppercase tracking-widest mb-3">Free Trial</p>
+                        <div className="flex items-end gap-1.5 mb-1">
+                            <span className="text-4xl font-serif text-text-1">$0</span>
                         </div>
-                        <ul className="space-y-2">
+                        <p className="text-xs text-text-3 mb-6">for 30 days</p>
+                        <ul className="space-y-3 flex-1">
                             {TRIAL_FEATURES.map((f) => (
-                                <li key={f} className="flex items-start gap-2 text-xs text-text-2">
-                                    <Check size={12} className="text-text-3 shrink-0 mt-0.5" />
+                                <li key={f} className="flex items-start gap-2.5 text-sm text-text-2">
+                                    <Check size={14} className="text-text-3 shrink-0 mt-0.5" />
                                     {f}
                                 </li>
                             ))}
                         </ul>
                     </div>
 
-                    {/* Pro column */}
-                    <div className="rounded-xl border border-accent/30 bg-accent/5 p-4 space-y-3 relative overflow-hidden">
-                        <div className="absolute top-0 right-0 bg-accent text-white text-[9px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-bl-lg">
-                            Best value
+                    {/* Pro card */}
+                    <div className="bg-surface p-8 rounded-2xl border border-accent shadow-xl shadow-accent/10 flex flex-col relative">
+                        <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-accent text-white text-[9px] font-bold uppercase tracking-wider px-4 py-1 rounded-full whitespace-nowrap">
+                            Most Popular
                         </div>
-                        <div>
-                            <p className="text-[10px] font-bold text-accent uppercase tracking-widest">Pro</p>
-                            <p className="text-xl font-semibold text-text-1 mt-0.5">$5<span className="text-sm font-normal text-text-3">/month</span></p>
-                            <p className="text-xs text-text-3">Billed monthly</p>
+                        <p className="text-[10px] font-bold text-accent uppercase tracking-widest mb-3">Pro</p>
+                        <div className="flex items-end gap-1.5 mb-1">
+                            <span className="text-4xl font-serif text-text-1">$5</span>
                         </div>
-                        <ul className="space-y-2">
+                        <p className="text-xs text-text-3 mb-6">per month</p>
+                        <ul className="space-y-3 flex-1 mb-6">
                             {PRO_FEATURES.map((f) => (
-                                <li key={f} className="flex items-start gap-2 text-xs text-text-2">
-                                    <Check size={12} className="text-accent shrink-0 mt-0.5" />
+                                <li key={f} className="flex items-start gap-2.5 text-sm text-text-2">
+                                    <Check size={14} className="text-accent shrink-0 mt-0.5" />
                                     {f}
                                 </li>
                             ))}
                         </ul>
+                        <Button
+                            variant="primary"
+                            onClick={handleUpgrade}
+                            className="w-full flex items-center justify-center gap-2"
+                        >
+                            <Zap size={14} />
+                            Get Started
+                        </Button>
+                        <p className="text-center text-[10px] text-text-3 mt-3">Billed monthly. Cancel anytime.</p>
                     </div>
-                </div>
-
-                {/* CTA */}
-                <div className="px-6 pb-6 flex flex-col gap-2">
-                    <Button
-                        variant="primary"
-                        onClick={handleUpgrade}
-                        className="w-full flex items-center justify-center gap-2"
-                    >
-                        <Zap size={15} />
-                        Upgrade for $5/month
-                    </Button>
-                    <button
-                        onClick={onClose}
-                        className="text-xs text-text-3 hover:text-text-2 transition-colors text-center py-1"
-                    >
-                        Maybe later
-                    </button>
                 </div>
             </div>
         </div>

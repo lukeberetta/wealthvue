@@ -338,7 +338,7 @@ export const LandingPage = ({ user, firebaseUid, isDemo = false, onSignIn, onTry
                                     </div>
                                 </div>
                                 <ul className="space-y-3 mb-10 flex-1">
-                                    {["All features included", "Add unlimited assets", "AI-powered valuation", "Live price refresh", "Multi-currency display", "No credit card required"].map(f => (
+                                    {["Full portfolio & net worth tracking", "Multi-currency & FX support", "Financial goal tracking", "Net worth history (30 days)", "10 AI credits — one-time"].map(f => (
                                         <li key={f} className="flex items-center gap-3 text-sm text-text-2">
                                             <Check size={14} className="text-positive shrink-0" />{f}
                                         </li>
@@ -362,7 +362,7 @@ export const LandingPage = ({ user, firebaseUid, isDemo = false, onSignIn, onTry
                                     </div>
                                 </div>
                                 <ul className="space-y-3 mb-10 flex-1">
-                                    {["Everything in Free Trial", "Continued full access", "Priority support", "Early access to new features"].map(f => (
+                                    {["Everything in Trial, forever", "50 AI credits / month — renewed monthly", "Unlimited net worth history", "Priority support", "Export to CSV"].map(f => (
                                         <li key={f} className="flex items-center gap-3 text-sm text-text-2">
                                             <Check size={14} className="text-positive shrink-0" />{f}
                                         </li>

@@ -14,6 +14,7 @@ import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { ToastProvider } from "./components/ui/Toast";
 import { setOnCheckoutComplete } from "./services/paddleService";
 import { Button } from "./components/ui/Button";
+import confetti from "canvas-confetti";
 
 // ---------------------------------------------------------------------------
 // Theme context — consumed by nav and settings
@@ -67,6 +68,14 @@ function Inner() {
   React.useEffect(() => {
     setOnCheckoutComplete(() => {
       setShowUpgradeSuccess(true);
+      const colors = ["#C96442", "#E8B89A", "#F5F1EB", "#5D8F6E", "#ffffff"];
+      const end = Date.now() + 2500;
+      const fire = () => {
+        confetti({ particleCount: 5, angle: 60, spread: 60, origin: { x: 0, y: 0.65 }, colors });
+        confetti({ particleCount: 5, angle: 120, spread: 60, origin: { x: 1, y: 0.65 }, colors });
+        if (Date.now() < end) requestAnimationFrame(fire);
+      };
+      fire();
       // Delay refresh to give the webhook time to update Firestore
       setTimeout(() => refreshUser(), 4000);
     });
