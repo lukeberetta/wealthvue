@@ -8,7 +8,7 @@
  */
 
 import {setGlobalOptions} from "firebase-functions/v2";
-import {onRequest} from "firebase-functions/v2/https";
+import {onRequest, onCall, HttpsError} from "firebase-functions/v2/https";
 import * as functions from "firebase-functions/v1";
 import * as logger from "firebase-functions/logger";
 import * as admin from "firebase-admin";
@@ -141,7 +141,7 @@ export const paddleWebhook = onRequest(
       return;
     }
 
-    let event: {eventType: string; data: Record<string, unknown>};
+    let event: { eventType: string; data: Record<string, unknown> };
     try {
       // Verify Paddle webhook signature manually using Node.js crypto.
       // This lets us apply a 60-second timestamp tolerance instead of the
@@ -174,7 +174,7 @@ export const paddleWebhook = onRequest(
       // Signature verified; parse and adapt snake_case → camelCase.
       const raw = JSON.parse(rawBody) as {
         event_type: string;
-        data: {id: string; custom_data?: Record<string, string> | null};
+        data: { id: string; custom_data?: Record<string, string> | null };
       };
       event = {
         eventType: raw.event_type,
@@ -207,7 +207,7 @@ export const paddleWebhook = onRequest(
 
         // Check if this update is a scheduled cancellation
         const scheduledChange = sub.scheduled_change as
-          {action: string; effective_at: string} | null | undefined;
+            { action: string; effective_at: string } | null | undefined;
         const isCancelScheduled = scheduledChange?.action === "cancel";
 
         const now = new Date();
@@ -219,7 +219,7 @@ export const paddleWebhook = onRequest(
           "paddleSubscriptionId": sub.id,
           // Store scheduled cancellation date so UI can show it
           "paddleCancelAt": isCancelScheduled ?
-            scheduledChange!.effective_at : FieldValue.delete(),
+              scheduledChange!.effective_at : FieldValue.delete(),
           // Reset AI credits for the new billing month
           "aiUsage.monthlyCallCount": 0,
           "aiUsage.currentMonth": currentMonth,
@@ -227,8 +227,8 @@ export const paddleWebhook = onRequest(
         });
         logger.info(
           `[paddleWebhook] Upgraded uid=${uid} sub=${sub.id}` +
-          (isCancelScheduled ?
-            ` (cancel scheduled ${scheduledChange!.effective_at})` : "")
+            (isCancelScheduled ?
+              ` (cancel scheduled ${scheduledChange!.effective_at})` : "")
         );
         break;
       }
@@ -326,7 +326,7 @@ export const cancelSubscription = onRequest(
         `[cancelSubscription] Scheduled uid=${uid} sub=${subscriptionId}`
       );
     } catch (err) {
-      const errCode = (err as {code?: string}).code;
+      const errCode = (err as { code?: string }).code;
       if (errCode === "subscription_locked_pending_changes") {
         alreadyPending = true;
         logger.info(
@@ -345,7 +345,7 @@ export const cancelSubscription = onRequest(
     try {
       const sub = await paddle.subscriptions.get(subscriptionId);
       const scheduled = (sub as unknown as {
-        scheduledChange?: {action: string; effectiveAt: string} | null;
+        scheduledChange?: { action: string; effectiveAt: string } | null;
       }).scheduledChange;
       if (scheduled?.action === "cancel" && scheduled.effectiveAt) {
         cancelAt = scheduled.effectiveAt;
@@ -368,3 +368,100 @@ export const cancelSubscription = onRequest(
     res.status(200).json({ok: true, cancelAt});
   }
 );
+
+/**
+ * deleteAccount — deletes the authenticated user's data from Firestore and
+ * completely removes their account from Firebase Authentication.
+ */
+export const deleteAccount = onCall({cors: true}, async (request) => {
+  const uid = request.auth?.uid;
+  if (!uid) {
+    throw new HttpsError(
+      "unauthenticated",
+      "User must be signed in to delete their account."
+    );
+  }
+
+  logger.info(`[deleteAccount] Initiating account deletion for uid=${uid}`);
+
+  try {
+    // 1. Delete assets subcollection
+    const assetsSnapshot = await db
+      .collection("users")
+      .doc(uid)
+      .collection("assets")
+      .get();
+
+    // Process in batches of 500 (Firestore limit)
+    let batch = db.batch();
+    let count = 0;
+
+    for (const doc of assetsSnapshot.docs) {
+      batch.delete(doc.ref);
+      count++;
+
+      if (count === 500) {
+        await batch.commit();
+        batch = db.batch();
+        count = 0;
+      }
+    }
+
+    if (count > 0) {
+      await batch.commit();
+    }
+    logger.info(
+      `[deleteAccount] Deleted ${assetsSnapshot.size} assets for uid=${uid}`
+    );
+
+    // 2. Delete navHistory subcollection
+    const navHistorySnapshot = await db
+      .collection("users")
+      .doc(uid)
+      .collection("navHistory")
+      .get();
+
+    batch = db.batch();
+    count = 0;
+
+    for (const doc of navHistorySnapshot.docs) {
+      batch.delete(doc.ref);
+      count++;
+
+      if (count === 500) {
+        await batch.commit();
+        batch = db.batch();
+        count = 0;
+      }
+    }
+
+    if (count > 0) {
+      await batch.commit();
+    }
+    logger.info(
+      `[deleteAccount] Deleted ${navHistorySnapshot.size} NAV ` +
+      `history entries for uid=${uid}`
+    );
+
+    // 3. Delete user document
+    await db.collection("users").doc(uid).delete();
+    logger.info(`[deleteAccount] Deleted user document for uid=${uid}`);
+
+    // 4. Delete user from Firebase Authentication
+    await admin.auth().deleteUser(uid);
+    logger.info(
+      `[deleteAccount] Successfully deleted user from Authentication uid=${uid}`
+    );
+
+    return {success: true};
+  } catch (error) {
+    logger.error(
+      `[deleteAccount] Error deleting account for uid=${uid}`,
+      error
+    );
+    throw new HttpsError(
+      "internal",
+      "An error occurred while deleting the account."
+    );
+  }
+});

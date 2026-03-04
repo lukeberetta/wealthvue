@@ -23,7 +23,8 @@ import {
     limit,
     increment,
 } from "firebase/firestore";
-import { db } from "../lib/firebase";
+import { httpsCallable } from "firebase/functions";
+import { db, functions } from "../lib/firebase";
 import { Asset, NAVHistoryEntry, FinancialGoal, FXCache, AIUsage } from "../types";
 
 // ---------------------------------------------------------------------------
@@ -262,6 +263,25 @@ export async function saveFXCache(cache: FXCache): Promise<void> {
         });
     } catch (err) {
         console.warn("Could not write FX cache to Firestore:", err);
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Account Deletion
+// ---------------------------------------------------------------------------
+
+/**
+ * Calls the secure backend function to completely delete the authenticated
+ * user's account, including their Firebase Auth account and all Firestore data.
+ */
+export async function deleteUserAccount(): Promise<boolean> {
+    try {
+        const deleteAccountFn = httpsCallable(functions, "deleteAccount");
+        await deleteAccountFn();
+        return true;
+    } catch (err) {
+        console.error("Failed to delete user account via Cloud Function:", err);
+        return false;
     }
 }
 

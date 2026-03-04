@@ -22,6 +22,7 @@ interface SettingsViewProps {
 export const SettingsView = ({ user, onSignOut, onBack, onUpdateUser }: SettingsViewProps) => {
     const [displayName, setDisplayName] = useState(user?.displayName ?? "");
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
     const [showUpgradeModal, setShowUpgradeModal] = useState(false);
     const [showCancelConfirm, setShowCancelConfirm] = useState(false);
     const [cancelling, setCancelling] = useState(false);
@@ -43,6 +44,24 @@ export const SettingsView = ({ user, onSignOut, onBack, onUpdateUser }: Settings
             addToast("Failed to cancel subscription. Please try again.", "error");
         } finally {
             setCancelling(false);
+        }
+    };
+
+    const handleDeleteAccount = async () => {
+        setIsDeleting(true);
+        try {
+            const { deleteUserAccount } = await import("../../services/firestoreService");
+            const success = await deleteUserAccount();
+            if (success) {
+                addToast("Your account has been successfully deleted.", "info");
+                onSignOut();
+            } else {
+                addToast("Failed to delete account. Please try again.", "error");
+            }
+        } catch {
+            addToast("Failed to delete account. Please try again.", "error");
+        } finally {
+            setIsDeleting(false);
         }
     };
 
@@ -314,11 +333,21 @@ export const SettingsView = ({ user, onSignOut, onBack, onUpdateUser }: Settings
                                 </div>
                             </div>
                             <div className="flex gap-3 justify-end">
-                                <Button variant="secondary" className="text-sm px-4 py-2 rounded-xl" onClick={() => setShowDeleteConfirm(false)}>
+                                <Button
+                                    variant="secondary"
+                                    className="text-sm px-4 py-2 rounded-xl"
+                                    onClick={() => setShowDeleteConfirm(false)}
+                                    disabled={isDeleting}
+                                >
                                     Cancel
                                 </Button>
-                                <Button variant="ghost" className="text-negative hover:bg-negative/10 text-sm px-4 py-2 rounded-xl" onClick={onSignOut}>
-                                    Yes, delete my account
+                                <Button
+                                    variant="ghost"
+                                    className="text-negative hover:bg-negative/10 text-sm px-4 py-2 rounded-xl"
+                                    onClick={handleDeleteAccount}
+                                    disabled={isDeleting}
+                                >
+                                    {isDeleting ? "Deleting…" : "Yes, delete my account"}
                                 </Button>
                             </div>
                         </div>

@@ -3,6 +3,7 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth, connectAuthEmulator } from "firebase/auth";
 import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
+import { getFunctions, connectFunctionsEmulator } from "firebase/functions";
 import { getAnalytics, isSupported } from "firebase/analytics";
 
 // ---------------------------------------------------------------------------
@@ -34,6 +35,9 @@ const auth = getAuth(app);
 /** Cloud Firestore database */
 const db = getFirestore(app);
 
+/** Cloud Functions */
+const functions = getFunctions(app, "us-central1");
+
 /** Google Analytics (only initialised in environments that support it) */
 const analyticsPromise = isSupported().then((supported) =>
     supported ? getAnalytics(app) : null
@@ -47,7 +51,8 @@ const analyticsPromise = isSupported().then((supported) =>
 if (import.meta.env.VITE_USE_EMULATOR === "true") {
     connectAuthEmulator(auth, "http://localhost:9099", { disableWarnings: false });
     connectFirestoreEmulator(db, "localhost", 8080);
+    connectFunctionsEmulator(functions, "localhost", 5001);
     console.info("[WealthVue] 🔧 Connected to Firebase Emulator Suite");
 }
 
-export { app, auth, db, analyticsPromise };
+export { app, auth, db, functions, analyticsPromise };
