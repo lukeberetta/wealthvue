@@ -28,14 +28,14 @@ const PRO_FEATURES = [
 ];
 
 export const UpgradeModal: React.FC<UpgradeModalProps> = ({ isOpen, onClose, reason }) => {
-    const { user } = useAuth();
+    const { user, firebaseUser } = useAuth();
     const { aiCreditsRemaining, aiCreditLimit } = useSubscription();
 
     if (!isOpen) return null;
 
     const handleUpgrade = () => {
-        if (user) {
-            openCheckout(user.email, user.email);
+        if (user && firebaseUser) {
+            openCheckout(user.email, firebaseUser.uid);
         }
     };
 

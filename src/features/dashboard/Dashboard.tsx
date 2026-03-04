@@ -27,6 +27,9 @@ import { NAVChart, PERIODS, Period } from "./components/NAVChart";
 import { AddAssetModal } from "./components/AddAssetModal";
 import { EditAssetModal } from "./components/EditAssetModal";
 import { convertCurrency } from "../../lib/fx";
+import { useSubscription } from "../../hooks/useSubscription";
+import { ReadOnlyBanner } from "../../components/ui/ReadOnlyBanner";
+import { UpgradeModal } from "../subscription/UpgradeModal";
 
 interface DashboardProps {
     user: User | null;
@@ -40,11 +43,31 @@ interface DashboardProps {
 
 export const Dashboard = ({ user, isDemo, onSignIn, onSignOut, onGoHome, onUpdateUser, onOpenFeedback }: DashboardProps) => {
     const [isAdviceModalOpen, setIsAdviceModalOpen] = useState(false);
+    const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
+    const [upgradeReason, setUpgradeReason] = useState<string | undefined>();
     const [navPeriod, setNavPeriod] = useState<Period>("1M");
     const [goalAmountInput, setGoalAmountInput] = useState('');
     const [fabLabelVisible, setFabLabelVisible] = useState(true);
     const lastScrollY = useRef(0);
     const location = useLocation();
+    const { isReadOnly, canUseAI } = useSubscription();
+
+    const showUpgrade = (reason?: string) => {
+        setUpgradeReason(reason);
+        setIsUpgradeModalOpen(true);
+    };
+
+    // Guard: blocks action when read-only; shows upgrade modal instead
+    const guard = (fn: () => void, reason?: string) => {
+        if (isReadOnly) { showUpgrade(reason); return; }
+        fn();
+    };
+
+    // Guard for AI-gated actions
+    const aiGuard = (fn: () => void) => {
+        if (!canUseAI) { showUpgrade("You've used all your AI credits for this period."); return; }
+        fn();
+    };
 
     const {
         assets,
@@ -179,6 +202,7 @@ export const Dashboard = ({ user, isDemo, onSignIn, onSignOut, onGoHome, onUpdat
     return (
         <div className="min-h-screen flex flex-col bg-bg text-text-1">
             <AppNav {...navProps} />
+            {isReadOnly && <ReadOnlyBanner onUpgradeClick={() => showUpgrade()} />}
 
             <main className={cn("flex-1 max-w-[1120px] mx-auto w-full px-6 pb-24 space-y-16", isDemo ? "pt-36" : "pt-28")}>
 
@@ -233,7 +257,7 @@ export const Dashboard = ({ user, isDemo, onSignIn, onSignOut, onGoHome, onUpdat
 
                         <div className="hidden md:flex gap-3">
                             <Button
-                                onClick={isDemo ? onSignIn : () => setIsAddModalOpen(true)}
+                                onClick={isDemo ? onSignIn : () => guard(() => setIsAddModalOpen(true), "Upgrade to Pro to continue managing your assets.")}
                                 className="flex items-center gap-2 rounded-full px-5 py-2 text-sm"
                             >
                                 <Plus size={17} />
@@ -352,7 +376,7 @@ export const Dashboard = ({ user, isDemo, onSignIn, onSignOut, onGoHome, onUpdat
                         assets={assets}
                         displayCurrency={displayCurrency}
                         fxRates={fxRates}
-                        onOpenAdvice={isDemo ? onSignIn : () => setIsAdviceModalOpen(true)}
+                        onOpenAdvice={isDemo ? onSignIn : () => aiGuard(() => setIsAdviceModalOpen(true))}
                     />
                 </div>
 
@@ -400,26 +424,28 @@ export const Dashboard = ({ user, isDemo, onSignIn, onSignOut, onGoHome, onUpdat
                         refreshingAssetId={refreshingAssetId}
                         onSelectAsset={(id, checked) => {
                             if (isDemo) { onSignIn(); return; }
+                            if (isReadOnly) { showUpgrade(); return; }
                             if (checked) setSelectedAssetIds([...selectedAssetIds, id]);
                             else setSelectedAssetIds(selectedAssetIds.filter(x => x !== id));
                         }}
                         onEditAsset={(asset) => {
                             if (isDemo) { onSignIn(); return; }
+                            if (isReadOnly) { showUpgrade(); return; }
                             setSelectedAsset(asset);
                             setIsEditModalOpen(true);
                         }}
-                        onAddAsset={isDemo ? onSignIn : () => setIsAddModalOpen(true)}
+                        onAddAsset={isDemo ? onSignIn : () => guard(() => setIsAddModalOpen(true))}
                         onRefreshAsset={isDemo ? undefined : handleRefreshAsset}
                         sortBy={sortBy}
                         onSortChange={setSortBy}
-                        onBulkDelete={isDemo ? onSignIn : handleBulkDelete}
+                        onBulkDelete={isDemo ? onSignIn : () => guard(handleBulkDelete)}
                     />
                 </div>
                 {/* Mobile FAB — sticky so it stays above the footer */}
                 <div className="md:hidden sticky bottom-4 flex justify-center pointer-events-none">
                     <motion.button
                         className="pointer-events-auto w-fit z-40 flex items-center h-12 bg-accent text-white rounded-full px-5 text-sm font-semibold shadow-lg shadow-accent/30"
-                        onClick={isDemo ? onSignIn : () => setIsAddModalOpen(true)}
+                        onClick={isDemo ? onSignIn : () => guard(() => setIsAddModalOpen(true))}
                         whileTap={{ scale: 0.95 }}
                         aria-label="Add Asset"
                     >
@@ -488,6 +514,12 @@ export const Dashboard = ({ user, isDemo, onSignIn, onSignOut, onGoHome, onUpdat
                 archetypeSubtitle={archetype.subtitle}
                 goal={goal}
                 navHistory={navHistory}
+            />
+
+            <UpgradeModal
+                isOpen={isUpgradeModalOpen}
+                onClose={() => setIsUpgradeModalOpen(false)}
+                reason={upgradeReason}
             />
 
         </div>

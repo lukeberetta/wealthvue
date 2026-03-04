@@ -10,10 +10,11 @@
     "clean": "rm -rf dist",
     "lint": "tsc --noEmit",
     "emulators": "PATH=\"/opt/homebrew/opt/openjdk/bin:$PATH\" firebase emulators:start",
-    "publish": "npm run build && firebase deploy"
+    "deploy:functions": "firebase deploy --only functions"
   },
   "dependencies": {
     "@google/genai": "^1.29.0",
+    "@paddle/paddle-js": "^1.6.2",
     "@tailwindcss/vite": "^4.1.14",
     "@types/uuid": "^10.0.0",
     "@vitejs/plugin-react": "^5.0.4",

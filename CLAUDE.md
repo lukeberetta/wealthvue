@@ -2,14 +2,15 @@
 
 ## Project Overview
 
-AI-powered personal net worth tracker. React SPA backed by **Firebase** (Auth + Firestore + Cloud Functions + Hosting). Users track assets (stocks, crypto, property, vehicles, cash) in a unified dashboard with AI-assisted entry and live FX conversion.
+AI-powered personal net worth tracker. React SPA backed by **Firebase** (Auth + Firestore + Cloud Functions) and hosted on **Cloudflare Pages**. Users track assets (stocks, crypto, property, vehicles, cash) in a unified dashboard with AI-assisted entry and live FX conversion.
 
 ## Tech Stack
 
 - **React 19** + **TypeScript** + **Vite** (dev server on port 3000)
 - **Tailwind CSS 4**, **React Router DOM 7**
 - **Recharts** (charts), **motion** (Framer Motion v12, animations), **Lucide React** (icons)
-- **Firebase 12** (`firebase`) — Auth (Google Sign-in), Firestore, Analytics, Hosting
+- **Firebase 12** (`firebase`) — Auth (Google Sign-in), Firestore, Analytics
+- **Cloudflare Pages** — hosting at `wealthvue.lukeberetta.com` (auto-deploys from GitHub)
 - **Firebase Cloud Functions** (`firebase-functions` v7, `firebase-admin` v13) — TypeScript, Node.js
 - **Google Gemini AI** (`@google/genai`) — model rotation across 3 Flash models
 - **Frankfurter API** — free FX rates, cached 1 hour in Firestore (shared) and localStorage (demo)
@@ -24,8 +25,8 @@ npm run dev       # Start dev server (port 3000)
 npm run build     # Production build
 npm run lint      # TypeScript type-check (tsc --noEmit)
 npm run preview   # Preview production build
-npm run emulators # Start Firebase Emulator Suite (Auth 9099, Firestore 8080, Functions 5001, UI 4000)
-npm run publish   # Build + deploy to Firebase Hosting & Functions
+npm run emulators        # Start Firebase Emulator Suite (Auth 9099, Firestore 8080, Functions 5001, UI 4000)
+npm run deploy:functions # Deploy Cloud Functions only (frontend deploys via Cloudflare Pages ← GitHub)
 
 # Functions (from /functions)
 npm run build     # Compile TypeScript
@@ -56,6 +57,7 @@ src/
       hooks/useDashboard.ts        # ALL dashboard state & actions (central hook)
       components/                  # AddAssetModal, EditAssetModal, AssetList, charts
     settings/SettingsView.tsx      # User settings (currency, profile, goal)
+    legal/                         # TermsPage, PrivacyPage, RefundPage — public routes
 
   hooks/
     useTheme.ts                    # light/dark/system theme management
@@ -141,7 +143,11 @@ VITE_FIREBASE_STORAGE_BUCKET
 VITE_FIREBASE_MESSAGING_SENDER_ID
 VITE_FIREBASE_APP_ID
 VITE_FIREBASE_MEASUREMENT_ID
-VITE_USE_EMULATOR=true   # optional — connects to local emulators
+VITE_USE_EMULATOR=true        # optional — connects to local emulators
+VITE_API_BASE_URL             # Direct Cloud Function base URL (e.g. https://us-central1-wealthvue-e9f1b.cloudfunctions.net)
+VITE_PADDLE_CLIENT_TOKEN
+VITE_PADDLE_PRO_PRICE_ID
+VITE_PADDLE_ENVIRONMENT       # "sandbox" | "production"
 ```
 
 ## AI / Gemini Service

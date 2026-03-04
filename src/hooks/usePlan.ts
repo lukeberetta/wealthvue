@@ -8,12 +8,7 @@
  */
 
 import { useMemo } from "react";
-import { User } from "../types";
-
-// ── Limits ────────────────────────────────────────────────────────────────────
-
-/** Monthly AI call cap for trial users. Pro users have no cap. */
-const TRIAL_MONTHLY_LIMIT = 50;
+import { User, AI_CREDIT_LIMITS } from "../types";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -78,11 +73,11 @@ export function usePlan(user: User | null, isDemo: boolean): PlanStatus {
                 : 0;
 
         const isActive = isPro || !trialExpired;
-        const monthlyCallLimit = isPro ? null : TRIAL_MONTHLY_LIMIT;
+        const monthlyCallLimit = isPro ? null : AI_CREDIT_LIMITS.trial;
 
         const checkAIGate = (): PlanGateReason => {
             if (!isPro && trialExpired) return "trial_expired";
-            if (!isPro && monthlyCallsUsed >= TRIAL_MONTHLY_LIMIT) return "monthly_limit";
+            if (!isPro && monthlyCallsUsed >= AI_CREDIT_LIMITS.trial) return "monthly_limit";
             return null;
         };
 
@@ -96,7 +91,7 @@ export function usePlan(user: User | null, isDemo: boolean): PlanStatus {
             if (reason === "trial_expired")
                 return "Your 30-day trial has ended. Upgrade to Pro to continue using AI-powered features.";
             if (reason === "monthly_limit")
-                return `You've used all ${TRIAL_MONTHLY_LIMIT} AI calls this month. Upgrade to Pro for unlimited access, or wait until next month.`;
+                return `You've used all ${AI_CREDIT_LIMITS.trial} AI credits this period. Upgrade to Pro for more.`;
             return "";
         };
 

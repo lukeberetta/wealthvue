@@ -12,6 +12,7 @@ import { Footer } from "../../layouts/Footer";
 
 interface LandingPageProps {
     user: import("../../types").User | null;
+    firebaseUid?: string;
     isDemo?: boolean;
     onSignIn: () => void;
     onTryDemo: () => void;
@@ -20,7 +21,7 @@ interface LandingPageProps {
     onOpenFeedback?: () => void;
 }
 
-export const LandingPage = ({ user, isDemo = false, onSignIn, onTryDemo, onSignOut, onOpenSettings, onOpenFeedback }: LandingPageProps) => {
+export const LandingPage = ({ user, firebaseUid, isDemo = false, onSignIn, onTryDemo, onSignOut, onOpenSettings, onOpenFeedback }: LandingPageProps) => {
     useScrollReveal();
     const navigate = useNavigate();
 
@@ -109,68 +110,68 @@ export const LandingPage = ({ user, isDemo = false, onSignIn, onTryDemo, onSignO
                                 animate={{ opacity: 1, scale: 1, y: 0 }}
                                 transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
                             >
-                            <div className="bg-surface rounded-2xl border border-border overflow-hidden animate-float shadow-2xl">
-                                {/* Mockup nav */}
-                                <div className="bg-surface-2/50 border-b border-border px-5 py-3.5 flex justify-between items-center">
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-5 h-5 bg-accent rounded flex items-center justify-center text-[10px] text-white font-bold">W</div>
-                                        <span className="text-sm font-serif font-semibold text-accent">WealthVue</span>
-                                    </div>
-                                    <div className="bg-surface border border-border rounded-full px-3 py-0.5 text-[10px] font-bold text-text-3">ZAR</div>
-                                </div>
-                                {/* Mockup content */}
-                                <div className="p-6 space-y-6">
-                                    <div>
-                                        <p className="text-[9px] font-bold text-text-3 uppercase tracking-[0.2em] mb-1.5">Total Net Worth</p>
-                                        <p className="text-3xl font-serif tabular-nums">R 6,421,380</p>
-                                        <p className="text-[11px] text-positive mt-1.5 font-medium">+R 78,420 (+1.23%) today</p>
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-3">
-                                        <div className="bg-surface-2/40 rounded-xl p-4 border border-border/60">
-                                            {/* Mini donut */}
-                                            <div className="w-16 h-16 mx-auto rounded-full" style={{ background: "conic-gradient(#C96442 0% 42%, #5D8F6E 42% 73%, #6B6258 73% 87%, #38312A 87% 100%)" }} />
-                                            <div className="mt-2.5 space-y-0.5">
-                                                <div className="flex justify-between text-[8px] font-bold text-text-3 uppercase">
-                                                    <span>Stocks 42%</span><span>Crypto 31%</span>
-                                                </div>
-                                            </div>
+                                <div className="bg-surface rounded-2xl border border-border overflow-hidden animate-float shadow-2xl">
+                                    {/* Mockup nav */}
+                                    <div className="bg-surface-2/50 border-b border-border px-5 py-3.5 flex justify-between items-center">
+                                        <div className="flex items-center gap-2">
+                                            <div className="w-5 h-5 bg-accent rounded flex items-center justify-center text-[10px] text-white font-bold">W</div>
+                                            <span className="text-sm font-serif font-semibold text-accent">WealthVue</span>
                                         </div>
-                                        <div className="bg-surface-2/40 rounded-xl p-4 border border-border/60 flex flex-col justify-end">
-                                            <svg viewBox="0 0 100 40" className="w-full h-10">
-                                                <defs>
-                                                    <linearGradient id="heroGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                                                        <stop offset="0%" stopColor="#C96442" stopOpacity="0.3" />
-                                                        <stop offset="100%" stopColor="#C96442" stopOpacity="0" />
-                                                    </linearGradient>
-                                                </defs>
-                                                <path d="M0,35 Q25,28 45,18 T85,8 T100,4" fill="none" stroke="#C96442" strokeWidth="2" strokeLinecap="round" />
-                                                <path d="M0,35 Q25,28 45,18 T85,8 T100,4 V40 H0 Z" fill="url(#heroGrad)" />
-                                            </svg>
-                                        </div>
+                                        <div className="bg-surface border border-border rounded-full px-3 py-0.5 text-[10px] font-bold text-text-3">ZAR</div>
                                     </div>
-                                    <div className="space-y-2">
-                                        {[
-                                            { t: "AAPL", n: "Apple Inc", q: "24 shares", v: "R 86,200" },
-                                            { t: "BTC", n: "Bitcoin", q: "0.45 BTC", v: "R 534,100" },
-                                        ].map(row => (
-                                            <div key={row.t} className="flex items-center justify-between text-[10px] py-2 border-b border-border/40 last:border-0">
-                                                <div className="flex items-center gap-2.5">
-                                                    <div className="w-6 h-6 bg-surface-2 rounded-lg flex items-center justify-center font-bold text-text-2 text-[8px]">{row.t[0]}</div>
-                                                    <div>
-                                                        <p className="font-bold text-text-1">{row.t}</p>
-                                                        <p className="text-text-3">{row.n}</p>
+                                    {/* Mockup content */}
+                                    <div className="p-6 space-y-6">
+                                        <div>
+                                            <p className="text-[9px] font-bold text-text-3 uppercase tracking-[0.2em] mb-1.5">Total Net Worth</p>
+                                            <p className="text-3xl font-serif tabular-nums">R 6,421,380</p>
+                                            <p className="text-[11px] text-positive mt-1.5 font-medium">+R 78,420 (+1.23%) today</p>
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-3">
+                                            <div className="bg-surface-2/40 rounded-xl p-4 border border-border/60">
+                                                {/* Mini donut */}
+                                                <div className="w-16 h-16 mx-auto rounded-full" style={{ background: "conic-gradient(#C96442 0% 42%, #5D8F6E 42% 73%, #6B6258 73% 87%, #38312A 87% 100%)" }} />
+                                                <div className="mt-2.5 space-y-0.5">
+                                                    <div className="flex justify-between text-[8px] font-bold text-text-3 uppercase">
+                                                        <span>Stocks 42%</span><span>Crypto 31%</span>
                                                     </div>
                                                 </div>
-                                                <div className="text-right">
-                                                    <p className="font-bold tabular-nums text-text-1">{row.v}</p>
-                                                    <p className="text-text-3">{row.q}</p>
-                                                </div>
                                             </div>
-                                        ))}
+                                            <div className="bg-surface-2/40 rounded-xl p-4 border border-border/60 flex flex-col justify-end">
+                                                <svg viewBox="0 0 100 40" className="w-full h-10">
+                                                    <defs>
+                                                        <linearGradient id="heroGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                                                            <stop offset="0%" stopColor="#C96442" stopOpacity="0.3" />
+                                                            <stop offset="100%" stopColor="#C96442" stopOpacity="0" />
+                                                        </linearGradient>
+                                                    </defs>
+                                                    <path d="M0,35 Q25,28 45,18 T85,8 T100,4" fill="none" stroke="#C96442" strokeWidth="2" strokeLinecap="round" />
+                                                    <path d="M0,35 Q25,28 45,18 T85,8 T100,4 V40 H0 Z" fill="url(#heroGrad)" />
+                                                </svg>
+                                            </div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            {[
+                                                { t: "AAPL", n: "Apple Inc", q: "24 shares", v: "R 86,200" },
+                                                { t: "BTC", n: "Bitcoin", q: "0.45 BTC", v: "R 534,100" },
+                                            ].map(row => (
+                                                <div key={row.t} className="flex items-center justify-between text-[10px] py-2 border-b border-border/40 last:border-0">
+                                                    <div className="flex items-center gap-2.5">
+                                                        <div className="w-6 h-6 bg-surface-2 rounded-lg flex items-center justify-center font-bold text-text-2 text-[8px]">{row.t[0]}</div>
+                                                        <div>
+                                                            <p className="font-bold text-text-1">{row.t}</p>
+                                                            <p className="text-text-3">{row.n}</p>
+                                                        </div>
+                                                    </div>
+                                                    <div className="text-right">
+                                                        <p className="font-bold tabular-nums text-text-1">{row.v}</p>
+                                                        <p className="text-text-3">{row.q}</p>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        </motion.div>
+                            </motion.div>
                         </div>
                     </div>
                 </section>
@@ -356,7 +357,7 @@ export const LandingPage = ({ user, isDemo = false, onSignIn, onTryDemo, onSignO
                                 <div className="mb-8">
                                     <h3 className="font-serif text-xl text-text-1 mb-2">Pro</h3>
                                     <div className="flex items-baseline gap-1.5">
-                                        <span className="text-4xl font-serif text-text-1">$4</span>
+                                        <span className="text-4xl font-serif text-text-1">$5</span>
                                         <span className="text-text-3 text-sm">per month</span>
                                     </div>
                                 </div>
@@ -367,7 +368,13 @@ export const LandingPage = ({ user, isDemo = false, onSignIn, onTryDemo, onSignO
                                         </li>
                                     ))}
                                 </ul>
-                                <button onClick={() => user ? navigate("/app") : onSignIn()} className="w-full bg-accent text-white py-3 rounded-full text-sm font-medium hover:opacity-88 transition-all">
+                                <button onClick={() => {
+                                    if (!user) { onSignIn(); return; }
+                                    if (user.plan === "pro") { navigate("/app"); return; }
+                                    import("../../services/paddleService").then(({ openCheckout }) => {
+                                        openCheckout(user.email, firebaseUid ?? user.email);
+                                    });
+                                }} className="w-full bg-accent text-white py-3 rounded-full text-sm font-medium hover:opacity-88 transition-all">
                                     Get Started
                                 </button>
                                 <p className="text-center text-[10px] text-text-3 mt-3">Billed monthly. Cancel anytime.</p>

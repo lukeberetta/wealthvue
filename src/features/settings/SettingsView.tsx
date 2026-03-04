@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import { useToast } from "../../components/ui/Toast";
-import { ArrowLeft, CreditCard, Trash2, LogOut, Palette, ChevronDown, AlertTriangle } from "lucide-react";
+import { ArrowLeft, CreditCard, Trash2, LogOut, Palette, ChevronDown, AlertTriangle, Zap, Crown } from "lucide-react";
 import { User } from "../../types";
 import { Card } from "../../components/ui/Card";
 import { Button } from "../../components/ui/Button";
 import { ThemeToggle } from "../../components/ui/ThemeToggle";
 import { cn, getInitials, avatarPalette } from "../../lib/utils";
+import { useSubscription } from "../../hooks/useSubscription";
+import { UpgradeModal } from "../subscription/UpgradeModal";
 
 interface SettingsViewProps {
     user: User | null;
@@ -17,11 +19,9 @@ interface SettingsViewProps {
 export const SettingsView = ({ user, onSignOut, onBack, onUpdateUser }: SettingsViewProps) => {
     const [displayName, setDisplayName] = useState(user?.displayName ?? "");
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [showUpgradeModal, setShowUpgradeModal] = useState(false);
     const { addToast } = useToast();
-
-    const trialDaysRemaining = user?.trialEndsAt
-        ? Math.max(0, Math.ceil((new Date(user.trialEndsAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
-        : null;
+    const { isTrialExpired, trialDaysRemaining, aiCreditsRemaining, aiCreditLimit } = useSubscription();
 
     const handleCurrencyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         if (user) {
@@ -52,6 +52,12 @@ export const SettingsView = ({ user, onSignOut, onBack, onUpdateUser }: Settings
         { code: "CA", name: "Canada" },
         { code: "EU", name: "European Union" },
     ];
+
+    const isPro = user?.plan === "pro";
+    const aiUsedPct = aiCreditLimit === Infinity ? 0 : Math.min(100, ((aiCreditLimit - aiCreditsRemaining) / aiCreditLimit) * 100);
+    const trialTotalDays = 30;
+    const trialUsedDays = trialTotalDays - trialDaysRemaining;
+    const trialPct = Math.min(100, (trialUsedDays / trialTotalDays) * 100);
 
     return (
         <div className="max-w-2xl mx-auto w-full py-10 space-y-10">
@@ -156,23 +162,85 @@ export const SettingsView = ({ user, onSignOut, onBack, onUpdateUser }: Settings
             {/* Plan & Billing */}
             <section className="space-y-3">
                 <h3 className="text-[10px] font-bold text-text-3 uppercase tracking-[0.18em]">Plan & Billing</h3>
-                <Card className="p-6 flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                        <div className="w-9 h-9 bg-accent-light rounded-xl flex items-center justify-center text-accent">
-                            <CreditCard size={17} />
+                <Card className="p-6 space-y-5">
+                    {/* Plan header row */}
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                            <div className={cn(
+                                "w-9 h-9 rounded-xl flex items-center justify-center shrink-0",
+                                isPro ? "bg-accent-light text-accent" : "bg-surface-2 text-text-3"
+                            )}>
+                                {isPro ? <Crown size={17} /> : <CreditCard size={17} />}
+                            </div>
+                            <div>
+                                <div className="flex items-center gap-2">
+                                    <p className="font-medium text-text-1 text-sm capitalize">{isPro ? "Pro" : "Trial"} Plan</p>
+                                    {isPro && (
+                                        <span className="text-[9px] font-bold uppercase tracking-wider bg-accent/10 text-accent px-2 py-0.5 rounded-full">Active</span>
+                                    )}
+                                </div>
+                                {!isPro && (
+                                    <p className={cn("text-xs mt-0.5", isTrialExpired ? "text-negative" : "text-text-3")}>
+                                        {isTrialExpired
+                                            ? "Trial expired"
+                                            : `${trialDaysRemaining} day${trialDaysRemaining === 1 ? "" : "s"} remaining`}
+                                    </p>
+                                )}
+                                {isPro && (
+                                    <p className="text-xs text-text-3 mt-0.5">$5/month · renews monthly</p>
+                                )}
+                            </div>
                         </div>
-                        <div>
-                            <p className="font-medium text-text-1 text-sm capitalize">{user?.plan} Plan</p>
-                            {user?.plan === "trial" && trialDaysRemaining !== null && (
-                                <p className="text-xs text-text-3">
-                                    {trialDaysRemaining > 0
-                                        ? `Your trial ends in ${trialDaysRemaining} day${trialDaysRemaining === 1 ? "" : "s"}.`
-                                        : "Your trial has ended."}
-                                </p>
-                            )}
-                        </div>
+                        {!isPro && (
+                            <Button
+                                variant="secondary"
+                                className="text-sm rounded-full px-5 py-2 flex items-center gap-1.5"
+                                onClick={() => setShowUpgradeModal(true)}
+                            >
+                                <Zap size={13} />
+                                Upgrade to Pro
+                            </Button>
+                        )}
                     </div>
-                    <Button variant="secondary" className="text-sm rounded-full px-5 py-2">Upgrade to Pro</Button>
+
+                    {/* Trial progress bar */}
+                    {!isPro && (
+                        <div className="space-y-1.5">
+                            <div className="flex justify-between text-[10px] text-text-3 uppercase tracking-widest font-bold">
+                                <span>Trial period</span>
+                                <span>{trialDaysRemaining} / {trialTotalDays} days left</span>
+                            </div>
+                            <div className="h-1.5 w-full bg-surface-2 rounded-full overflow-hidden">
+                                <div
+                                    className={cn(
+                                        "h-full rounded-full transition-all",
+                                        isTrialExpired ? "bg-negative" : trialPct > 80 ? "bg-amber-400" : "bg-accent"
+                                    )}
+                                    style={{ width: `${trialPct}%` }}
+                                />
+                            </div>
+                        </div>
+                    )}
+
+                    {/* AI credits bar */}
+                    <div className="space-y-1.5">
+                        <div className="flex justify-between text-[10px] text-text-3 uppercase tracking-widest font-bold">
+                            <span>AI Credits</span>
+                            <span>{aiCreditsRemaining === Infinity ? "Unlimited" : `${aiCreditsRemaining} / ${aiCreditLimit} remaining`}</span>
+                        </div>
+                        <div className="h-1.5 w-full bg-surface-2 rounded-full overflow-hidden">
+                            <div
+                                className={cn(
+                                    "h-full rounded-full transition-all",
+                                    aiCreditsRemaining === 0 ? "bg-negative" : aiUsedPct > 75 ? "bg-amber-400" : "bg-accent"
+                                )}
+                                style={{ width: aiCreditLimit === Infinity ? "100%" : `${100 - aiUsedPct}%` }}
+                            />
+                        </div>
+                        {isPro && (
+                            <p className="text-[10px] text-text-3">Resets on the 1st of each month.</p>
+                        )}
+                    </div>
                 </Card>
             </section>
 
@@ -219,6 +287,11 @@ export const SettingsView = ({ user, onSignOut, onBack, onUpdateUser }: Settings
                     Sign Out
                 </Button>
             </div>
+
+            <UpgradeModal
+                isOpen={showUpgradeModal}
+                onClose={() => setShowUpgradeModal(false)}
+            />
         </div>
     );
 };

@@ -53,7 +53,7 @@ function AppRoute() {
 // ---------------------------------------------------------------------------
 function Inner() {
   const { mode, setTheme } = useTheme();
-  const { user, isDemo, loading, setDemo, signOut, updateUser } = useAuth();
+  const { user, firebaseUser, isDemo, loading, setDemo, signOut, updateUser } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -83,6 +83,7 @@ const handleTryDemo = () => { if (user) { navigate("/app"); } else { setDemo(tru
                 element={
                   <LandingPage
                     user={user}
+                    firebaseUid={firebaseUser?.uid}
                     isDemo={isDemo}
                     onSignIn={() => setIsLoginModalOpen(true)}
                     onTryDemo={handleTryDemo}

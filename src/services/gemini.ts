@@ -2,7 +2,7 @@ import { GoogleGenAI } from "@google/genai";
 import { AssetType, ValueSource, AIConfidence } from "../types";
 import { fetchLiveQuote, LIVE_PRICE_TYPES, LiveQuote } from "./priceApi";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
+const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY || "" });
 
 export interface ParsedAsset {
   name: string;

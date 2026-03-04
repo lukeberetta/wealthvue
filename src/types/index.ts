@@ -3,6 +3,12 @@ export type ValueSource = "ai_estimate" | "live_price" | "manual";
 export type AIConfidence = "high" | "medium" | "low";
 export type PlanType = "trial" | "pro";
 
+/** AI credit limits per plan. */
+export const AI_CREDIT_LIMITS: Record<PlanType, number> = {
+  trial: 10,
+  pro: 50,
+};
+
 export interface AIUsage {
   totalCalls: number;
   monthlyCallCount: number;
@@ -21,6 +27,7 @@ export interface User {
   trialEndsAt: string;
   createdAt: string;
   aiUsage?: AIUsage;
+  paddleSubscriptionId?: string;
 }
 
 export interface Asset {
