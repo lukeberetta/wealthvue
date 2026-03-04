@@ -29,7 +29,7 @@ export const RefundPage = () => {
                     <section className="space-y-3">
                         <h2 className="font-serif text-xl font-semibold text-text-1">Our Policy</h2>
                         <p>We want you to be satisfied with WealthVue. If you are not happy with your subscription, we offer a <strong className="text-text-1">14-day money-back guarantee</strong> from the date of your first payment.</p>
-                        <p>To request a refund within this period, contact us at <a href="mailto:luke@lukeberetta.com" className="text-accent hover:underline">luke@lukeberetta.com</a> with your account email and reason for the request. We will process your refund within 5–10 business days.</p>
+                        <p>To request a refund within this period, contact us at <a href="mailto:hello@lukeberetta.com" className="text-accent hover:underline">hello@lukeberetta.com</a> with your account email and reason for the request. We will process your refund within 5–10 business days.</p>
                     </section>
 
                     <section className="space-y-3">
@@ -49,7 +49,7 @@ export const RefundPage = () => {
 
                     <section className="space-y-3">
                         <h2 className="font-serif text-xl font-semibold text-text-1">Contact</h2>
-                        <p>For refund requests or billing questions, email <a href="mailto:luke@lukeberetta.com" className="text-accent hover:underline">luke@lukeberetta.com</a>.</p>
+                        <p>For refund requests or billing questions, email <a href="mailto:hello@lukeberetta.com" className="text-accent hover:underline">hello@lukeberetta.com</a>.</p>
                     </section>
 
                 </div>

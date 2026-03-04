@@ -81,7 +81,7 @@ export const TermsPage = () => {
 
                     <section className="space-y-3">
                         <h2 className="font-serif text-xl font-semibold text-text-1">10. Contact</h2>
-                        <p>For questions about these Terms, please contact us at <a href="mailto:luke@lukeberetta.com" className="text-accent hover:underline">luke@lukeberetta.com</a>.</p>
+                        <p>For questions about these Terms, please contact us at <a href="mailto:hello@lukeberetta.com" className="text-accent hover:underline">hello@lukeberetta.com</a>.</p>
                     </section>
 
                 </div>

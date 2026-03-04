@@ -69,12 +69,12 @@ export const PrivacyPage = () => {
 
                     <section className="space-y-3">
                         <h2 className="font-serif text-xl font-semibold text-text-1">6. Data Retention and Deletion</h2>
-                        <p>Your data is retained for as long as your account is active. You may request deletion of your account and all associated data at any time by contacting us at <a href="mailto:luke@lukeberetta.com" className="text-accent hover:underline">luke@lukeberetta.com</a>. We will process deletion requests within 30 days.</p>
+                        <p>Your data is retained for as long as your account is active. You may request deletion of your account and all associated data at any time by contacting us at <a href="mailto:hello@lukeberetta.com" className="text-accent hover:underline">hello@lukeberetta.com</a>. We will process deletion requests within 30 days.</p>
                     </section>
 
                     <section className="space-y-3">
                         <h2 className="font-serif text-xl font-semibold text-text-1">7. Your Rights</h2>
-                        <p>Depending on your location, you may have rights under GDPR, CCPA, or other applicable laws, including the right to access, correct, or delete your personal data. To exercise these rights, contact us at <a href="mailto:luke@lukeberetta.com" className="text-accent hover:underline">luke@lukeberetta.com</a>.</p>
+                        <p>Depending on your location, you may have rights under GDPR, CCPA, or other applicable laws, including the right to access, correct, or delete your personal data. To exercise these rights, contact us at <a href="mailto:hello@lukeberetta.com" className="text-accent hover:underline">hello@lukeberetta.com</a>.</p>
                     </section>
 
                     <section className="space-y-3">
@@ -84,7 +84,7 @@ export const PrivacyPage = () => {
 
                     <section className="space-y-3">
                         <h2 className="font-serif text-xl font-semibold text-text-1">9. Contact</h2>
-                        <p>Questions about this Privacy Policy? Email us at <a href="mailto:luke@lukeberetta.com" className="text-accent hover:underline">luke@lukeberetta.com</a>.</p>
+                        <p>Questions about this Privacy Policy? Email us at <a href="mailto:hello@lukeberetta.com" className="text-accent hover:underline">hello@lukeberetta.com</a>.</p>
                     </section>
 
                 </div>
