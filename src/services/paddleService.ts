@@ -59,10 +59,19 @@ export function openCheckout(email: string, uid: string): void {
         return;
     }
 
+    const stored = localStorage.getItem("wealthvue-theme");
+    const theme =
+        stored === "light"
+            ? "light"
+            : stored === "system" && !window.matchMedia("(prefers-color-scheme: dark)").matches
+              ? "light"
+              : "dark";
+
     paddle.Checkout.open({
         items: [{ priceId, quantity: 1 }],
         customer: { email },
         customData: { uid },
+        settings: { theme },
     });
 }
 
