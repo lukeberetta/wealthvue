@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
 import { ChevronDown, Settings, LogOut, LayoutDashboard, Globe, MessageSquare } from "lucide-react";
@@ -48,6 +48,18 @@ export function AppNav({
 
     const [scrolled, setScrolled] = useState(false);
     const [menuOpen, setMenuOpen] = useState(false);
+    const menuRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (!menuOpen) return;
+        const handleClick = (e: MouseEvent) => {
+            if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+                setMenuOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClick);
+        return () => document.removeEventListener("mousedown", handleClick);
+    }, [menuOpen]);
 
     useEffect(() => {
         let rafId: number;
@@ -185,7 +197,7 @@ export function AppNav({
                         </button>
                     ) : user ? (
                         /* Signed-in: initials avatar + dropdown */
-                        <div className="relative">
+                        <div className="relative" ref={menuRef}>
                             <button
                                 id="nav-account-btn"
                                 onClick={() => setMenuOpen(o => !o)}
@@ -208,11 +220,6 @@ export function AppNav({
                             <AnimatePresence>
                                 {menuOpen && (
                                     <>
-                                        {/* Backdrop */}
-                                        <div
-                                            className="fixed inset-0 z-40"
-                                            onClick={() => setMenuOpen(false)}
-                                        />
                                         {/* Dropdown */}
                                         <motion.div
                                             initial={{ opacity: 0, y: 8, scale: 0.96 }}
