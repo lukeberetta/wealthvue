@@ -53,3 +53,20 @@ export function openCheckout(email: string, uid: string): void {
         customData: { uid },
     });
 }
+
+/**
+ * Cancel the current user's Pro subscription via the cancelSubscription
+ * Cloud Function. Effective at end of the current billing period.
+ */
+export async function cancelSubscription(
+    getIdToken: () => Promise<string>
+): Promise<{ cancelAt: string | null }> {
+    const token = await getIdToken();
+    const baseUrl = import.meta.env.VITE_API_BASE_URL as string;
+    const res = await fetch(`${baseUrl}/cancelSubscription`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) throw new Error(await res.text());
+    return res.json() as Promise<{ cancelAt: string | null }>;
+}

@@ -14,7 +14,7 @@ import * as logger from "firebase-functions/logger";
 import * as admin from "firebase-admin";
 import {FieldValue} from "firebase-admin/firestore";
 import yahooFinanceModule from "yahoo-finance2";
-import {EventName} from "@paddle/paddle-node-sdk";
+import {Paddle, Environment, EventName} from "@paddle/paddle-node-sdk";
 
 // yahoo-finance2 exports a class as its default; instantiate for use
 type YFConstructor = new () => typeof yahooFinanceModule;
@@ -204,6 +204,12 @@ export const paddleWebhook = onRequest(
           logger.warn("[paddleWebhook] No uid in customData", sub.id);
           break;
         }
+
+        // Check if this update is a scheduled cancellation
+        const scheduledChange = sub.scheduled_change as
+          {action: string; effective_at: string} | null | undefined;
+        const isCancelScheduled = scheduledChange?.action === "cancel";
+
         const now = new Date();
         const currentMonth = `${now.getFullYear()}-` +
             `${String(now.getMonth() + 1).padStart(2, "0")}`;
@@ -211,12 +217,19 @@ export const paddleWebhook = onRequest(
         await db.collection("users").doc(uid).update({
           "plan": "pro",
           "paddleSubscriptionId": sub.id,
+          // Store scheduled cancellation date so UI can show it
+          "paddleCancelAt": isCancelScheduled ?
+            scheduledChange!.effective_at : FieldValue.delete(),
           // Reset AI credits for the new billing month
           "aiUsage.monthlyCallCount": 0,
           "aiUsage.currentMonth": currentMonth,
           "updatedAt": FieldValue.serverTimestamp(),
         });
-        logger.info(`[paddleWebhook] Upgraded uid=${uid} sub=${sub.id}`);
+        logger.info(
+          `[paddleWebhook] Upgraded uid=${uid} sub=${sub.id}` +
+          (isCancelScheduled ?
+            ` (cancel scheduled ${scheduledChange!.effective_at})` : "")
+        );
         break;
       }
 
@@ -233,6 +246,7 @@ export const paddleWebhook = onRequest(
         await db.collection("users").doc(uid).update({
           plan: "trial",
           paddleSubscriptionId: FieldValue.delete(),
+          paddleCancelAt: FieldValue.delete(),
           updatedAt: FieldValue.serverTimestamp(),
         });
         logger.info(`[paddleWebhook] Downgraded uid=${uid} sub=${sub.id}`);
@@ -252,3 +266,105 @@ export const paddleWebhook = onRequest(
 
     res.status(200).send("OK");
   });
+
+/**
+ * cancelSubscription — cancels a user's Paddle subscription at the end of
+ * the current billing period. Requires a valid Firebase ID token in the
+ * Authorization header.
+ */
+export const cancelSubscription = onRequest(
+  {secrets: ["PADDLE_SECRET_KEY", "PADDLE_ENVIRONMENT"], cors: true},
+  async (req, res) => {
+    if (req.method !== "POST") {
+      res.status(405).send("Method Not Allowed");
+      return;
+    }
+
+    // Verify Firebase ID token
+    const authHeader = req.headers.authorization ?? "";
+    const idToken = authHeader.startsWith("Bearer ") ?
+      authHeader.slice(7) : null;
+    if (!idToken) {
+      res.status(401).send("Unauthorized");
+      return;
+    }
+
+    let uid: string;
+    try {
+      const decoded = await admin.auth().verifyIdToken(idToken);
+      uid = decoded.uid;
+    } catch {
+      res.status(401).send("Invalid token");
+      return;
+    }
+
+    // Get paddleSubscriptionId from Firestore
+    const userSnap = await db.collection("users").doc(uid).get();
+    const subscriptionId = userSnap.data()?.paddleSubscriptionId as
+      string | undefined;
+    if (!subscriptionId) {
+      res.status(400).send("No active subscription");
+      return;
+    }
+
+    // Cancel via Paddle API — effective at end of current billing period
+    const secretKey = process.env.PADDLE_SECRET_KEY?.trim();
+    const envStr = process.env.PADDLE_ENVIRONMENT?.trim();
+    const environment = envStr === "production" ?
+      Environment.production : Environment.sandbox;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const paddle = new Paddle(secretKey!, {environment});
+
+    // Attempt to cancel; if already pending cancellation, continue gracefully
+    let alreadyPending = false;
+    try {
+      await paddle.subscriptions.cancel(
+        subscriptionId,
+        {effectiveFrom: "next_billing_period"}
+      );
+      logger.info(
+        `[cancelSubscription] Scheduled uid=${uid} sub=${subscriptionId}`
+      );
+    } catch (err) {
+      const errCode = (err as {code?: string}).code;
+      if (errCode === "subscription_locked_pending_changes") {
+        alreadyPending = true;
+        logger.info(
+          `[cancelSubscription] Already pending uid=${uid} — reading state`
+        );
+      } else {
+        logger.error("[cancelSubscription] Paddle API error", err);
+        res.status(500).send("Failed to cancel subscription");
+        return;
+      }
+    }
+
+    // Fetch subscription to get the effective cancellation date and persist it
+    // directly to Firestore (so the UI updates without relying on the webhook).
+    let cancelAt: string | null = null;
+    try {
+      const sub = await paddle.subscriptions.get(subscriptionId);
+      const scheduled = (sub as unknown as {
+        scheduledChange?: {action: string; effectiveAt: string} | null;
+      }).scheduledChange;
+      if (scheduled?.action === "cancel" && scheduled.effectiveAt) {
+        cancelAt = scheduled.effectiveAt;
+        await db.collection("users").doc(uid).update({
+          paddleCancelAt: cancelAt,
+          updatedAt: FieldValue.serverTimestamp(),
+        });
+        logger.info(
+          `[cancelSubscription] Wrote paddleCancelAt=${cancelAt}` +
+          ` uid=${uid}${alreadyPending ? " (was already pending)" : ""}`
+        );
+      }
+    } catch (fetchErr) {
+      logger.warn(
+        "[cancelSubscription] Could not fetch subscription details",
+        fetchErr
+      );
+    }
+
+    res.status(200).json({ok: true, cancelAt});
+  }
+);

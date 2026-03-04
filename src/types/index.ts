@@ -28,6 +28,7 @@ export interface User {
   createdAt: string;
   aiUsage?: AIUsage;
   paddleSubscriptionId?: string;
+  paddleCancelAt?: string; // ISO date — set when cancellation is scheduled
 }
 
 export interface Asset {

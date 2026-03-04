@@ -4,9 +4,12 @@ import { ArrowLeft, CreditCard, Trash2, LogOut, Palette, ChevronDown, AlertTrian
 import { User } from "../../types";
 import { Card } from "../../components/ui/Card";
 import { Button } from "../../components/ui/Button";
+import { Modal } from "../../components/ui/Modal";
 import { ThemeToggle } from "../../components/ui/ThemeToggle";
 import { cn, getInitials, avatarPalette } from "../../lib/utils";
 import { useSubscription } from "../../hooks/useSubscription";
+import { useAuth } from "../../contexts/AuthContext";
+import { cancelSubscription } from "../../services/paddleService";
 import { UpgradeModal } from "../subscription/UpgradeModal";
 
 interface SettingsViewProps {
@@ -20,8 +23,28 @@ export const SettingsView = ({ user, onSignOut, onBack, onUpdateUser }: Settings
     const [displayName, setDisplayName] = useState(user?.displayName ?? "");
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+    const [showCancelConfirm, setShowCancelConfirm] = useState(false);
+    const [cancelling, setCancelling] = useState(false);
     const { addToast } = useToast();
     const { isTrialExpired, trialDaysRemaining, aiCreditsRemaining, aiCreditLimit } = useSubscription();
+    const { firebaseUser } = useAuth();
+
+    const handleCancelSubscription = async () => {
+        if (!firebaseUser) return;
+        setCancelling(true);
+        try {
+            const result = await cancelSubscription(() => firebaseUser.getIdToken());
+            setShowCancelConfirm(false);
+            if (result.cancelAt && user) {
+                onUpdateUser({ ...user, paddleCancelAt: result.cancelAt });
+            }
+            addToast("Your subscription will cancel at the end of your billing period.", "info");
+        } catch {
+            addToast("Failed to cancel subscription. Please try again.", "error");
+        } finally {
+            setCancelling(false);
+        }
+    };
 
     const handleCurrencyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         if (user) {
@@ -54,6 +77,12 @@ export const SettingsView = ({ user, onSignOut, onBack, onUpdateUser }: Settings
     ];
 
     const isPro = user?.plan === "pro";
+    const cancelAt = user?.paddleCancelAt
+        ? new Date(user.paddleCancelAt)
+        : null;
+    const cancelAtFormatted = cancelAt
+        ? cancelAt.toLocaleDateString(undefined, { day: "numeric", month: "long", year: "numeric" })
+        : null;
     const aiUsedPct = aiCreditLimit === Infinity ? 0 : Math.min(100, ((aiCreditLimit - aiCreditsRemaining) / aiCreditLimit) * 100);
     const trialTotalDays = 30;
     const trialUsedDays = trialTotalDays - trialDaysRemaining;
@@ -187,7 +216,11 @@ export const SettingsView = ({ user, onSignOut, onBack, onUpdateUser }: Settings
                                     </p>
                                 )}
                                 {isPro && (
-                                    <p className="text-xs text-text-3 mt-0.5">$5/month · renews monthly</p>
+                                    <p className="text-xs mt-0.5 text-text-3">
+                                        {cancelAt
+                                            ? `Cancels on ${cancelAtFormatted}`
+                                            : "$5/month · renews monthly"}
+                                    </p>
                                 )}
                             </div>
                         </div>
@@ -216,7 +249,7 @@ export const SettingsView = ({ user, onSignOut, onBack, onUpdateUser }: Settings
                                         "h-full rounded-full transition-all",
                                         isTrialExpired ? "bg-negative" : trialPct > 80 ? "bg-amber-400" : "bg-accent"
                                     )}
-                                    style={{ width: `${trialPct}%` }}
+                                    style={{ width: `${100 - trialPct}%` }}
                                 />
                             </div>
                         </div>
@@ -241,6 +274,18 @@ export const SettingsView = ({ user, onSignOut, onBack, onUpdateUser }: Settings
                             <p className="text-[10px] text-text-3">Resets on the 1st of each month.</p>
                         )}
                     </div>
+
+                    {/* Cancel subscription */}
+                    {isPro && !cancelAt && (
+                        <div className="pt-1 border-t border-border">
+                            <button
+                                onClick={() => setShowCancelConfirm(true)}
+                                className="text-xs text-text-3 hover:text-negative transition-colors"
+                            >
+                                Cancel subscription
+                            </button>
+                        </div>
+                    )}
                 </Card>
             </section>
 
@@ -292,6 +337,37 @@ export const SettingsView = ({ user, onSignOut, onBack, onUpdateUser }: Settings
                 isOpen={showUpgradeModal}
                 onClose={() => setShowUpgradeModal(false)}
             />
+
+            <Modal
+                isOpen={showCancelConfirm}
+                onClose={() => setShowCancelConfirm(false)}
+                title="Cancel Subscription"
+            >
+                <div className="space-y-5">
+                    <p className="text-sm text-text-2 leading-relaxed">
+                        Your Pro access will continue until the end of your current billing period.
+                        After that, your account will revert to the free trial limits.
+                    </p>
+                    <div className="flex gap-3 justify-end">
+                        <Button
+                            variant="secondary"
+                            className="text-sm px-4 py-2 rounded-xl"
+                            onClick={() => setShowCancelConfirm(false)}
+                            disabled={cancelling}
+                        >
+                            Keep Pro
+                        </Button>
+                        <Button
+                            variant="ghost"
+                            className="text-negative hover:bg-negative/10 text-sm px-4 py-2 rounded-xl"
+                            onClick={handleCancelSubscription}
+                            disabled={cancelling}
+                        >
+                            {cancelling ? "Cancelling…" : "Cancel Subscription"}
+                        </Button>
+                    </div>
+                </div>
+            </Modal>
         </div>
     );
 };
