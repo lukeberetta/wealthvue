@@ -116,10 +116,30 @@ function getRiskProfile(pct: Record<string, number>): { label: string; value: 1 
     return { label: "Low", value: 1, color: "var(--color-text-1)" };
 }
 
+// Monochromatic shades for donut chart — uses color-mix so text-1 auto-adapts dark/light
+const CHART_TYPE_SHADES: Record<string, string> = {
+    stock:       'color-mix(in srgb, var(--color-text-1) 90%, transparent)',
+    etf:         'color-mix(in srgb, var(--color-text-1) 74%, transparent)',
+    crypto:      'color-mix(in srgb, var(--color-text-1) 59%, transparent)',
+    commodities: 'color-mix(in srgb, var(--color-text-1) 46%, transparent)',
+    property:    'color-mix(in srgb, var(--color-text-1) 34%, transparent)',
+    vehicle:     'color-mix(in srgb, var(--color-text-1) 24%, transparent)',
+    cash:        'color-mix(in srgb, var(--color-text-1) 15%, transparent)',
+    other:       'color-mix(in srgb, var(--color-text-1) 8%, transparent)',
+};
+
+// Same shade ladder for account tab
 const ACCOUNT_PALETTE = [
-    '#094D92', '#197278', '#18206F', '#EA9010',
-    '#646536', '#BB4430', '#283D3B', '#C17767',
-    '#243010', '#BB4430',
+    'color-mix(in srgb, var(--color-text-1) 90%, transparent)',
+    'color-mix(in srgb, var(--color-text-1) 78%, transparent)',
+    'color-mix(in srgb, var(--color-text-1) 66%, transparent)',
+    'color-mix(in srgb, var(--color-text-1) 55%, transparent)',
+    'color-mix(in srgb, var(--color-text-1) 44%, transparent)',
+    'color-mix(in srgb, var(--color-text-1) 34%, transparent)',
+    'color-mix(in srgb, var(--color-text-1) 25%, transparent)',
+    'color-mix(in srgb, var(--color-text-1) 17%, transparent)',
+    'color-mix(in srgb, var(--color-text-1) 10%, transparent)',
+    'color-mix(in srgb, var(--color-text-1) 5%, transparent)',
 ];
 function getAccountColor(name: string): string {
     let hash = 0;
@@ -199,7 +219,7 @@ export const PortfolioInsights = ({ assets, displayCurrency, fxRates, onOpenAdvi
     const displayData = tab === "type" ? chartData : accountData;
     const displayPct = tab === "type" ? pct : accountPct;
     const getColor = (name: string) => tab === "type"
-        ? (TYPE_COLORS[name] || TYPE_COLORS.other)
+        ? (CHART_TYPE_SHADES[name] || CHART_TYPE_SHADES.other)
         : getAccountColor(name);
     const getLabel = (name: string) => tab === "type"
         ? (TYPE_LABELS[name] || name)
@@ -506,9 +526,9 @@ export const PortfolioInsights = ({ assets, displayCurrency, fxRates, onOpenAdvi
 
                         <button
                             onClick={onOpenAdvice}
-                            className="mt-auto w-full flex items-center justify-center gap-2 bg-surface-2 hover:bg-surface-2/80 text-text-1 rounded-xl py-3 px-4 text-sm font-normal transition-colors"
+                            className="mt-auto w-full flex items-center justify-center gap-2 btn-primary text-sm rounded-xl"
                         >
-                            <Sparkles size={15} className="text-text-2" />
+                            <Sparkles size={15} />
                             Analyse Portfolio
                         </button>
                     </div>

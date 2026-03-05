@@ -166,12 +166,19 @@ The `callAIWithRotation()` helper wraps all Gemini calls and handles quota rotat
 
 ## Theming
 
-CSS custom properties on `document.documentElement`, persisted to localStorage.
+CSS custom properties on `document.documentElement`, persisted to localStorage. All theme tokens are defined in `src/index.css` and bridged to Tailwind via the `@theme {}` block.
 
-- **Dark** (default): bg `#1A1714`, surface `#231F1B`, accent `#C96442` (terracotta), positive `#5D8F6E`, negative `#A0504A`
-- **Light**: bg `#F5F1EB`, text `#1C1714`, same accent
-- **Fonts**: Playfair Display (headings), DM Sans (body)
+- **Dark** (default): bg `#111111`, surface `#1A1A1A`, accent `#dce344` (lime), positive `#2DA85C`, negative `#E04E4E`
+- **Light**: bg `#FFFFFF`, surface `#F7F6F2`, surface-2 `#EEEDE8`, surface-3 `#D8DBE0`, same accent, positive `#1A9448`, negative `#C83C3C`
+- **Fonts**: Inter for everything — headings (`h1/h2`) at weight 500 with `letter-spacing: -0.03em`, body at weight 400 with `letter-spacing: -0.012em`
+- **`--color-on-accent`**: always `#111111` — use `text-on-accent` on any element with `bg-accent` to ensure readable dark text on the lime background
 - Managed by `src/hooks/useTheme.ts`; three modes: `light`, `dark`, `system`
+
+### Color token conventions
+- Never hardcode hex values in components — always use Tailwind classes (`bg-accent`, `text-text-1`, `border-border`, etc.) or `var(--color-*)` for inline styles
+- Exception: `src/features/dashboard/components/AssetIcon.tsx` — `TYPE_COLORS` holds intentional per-asset-type icon colors (curated named palette, not theme tokens)
+- Exception: `src/features/dashboard/components/PortfolioInsights.tsx` — `CHART_TYPE_SHADES` holds monochromatic opacity ladder for the allocation donut chart (white at 8–90% opacity), kept separate from `TYPE_COLORS` so icons and charts can differ
+- SVG inline colors must use `style={{ stroke: 'var(--color-accent)' }}` / `style={{ stopColor: 'var(--color-accent)' }}` not hardcoded hex attributes
 
 ## Key Patterns & Conventions
 

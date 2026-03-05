@@ -124,7 +124,7 @@ export const LandingPage = ({ user, firebaseUid, isDemo = false, onSignIn, onTry
                                         <div>
                                             <p className="text-[9px] font-normal text-text-3 uppercase tracking-[0.2em] mb-1.5">Total Net Worth</p>
                                             <p className="text-3xl font-serif tabular-nums">R 6,421,380</p>
-                                            <p className="text-[11px] text-positive mt-1.5 font-normal">+R 78,420 (+1.23%) today</p>
+                                            <p className="text-[11px] text-text-2 mt-1.5 font-normal">+R 78,420 (+1.23%) today</p>
                                         </div>
                                         <div className="grid grid-cols-2 gap-3">
                                             <div className="bg-surface-2/40 rounded-xl p-4 border border-border/60">
@@ -140,11 +140,11 @@ export const LandingPage = ({ user, firebaseUid, isDemo = false, onSignIn, onTry
                                                 <svg viewBox="0 0 100 40" className="w-full h-10">
                                                     <defs>
                                                         <linearGradient id="heroGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                                                            <stop offset="0%" stopColor="#dce344" stopOpacity="0.3" />
-                                                            <stop offset="100%" stopColor="#dce344" stopOpacity="0" />
+                                                            <stop offset="0%" style={{ stopColor: 'var(--color-accent)', stopOpacity: 0.3 }} />
+                                                            <stop offset="100%" style={{ stopColor: 'var(--color-accent)', stopOpacity: 0 }} />
                                                         </linearGradient>
                                                     </defs>
-                                                    <path d="M0,35 Q25,28 45,18 T85,8 T100,4" fill="none" stroke="#dce344" strokeWidth="2" strokeLinecap="round" />
+                                                    <path d="M0,35 Q25,28 45,18 T85,8 T100,4" fill="none" style={{ stroke: 'var(--color-accent)' }} strokeWidth="2" strokeLinecap="round" />
                                                     <path d="M0,35 Q25,28 45,18 T85,8 T100,4 V40 H0 Z" fill="url(#heroGrad)" />
                                                 </svg>
                                             </div>
@@ -340,7 +340,7 @@ export const LandingPage = ({ user, firebaseUid, isDemo = false, onSignIn, onTry
                                 <ul className="space-y-3 mb-10 flex-1">
                                     {["Full portfolio & net worth tracking", "Multi-currency & FX support", "Financial goal tracking", "Net worth history (30 days)", "10 AI credits — one-time"].map(f => (
                                         <li key={f} className="flex items-center gap-3 text-sm text-text-2">
-                                            <Check size={14} className="text-positive shrink-0" />{f}
+                                            <Check size={14} className="text-text-2 shrink-0" />{f}
                                         </li>
                                     ))}
                                 </ul>
@@ -364,7 +364,7 @@ export const LandingPage = ({ user, firebaseUid, isDemo = false, onSignIn, onTry
                                 <ul className="space-y-3 mb-10 flex-1">
                                     {["Everything in Trial, forever", "50 AI credits / month — renewed monthly", "Unlimited net worth history", "Priority support", "Export to CSV"].map(f => (
                                         <li key={f} className="flex items-center gap-3 text-sm text-text-2">
-                                            <Check size={14} className="text-positive shrink-0" />{f}
+                                            <Check size={14} className="text-text-2 shrink-0" />{f}
                                         </li>
                                     ))}
                                 </ul>
