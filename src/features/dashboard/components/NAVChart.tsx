@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
     AreaChart,
     Area,
@@ -81,6 +81,7 @@ function CustomTooltip({ active, payload, displayCurrency }: any) {
 export const NAVChart = ({ navHistory, displayCurrency, fxRates, assets = [], onResetTracking, period }: NAVChartProps) => {
     const [resetArmed, setResetArmed] = useState(false);
     const [isResetting, setIsResetting] = useState(false);
+    const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
     const handleResetClick = async () => {
         if (!resetArmed) {
@@ -93,59 +94,6 @@ export const NAVChart = ({ navHistory, displayCurrency, fxRates, assets = [], on
         setIsResetting(false);
     };
 
-    const chartData = useMemo(() => {
-        if (navHistory.length === 0) return [];
-
-        const cutoff = cutoffDate(period);
-
-        // Sort ascending, filter to period window
-        const filtered = [...navHistory]
-            .sort((a, b) => a.date.localeCompare(b.date))
-            .filter(e => e.date >= cutoff);
-
-        if (filtered.length === 0) return [];
-
-        const first = convertCurrency(filtered[0].totalNAV, "USD", displayCurrency, fxRates);
-
-        return filtered.map((entry, i) => {
-            const nav = convertCurrency(entry.totalNAV, "USD", displayCurrency, fxRates);
-            const change = i === 0 ? null : nav - first;
-            const changePct = i === 0 || first === 0 ? 0 : ((nav - first) / first) * 100;
-
-            return {
-                date: entry.date,
-                dateLabel: formatXLabel(entry.date, period),
-                nav,
-                change,
-                changePct,
-            };
-        });
-    }, [navHistory, displayCurrency, fxRates, period]);
-
-    const isEmpty = navHistory.length < 2 || chartData.length < 2;
-
-    // Determine chart colour based on whether the period is up or down
-    const isUp = chartData.length >= 2
-        ? chartData[chartData.length - 1].nav >= chartData[0].nav
-        : true;
-
-    const lineColor = isUp ? "var(--color-positive)" : "var(--color-negative)";
-    const gradientId = isUp ? "navGradientUp" : "navGradientDown";
-
-    // Calculate min/max for Y domain padding
-    const allValues = chartData.map((d: { nav: number }) => d.nav);
-    const minNav = allValues.length > 0 ? Math.min(...allValues) : 0;
-    const maxNav = allValues.length > 0 ? Math.max(...allValues) : 0;
-    const padding = (maxNav - minNav) * 0.12 || maxNav * 0.05;
-    const yMin = Math.max(0, minNav - padding);
-    const yMax = maxNav + padding;
-
-    // Period change stats
-    const firstNav = chartData[0]?.nav ?? 0;
-    const lastNav = chartData[chartData.length - 1]?.nav ?? 0;
-    const periodChange = lastNav - firstNav;
-    const periodChangePct = firstNav > 0 ? (periodChange / firstNav) * 100 : 0;
-
     // Category breakdown — current value per type + period % change from navHistory
     const categoryBreakdown = useMemo(() => {
         const currentByType: Record<string, number> = {};
@@ -154,7 +102,6 @@ export const NAVChart = ({ navHistory, displayCurrency, fxRates, assets = [], on
             currentByType[asset.assetType] = (currentByType[asset.assetType] || 0) + val;
         }
 
-        // Find anchor navHistory entry for the selected period
         const sorted = [...navHistory].sort((a, b) => a.date.localeCompare(b.date));
         const cutoff = cutoffDate(period);
         const anchor = period === "All"
@@ -173,28 +120,121 @@ export const NAVChart = ({ navHistory, displayCurrency, fxRates, assets = [], on
             .sort((a, b) => b.value - a.value);
     }, [assets, navHistory, displayCurrency, fxRates, period]);
 
-    // Decide how many X ticks to show
+    // Reset to "all" if the selected category disappears
+    useEffect(() => {
+        if (selectedCategory !== "all" && !categoryBreakdown.find(c => c.type === selectedCategory)) {
+            setSelectedCategory("all");
+        }
+    }, [categoryBreakdown, selectedCategory]);
+
+    // Overall period % change for the "All" tab (independent of selectedCategory)
+    const allPeriodChangePct = useMemo(() => {
+        const cutoff = cutoffDate(period);
+        const filtered = [...navHistory]
+            .sort((a, b) => a.date.localeCompare(b.date))
+            .filter(e => e.date >= cutoff);
+        if (filtered.length < 2) return 0;
+        const first = convertCurrency(filtered[0].totalNAV, "USD", displayCurrency, fxRates);
+        const last = convertCurrency(filtered[filtered.length - 1].totalNAV, "USD", displayCurrency, fxRates);
+        return first > 0 ? ((last - first) / first) * 100 : 0;
+    }, [navHistory, displayCurrency, fxRates, period]);
+
+    const chartData = useMemo(() => {
+        if (navHistory.length === 0) return [];
+
+        const cutoff = cutoffDate(period);
+
+        const filtered = [...navHistory]
+            .sort((a, b) => a.date.localeCompare(b.date))
+            .filter(e => e.date >= cutoff);
+
+        if (filtered.length === 0) return [];
+
+        const getVal = (entry: NAVHistoryEntry): number | null => {
+            if (selectedCategory === "all") return entry.totalNAV;
+            return entry.categoryBreakdown?.[selectedCategory] ?? null;
+        };
+
+        const validFiltered = filtered.filter(e => getVal(e) !== null);
+        if (validFiltered.length === 0) return [];
+
+        const firstUSD = getVal(validFiltered[0])!;
+        const first = convertCurrency(firstUSD, "USD", displayCurrency, fxRates);
+
+        return validFiltered.map((entry, i) => {
+            const navUSD = getVal(entry)!;
+            const nav = convertCurrency(navUSD, "USD", displayCurrency, fxRates);
+            const change = i === 0 ? null : nav - first;
+            const changePct = i === 0 || first === 0 ? 0 : ((nav - first) / first) * 100;
+
+            return {
+                date: entry.date,
+                dateLabel: formatXLabel(entry.date, period),
+                nav,
+                change,
+                changePct,
+            };
+        });
+    }, [navHistory, displayCurrency, fxRates, period, selectedCategory]);
+
+    const isEmpty = navHistory.length < 2 || chartData.length < 2;
+
+    const isUp = chartData.length >= 2
+        ? chartData[chartData.length - 1].nav >= chartData[0].nav
+        : true;
+
+    const lineColor = isUp ? "var(--color-positive)" : "var(--color-negative)";
+    const gradientId = isUp ? "navGradientUp" : "navGradientDown";
+
+    const allValues = chartData.map((d: { nav: number }) => d.nav);
+    const minNav = allValues.length > 0 ? Math.min(...allValues) : 0;
+    const maxNav = allValues.length > 0 ? Math.max(...allValues) : 0;
+    const padding = (maxNav - minNav) * 0.12 || maxNav * 0.05;
+    const yMin = Math.max(0, minNav - padding);
+    const yMax = maxNav + padding;
+
+    const firstNav = chartData[0]?.nav ?? 0;
+
     const xTickCount = period === "1W" ? 7 : period === "1M" ? 5 : period === "3M" ? 6 : 6;
+
+    const activeChangePct = selectedCategory === "all"
+        ? allPeriodChangePct
+        : (categoryBreakdown.find(c => c.type === selectedCategory)?.changePct ?? null);
+    const activeIsUp = activeChangePct === null ? true : activeChangePct >= 0;
 
     return (
         <div className="bg-surface rounded-2xl p-6">
             {/* Header */}
-            {!isEmpty && (
-                <div className="mb-5 flex items-center gap-3">
+            <div className="mb-5 flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
                     <h3 className="text-[10px] font-bold text-text-3 uppercase tracking-widest">
                         Net Worth History
                     </h3>
-
-                    <div className="flex items-center gap-2">
+                    {activeChangePct !== null && (
                         <span className={cn(
                             "text-[10px] font-bold tabular-nums px-2 py-0.5 rounded-full",
-                            isUp ? "text-positive bg-positive/10" : "text-negative bg-negative/10"
+                            activeIsUp ? "text-positive bg-positive/10" : "text-negative bg-negative/10"
                         )}>
-                            {isUp ? "+" : ""}{periodChangePct.toFixed(2)}%
+                            {activeIsUp ? "+" : ""}{activeChangePct.toFixed(2)}%
                         </span>
-                    </div>
+                    )}
                 </div>
-            )}
+                {categoryBreakdown.length > 0 && (
+                    <select
+                        value={selectedCategory}
+                        onChange={e => setSelectedCategory(e.target.value)}
+                        className="text-[11px] font-medium text-text-2 bg-surface-2/60 border border-border rounded-lg px-2 py-1 cursor-pointer hover:bg-surface-2 transition-colors appearance-none pr-5 relative"
+                        style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E")`, backgroundRepeat: "no-repeat", backgroundPosition: "right 6px center" }}
+                    >
+                        <option value="all">All</option>
+                        {categoryBreakdown.map(({ type }) => (
+                            <option key={type} value={type}>
+                                {TYPE_LABELS[type] || type}
+                            </option>
+                        ))}
+                    </select>
+                )}
+            </div>
 
             {/* Empty state */}
             {isEmpty ? (
@@ -276,6 +316,7 @@ export const NAVChart = ({ navHistory, displayCurrency, fxRates, assets = [], on
                     </AreaChart>
                 </ResponsiveContainer>
             )}
+
             {/* Footer — reset tracking */}
             {onResetTracking && navHistory.length > 0 && (
                 <div className="flex items-center justify-end mt-3">
@@ -306,32 +347,6 @@ export const NAVChart = ({ navHistory, displayCurrency, fxRates, assets = [], on
                             Reset tracking
                         </button>
                     )}
-                </div>
-            )}
-            {/* Category breakdown */}
-            {categoryBreakdown.length > 0 && (
-                <div className="mt-5">
-                    <h3 className="text-[10px] font-bold text-text-3 uppercase tracking-widest mb-3">By category</h3>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                        {categoryBreakdown.map(({ type, changePct }) => {
-                            const isPos = changePct !== null && changePct >= 0;
-                            return (
-                                <div key={type} className="flex items-center justify-between gap-2 bg-surface-2/50 rounded-xl px-3 py-2">
-                                    <span className="text-[11px] font-medium text-text-2 truncate">{TYPE_LABELS[type] || type}</span>
-                                    <span className={cn(
-                                        "text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full shrink-0",
-                                        changePct === null
-                                            ? "bg-surface-2 text-text-3"
-                                            : isPos
-                                            ? "bg-positive/10 text-positive"
-                                            : "bg-negative/10 text-negative"
-                                    )}>
-                                        {changePct === null ? "N/A" : `${isPos ? "+" : ""}${changePct.toFixed(2)}%`}
-                                    </span>
-                                </div>
-                            );
-                        })}
-                    </div>
                 </div>
             )}
         </div>
