@@ -52,10 +52,16 @@ async function callAIWithRotation(
       });
     } catch (error: any) {
       lastError = error;
-      const isQuotaError = error.status === "RESOURCE_EXHAUSTED" || error.message?.includes("429");
+      const isRetryable =
+        error.status === "RESOURCE_EXHAUSTED" ||
+        error.message?.includes("429") ||
+        error.status === 503 ||
+        error.status === "UNAVAILABLE" ||
+        error.message?.includes("503") ||
+        error.message?.includes("overloaded");
 
-      if (isQuotaError) {
-        console.warn(`Model ${model} storage exhausted (or search limited). Trying next...`);
+      if (isRetryable) {
+        console.warn(`Model ${model} unavailable (${error.status ?? error.message}). Trying next...`);
         continue; // Try next model in list
       }
 
