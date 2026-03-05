@@ -350,6 +350,26 @@ export const DEMO_ASSETS: Asset[] = [
     lastRefreshed: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
+  },
+  {
+    id: "16",
+    name: "iShares Gold Trust",
+    description: "Physical gold exposure",
+    assetType: "commodities",
+    ticker: "IAU",
+    quantity: 800,
+    unitPrice: 46.20,
+    unitPriceCurrency: "USD",
+    totalValue: 800 * 46.20,
+    totalValueCurrency: "USD",
+    valueSource: "live_price",
+    source: "Fidelity",
+    aiConfidence: null,
+    aiRationale: null,
+    inputMethod: "manual",
+    lastRefreshed: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   }
 ];
 

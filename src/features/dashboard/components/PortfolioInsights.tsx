@@ -97,6 +97,17 @@ function getDiversificationScore(pct: Record<string, number>): { label: string; 
 }
 
 
+const LIQUID_TYPES = new Set(["stock", "etf", "crypto", "cash", "commodities"]);
+
+function getLiquidityScore(pct: Record<string, number>): { label: string; pct: number; color: string } {
+    const liquidPct = Object.entries(pct)
+        .filter(([type]) => LIQUID_TYPES.has(type))
+        .reduce((sum, [, p]) => sum + p, 0);
+    if (liquidPct >= 70) return { label: "High", pct: liquidPct, color: "var(--color-positive)" };
+    if (liquidPct >= 40) return { label: "Moderate", pct: liquidPct, color: "var(--color-accent)" };
+    return { label: "Low", pct: liquidPct, color: "var(--color-negative)" };
+}
+
 function getRiskProfile(pct: Record<string, number>): { label: string; value: 1 | 2 | 3; color: string } {
     const score = (pct.crypto || 0) * 0.9 + (pct.stock || 0) * 0.5 + (pct.etf || 0) * 0.5 + (pct.commodities || 0) * 0.5
         - (pct.cash || 0) * 0.7 - (pct.property || 0) * 0.4;
@@ -421,6 +432,7 @@ export const PortfolioInsights = ({ assets, displayCurrency, fxRates, onOpenAdvi
             {(() => {
                 const risk = getRiskProfile(pct);
                 const diversification = getDiversificationScore(pct);
+                const liquidity = getLiquidityScore(pct);
                 return (
                     <div className="lg:col-span-2 bg-surface rounded-2xl p-6 flex flex-col min-h-[320px]">
                         <h3 className="text-[10px] font-bold text-text-3 uppercase tracking-widest mb-5">Portfolio Profile</h3>
@@ -472,6 +484,21 @@ export const PortfolioInsights = ({ assets, displayCurrency, fxRates, onOpenAdvi
                                         initial={{ width: 0 }}
                                         animate={{ width: `${diversification.pct}%` }}
                                         transition={{ duration: 0.6, ease: [0.34, 1.56, 0.64, 1], delay: 0.2 }}
+                                    />
+                                </div>
+                            </div>
+                            <div>
+                                <div className="flex items-center justify-between mb-2">
+                                    <p className="text-[10px] font-bold text-text-3 uppercase tracking-widest">Liquidity</p>
+                                    <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: liquidity.color }}>{liquidity.label}</span>
+                                </div>
+                                <div className="h-1.5 bg-surface-2 rounded-full overflow-hidden">
+                                    <motion.div
+                                        className="h-full rounded-full"
+                                        style={{ backgroundColor: liquidity.color }}
+                                        initial={{ width: 0 }}
+                                        animate={{ width: `${liquidity.pct}%` }}
+                                        transition={{ duration: 0.6, ease: [0.34, 1.56, 0.64, 1], delay: 0.4 }}
                                     />
                                 </div>
                             </div>
