@@ -1,19 +1,38 @@
 import { Asset, User, NAVHistoryEntry, FinancialGoal } from "../types";
 import { addDays, format, subDays } from "date-fns";
 
-const generateNAVHistory = (currentTotal: number): NAVHistoryEntry[] => {
+const generateNAVHistory = (
+  currentTotal: number,
+  categoryTotals: Record<string, number>
+): NAVHistoryEntry[] => {
   const history: NAVHistoryEntry[] = [];
   let currentVal = currentTotal * 0.9; // Start a bit lower
+
+  // Start each category at 90% of current value
+  const catVals: Record<string, number> = {};
+  for (const [type, val] of Object.entries(categoryTotals)) {
+    catVals[type] = val * 0.9;
+  }
 
   for (let i = 60; i >= 0; i--) {
     const date = format(subDays(new Date(), i), "yyyy-MM-dd");
     // Add gentle upward drift with occasional small dips
     const change = (Math.random() - 0.4) * 0.01; // -0.4% to +0.6%
     currentVal = currentVal * (1 + change);
+
+    // Each category drifts independently
+    const breakdown: Record<string, number> = {};
+    for (const type of Object.keys(catVals)) {
+      const catChange = (Math.random() - 0.4) * 0.015;
+      catVals[type] = catVals[type] * (1 + catChange);
+      breakdown[type] = Math.round(catVals[type]);
+    }
+
     history.push({
       date,
       totalNAV: Math.round(currentVal),
-      displayCurrency: "USD"
+      displayCurrency: "USD",
+      categoryBreakdown: breakdown,
     });
   }
   return history;
@@ -336,11 +355,17 @@ export const DEMO_ASSETS: Asset[] = [
 
 const totalDemoNAV = DEMO_ASSETS.reduce((acc, asset) => {
   // Simple conversion for demo: 1 ZAR = 0.053 USD
-  const val = asset.unitPriceCurrency === "ZAR" ? asset.totalValue * 0.053 : asset.totalValue;
+  const val = asset.totalValueCurrency === "ZAR" ? asset.totalValue * 0.053 : asset.totalValue;
   return acc + val;
 }, 0);
 
-export const DEMO_NAV_HISTORY = generateNAVHistory(totalDemoNAV);
+const demoCategoryTotals: Record<string, number> = {};
+for (const asset of DEMO_ASSETS) {
+  const val = asset.totalValueCurrency === "ZAR" ? asset.totalValue * 0.053 : asset.totalValue;
+  demoCategoryTotals[asset.assetType] = (demoCategoryTotals[asset.assetType] || 0) + val;
+}
+
+export const DEMO_NAV_HISTORY = generateNAVHistory(totalDemoNAV, demoCategoryTotals);
 
 export const DEMO_GOAL: FinancialGoal = {
   targetAmount: 10000000,
