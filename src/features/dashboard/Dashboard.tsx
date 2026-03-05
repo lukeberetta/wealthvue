@@ -289,7 +289,7 @@ export const Dashboard = ({ user, isDemo, isAuthLoading = false, onSignIn, onSig
                                 />
                                 <button
                                     onClick={submitGoal}
-                                    className="flex items-center gap-1 bg-accent text-white rounded-lg px-3 py-1.5 text-xs font-bold hover:bg-accent/90 transition-colors"
+                                    className="flex items-center gap-1 bg-accent text-on-accent rounded-lg px-3 py-1.5 text-xs font-bold hover:bg-accent/90 transition-colors"
                                 >
                                     <Check size={12} /> Save
                                 </button>
@@ -325,7 +325,7 @@ export const Dashboard = ({ user, isDemo, isAuthLoading = false, onSignIn, onSig
                                         <>
                                             <div className="h-1.5 bg-surface-2 rounded-full overflow-hidden w-full">
                                                 <div
-                                                    className="h-full bg-accent rounded-full transition-all duration-700 ease-out"
+                                                    className="h-full bg-text-1 rounded-full transition-all duration-700 ease-out"
                                                     style={{ width: `${progress * 100}%` }}
                                                 />
                                             </div>
@@ -446,7 +446,7 @@ export const Dashboard = ({ user, isDemo, isAuthLoading = false, onSignIn, onSig
                 {/* Mobile FAB — sticky so it stays above the footer */}
                 <div className="md:hidden sticky bottom-4 flex justify-center pointer-events-none">
                     <motion.button
-                        className="pointer-events-auto w-fit z-40 flex items-center h-12 bg-accent text-white rounded-full px-5 text-sm font-semibold shadow-lg shadow-accent/30"
+                        className="pointer-events-auto w-fit z-40 flex items-center h-12 bg-accent text-on-accent rounded-full px-5 text-sm font-semibold shadow-lg shadow-accent/30"
                         onClick={isDemo ? onSignIn : () => guard(() => setIsAddModalOpen(true))}
                         whileTap={{ scale: 0.95 }}
                         aria-label="Add Asset"

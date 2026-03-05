@@ -613,7 +613,7 @@ export const AddAssetModal = ({
                                     disabled={!canSubmit || isAnalyzing}
                                     className={cn(
                                         "w-full flex items-center justify-center gap-2.5 py-3.5 rounded-2xl",
-                                        "text-sm font-semibold bg-accent text-white shadow-md shadow-accent/20",
+                                        "text-sm font-semibold bg-accent text-on-accent shadow-md shadow-accent/20",
                                         "hover:opacity-90 active:scale-[0.98] transition-all duration-200",
                                         "disabled:opacity-40 disabled:pointer-events-none"
                                     )}
@@ -694,7 +694,7 @@ export const AddAssetModal = ({
                                             onSaveDrafts(globalSource);
                                             setGlobalSource("");
                                         }}
-                                        className="flex-[2] flex items-center justify-center gap-2 py-3 rounded-2xl bg-accent text-white text-sm font-semibold hover:opacity-90 active:scale-[0.98] transition-all duration-200"
+                                        className="flex-[2] flex items-center justify-center gap-2 py-3 rounded-2xl bg-accent text-on-accent text-sm font-semibold hover:opacity-90 active:scale-[0.98] transition-all duration-200"
                                     >
                                         <Check size={16} />
                                         {draftAssets.length > 1 ? `Save all ${draftAssets.length} assets` : "Save to portfolio"}

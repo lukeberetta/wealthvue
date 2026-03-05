@@ -85,15 +85,15 @@ export function getArchetype(pct: Record<string, number>): Archetype {
 function getDiversificationScore(pct: Record<string, number>): { label: string; pct: number; color: string } {
     const values = Object.values(pct);
     const n = values.length;
-    if (n <= 1) return { label: "Concentrated", pct: 8, color: "var(--color-negative)" };
+    if (n <= 1) return { label: "Concentrated", pct: 8, color: "var(--color-text-1)" };
     // Herfindahl–Hirschman Index: 1 = fully concentrated, 1/n = perfectly spread
     const hhi = values.reduce((sum, v) => sum + (v / 100) ** 2, 0);
     const maxHHI = 1;
     const minHHI = 1 / n;
     const score = Math.round(((maxHHI - hhi) / (maxHHI - minHHI)) * 100);
-    if (score >= 70) return { label: "Diversified", pct: score, color: "var(--color-positive)" };
-    if (score >= 40) return { label: "Moderate", pct: score, color: "var(--color-accent)" };
-    return { label: "Concentrated", pct: score, color: "var(--color-negative)" };
+    if (score >= 70) return { label: "Diversified", pct: score, color: "var(--color-text-1)" };
+    if (score >= 40) return { label: "Moderate", pct: score, color: "var(--color-text-1)" };
+    return { label: "Concentrated", pct: score, color: "var(--color-text-1)" };
 }
 
 
@@ -103,23 +103,23 @@ function getLiquidityScore(pct: Record<string, number>): { label: string; pct: n
     const liquidPct = Object.entries(pct)
         .filter(([type]) => LIQUID_TYPES.has(type))
         .reduce((sum, [, p]) => sum + p, 0);
-    if (liquidPct >= 70) return { label: "High", pct: liquidPct, color: "var(--color-positive)" };
-    if (liquidPct >= 40) return { label: "Moderate", pct: liquidPct, color: "var(--color-accent)" };
-    return { label: "Low", pct: liquidPct, color: "var(--color-negative)" };
+    if (liquidPct >= 70) return { label: "High", pct: liquidPct, color: "var(--color-text-1)" };
+    if (liquidPct >= 40) return { label: "Moderate", pct: liquidPct, color: "var(--color-text-1)" };
+    return { label: "Low", pct: liquidPct, color: "var(--color-text-1)" };
 }
 
 function getRiskProfile(pct: Record<string, number>): { label: string; value: 1 | 2 | 3; color: string } {
     const score = (pct.crypto || 0) * 0.9 + (pct.stock || 0) * 0.5 + (pct.etf || 0) * 0.5 + (pct.commodities || 0) * 0.5
         - (pct.cash || 0) * 0.7 - (pct.property || 0) * 0.4;
-    if (score > 40) return { label: "High", value: 3, color: "var(--color-negative)" };
-    if (score > 15) return { label: "Medium", value: 2, color: "var(--color-accent)" };
-    return { label: "Low", value: 1, color: "var(--color-positive)" };
+    if (score > 40) return { label: "High", value: 3, color: "var(--color-text-1)" };
+    if (score > 15) return { label: "Medium", value: 2, color: "var(--color-text-1)" };
+    return { label: "Low", value: 1, color: "var(--color-text-1)" };
 }
 
 const ACCOUNT_PALETTE = [
-    '#C96442', '#4A7C59', '#7B6FA8', '#3A8DA8',
-    '#A89240', '#B5534A', '#5A8F7B', '#8F7B5A',
-    '#6B8FA8', '#A87B5A',
+    '#094D92', '#197278', '#18206F', '#EA9010',
+    '#646536', '#BB4430', '#283D3B', '#C17767',
+    '#243010', '#BB4430',
 ];
 function getAccountColor(name: string): string {
     let hash = 0;
@@ -508,7 +508,7 @@ export const PortfolioInsights = ({ assets, displayCurrency, fxRates, onOpenAdvi
                             onClick={onOpenAdvice}
                             className="mt-auto w-full flex items-center justify-center gap-2 bg-surface-2 hover:bg-surface-2/80 text-text-1 rounded-xl py-3 px-4 text-sm font-medium transition-colors"
                         >
-                            <Sparkles size={15} className="text-accent" />
+                            <Sparkles size={15} className="text-text-2" />
                             Analyse Portfolio
                         </button>
                     </div>

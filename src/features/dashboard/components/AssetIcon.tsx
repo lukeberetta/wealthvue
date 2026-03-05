@@ -52,14 +52,14 @@ import {
 import { Asset } from "../../../types";
 
 export const TYPE_COLORS: Record<string, string> = {
-    stock: '#C96442',
-    etf: '#3A8DA8',
-    crypto: '#4A7C59',
-    commodities: '#D4AF37',
-    vehicle: '#5C7A8C',
-    property: '#B5534A',
-    cash: '#A0916E',
-    other: '#7B6882',
+    stock:       '#094D92',   // steel azure
+    etf:         '#197278',   // stormy teal
+    crypto:      '#18206F',   // midnight blue
+    commodities: '#EA9010',   // carrot orange
+    vehicle:     '#646536',   // olive leaf
+    property:    '#BB4430',   // tomato jam
+    cash:        '#283D3B',   // dark slate grey
+    other:       '#C17767',   // dusty rose
 };
 
 export const getAssetIcon = (asset: Partial<Asset>, size: number = 20, color?: string): React.ReactNode => {

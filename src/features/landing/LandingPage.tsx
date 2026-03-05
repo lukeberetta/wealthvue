@@ -114,7 +114,7 @@ export const LandingPage = ({ user, firebaseUid, isDemo = false, onSignIn, onTry
                                     {/* Mockup nav */}
                                     <div className="bg-surface-2/50 border-b border-border px-5 py-3.5 flex justify-between items-center">
                                         <div className="flex items-center gap-2">
-                                            <div className="w-5 h-5 bg-accent rounded flex items-center justify-center text-[10px] text-white font-bold">W</div>
+                                            <div className="w-5 h-5 bg-accent rounded flex items-center justify-center text-[10px] text-on-accent font-bold">W</div>
                                             <span className="text-sm font-serif font-semibold text-accent">WealthVue</span>
                                         </div>
                                         <div className="bg-surface border border-border rounded-full px-3 py-0.5 text-[10px] font-bold text-text-3">ZAR</div>
@@ -129,7 +129,7 @@ export const LandingPage = ({ user, firebaseUid, isDemo = false, onSignIn, onTry
                                         <div className="grid grid-cols-2 gap-3">
                                             <div className="bg-surface-2/40 rounded-xl p-4 border border-border/60">
                                                 {/* Mini donut */}
-                                                <div className="w-16 h-16 mx-auto rounded-full" style={{ background: "conic-gradient(#C96442 0% 42%, #5D8F6E 42% 73%, #6B6258 73% 87%, #38312A 87% 100%)" }} />
+                                                <div className="w-16 h-16 mx-auto rounded-full" style={{ background: "conic-gradient(#094D92 0% 42%, #18206F 42% 73%, #283D3B 73% 87%, #1A1A1A 87% 100%)" }} />
                                                 <div className="mt-2.5 space-y-0.5">
                                                     <div className="flex justify-between text-[8px] font-bold text-text-3 uppercase">
                                                         <span>Stocks 42%</span><span>Crypto 31%</span>
@@ -140,11 +140,11 @@ export const LandingPage = ({ user, firebaseUid, isDemo = false, onSignIn, onTry
                                                 <svg viewBox="0 0 100 40" className="w-full h-10">
                                                     <defs>
                                                         <linearGradient id="heroGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                                                            <stop offset="0%" stopColor="#C96442" stopOpacity="0.3" />
-                                                            <stop offset="100%" stopColor="#C96442" stopOpacity="0" />
+                                                            <stop offset="0%" stopColor="#F0FA96" stopOpacity="0.3" />
+                                                            <stop offset="100%" stopColor="#F0FA96" stopOpacity="0" />
                                                         </linearGradient>
                                                     </defs>
-                                                    <path d="M0,35 Q25,28 45,18 T85,8 T100,4" fill="none" stroke="#C96442" strokeWidth="2" strokeLinecap="round" />
+                                                    <path d="M0,35 Q25,28 45,18 T85,8 T100,4" fill="none" stroke="#F0FA96" strokeWidth="2" strokeLinecap="round" />
                                                     <path d="M0,35 Q25,28 45,18 T85,8 T100,4 V40 H0 Z" fill="url(#heroGrad)" />
                                                 </svg>
                                             </div>
@@ -351,7 +351,7 @@ export const LandingPage = ({ user, firebaseUid, isDemo = false, onSignIn, onTry
 
                             {/* Pro */}
                             <div className="bg-surface p-10 rounded-2xl border border-accent shadow-xl shadow-accent/10 flex flex-col relative fade-up">
-                                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-accent text-white px-4 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider whitespace-nowrap">
+                                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-accent text-on-accent px-4 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider whitespace-nowrap">
                                     Most Popular
                                 </div>
                                 <div className="mb-8">
@@ -374,7 +374,7 @@ export const LandingPage = ({ user, firebaseUid, isDemo = false, onSignIn, onTry
                                     import("../../services/paddleService").then(({ openCheckout }) => {
                                         openCheckout(user.email, firebaseUid ?? user.email);
                                     });
-                                }} className="w-full bg-accent text-white py-3 rounded-full text-sm font-medium hover:opacity-88 transition-all">
+                                }} className="w-full bg-accent text-on-accent py-3 rounded-full text-sm font-medium hover:opacity-88 transition-all">
                                     Get Started
                                 </button>
                                 <p className="text-center text-[10px] text-text-3 mt-3">Billed monthly. Cancel anytime.</p>

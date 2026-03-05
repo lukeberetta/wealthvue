@@ -179,12 +179,8 @@ export const NAVChart = ({ navHistory, displayCurrency, fxRates, assets = [], on
 
     const isEmpty = navHistory.length < 2 || chartData.length < 2;
 
-    const isUp = chartData.length >= 2
-        ? chartData[chartData.length - 1].nav >= chartData[0].nav
-        : true;
-
-    const lineColor = isUp ? "var(--color-positive)" : "var(--color-negative)";
-    const gradientId = isUp ? "navGradientUp" : "navGradientDown";
+    const lineColor = "var(--color-text-1)";
+    const gradientId = "navGradientNeutral";
 
     const allValues = chartData.map((d: { nav: number }) => d.nav);
     const minNav = allValues.length > 0 ? Math.min(...allValues) : 0;
@@ -255,13 +251,9 @@ export const NAVChart = ({ navHistory, displayCurrency, fxRates, assets = [], on
                         margin={{ top: 4, right: 4, bottom: 0, left: 0 }}
                     >
                         <defs>
-                            <linearGradient id="navGradientUp" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0%" stopColor="var(--color-positive)" stopOpacity={0.18} />
-                                <stop offset="100%" stopColor="var(--color-positive)" stopOpacity={0} />
-                            </linearGradient>
-                            <linearGradient id="navGradientDown" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0%" stopColor="var(--color-negative)" stopOpacity={0.18} />
-                                <stop offset="100%" stopColor="var(--color-negative)" stopOpacity={0} />
+                            <linearGradient id="navGradientNeutral" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stopColor="var(--color-text-1)" stopOpacity={0.08} />
+                                <stop offset="100%" stopColor="var(--color-text-1)" stopOpacity={0} />
                             </linearGradient>
                         </defs>
 

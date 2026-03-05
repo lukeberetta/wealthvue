@@ -51,11 +51,11 @@ export function getInitials(displayName: string): string {
 }
 
 const AVATAR_PALETTES = [
-  "bg-[#8B6B52] text-[#F0EBE3]",
-  "bg-[#5D6B52] text-[#F0EBE3]",
-  "bg-[#526B6B] text-[#F0EBE3]",
-  "bg-[#6B525D] text-[#F0EBE3]",
-  "bg-[#6B6B52] text-[#F0EBE3]",
+  "bg-[#1E3A5F] text-[#93C5FD]",
+  "bg-[#1E1B4B] text-[#A5B4FC]",
+  "bg-[#134E4A] text-[#6EE7B7]",
+  "bg-[#1A2744] text-[#67E8F9]",
+  "bg-[#1F2937] text-[#9CA3AF]",
 ];
 
 export function avatarPalette(name: string) {

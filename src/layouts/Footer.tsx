@@ -6,7 +6,7 @@ export const Footer = () => (
         <div className="max-w-[1120px] mx-auto px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-3">
 
             <div className="flex items-center gap-2">
-                <span className="font-serif text-sm text-accent font-semibold">WealthVue</span>
+                <span className="font-serif text-sm text-text-1 font-semibold">WealthVue</span>
                 <span className="text-border select-none">·</span>
                 <span className="text-xs text-text-3">© {new Date().getFullYear()}</span>
                 <span className="text-border select-none">·</span>

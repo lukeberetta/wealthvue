@@ -128,7 +128,7 @@ export function FeedbackModal({ isOpen, onClose, user }: FeedbackModalProps) {
                             </div>
                             <button
                                 onClick={handleClose}
-                                className="mt-2 px-5 py-2 bg-accent text-white text-sm font-medium rounded-full hover:bg-accent/90 transition-colors"
+                                className="mt-2 px-5 py-2 bg-accent text-on-accent text-sm font-medium rounded-full hover:bg-accent/90 transition-colors"
                             >
                                 Done
                             </button>
@@ -214,7 +214,7 @@ export function FeedbackModal({ isOpen, onClose, user }: FeedbackModalProps) {
                                 <button
                                     type="submit"
                                     disabled={!message.trim() || status === "sending"}
-                                    className="flex items-center gap-2 px-5 py-2 bg-accent text-white text-sm font-medium rounded-full hover:bg-accent/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                                    className="flex items-center gap-2 px-5 py-2 bg-accent text-on-accent text-sm font-medium rounded-full hover:bg-accent/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                                 >
                                     <Send size={14} />
                                     {status === "sending" ? "Sending…" : "Send Feedback"}

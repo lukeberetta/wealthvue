@@ -81,7 +81,7 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({ isOpen, onClose }) =
 
                     {/* Pro card */}
                     <div className="bg-surface p-8 rounded-2xl border border-accent shadow-xl shadow-accent/10 flex flex-col relative">
-                        <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-accent text-white text-[9px] font-bold uppercase tracking-wider px-4 py-1 rounded-full whitespace-nowrap">
+                        <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-accent text-on-accent text-[9px] font-bold uppercase tracking-wider px-4 py-1 rounded-full whitespace-nowrap">
                             Most Popular
                         </div>
                         <p className="text-[10px] font-bold text-accent uppercase tracking-widest mb-3">Pro</p>

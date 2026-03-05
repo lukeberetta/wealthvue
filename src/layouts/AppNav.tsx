@@ -89,7 +89,7 @@ export function AppNav({
         >
             {/* Demo banner */}
             {isDemo && isOnApp && (
-                <button onClick={onSignIn} className="bg-accent text-white py-2 shrink-0 overflow-hidden w-full cursor-pointer hover:bg-accent/90 transition-colors">
+                <button onClick={onSignIn} className="bg-accent text-on-accent py-2 shrink-0 overflow-hidden w-full cursor-pointer hover:bg-accent/90 transition-colors">
                     <div
                         className="flex whitespace-nowrap text-xs font-bold uppercase tracking-widest"
                         style={{ animation: "ticker 35s linear infinite" }}
@@ -121,10 +121,10 @@ export function AppNav({
                     className="flex items-center gap-2 hover:opacity-80 transition-opacity"
                     aria-label="WealthVue home"
                 >
-                    <div className="w-7 h-7 bg-accent rounded-md flex items-center justify-center">
-                        <span className="text-white font-serif font-bold text-sm leading-none">W</span>
+                    <div className="w-7 h-7 bg-text-1 rounded-md flex items-center justify-center">
+                        <span className="text-bg font-serif font-bold text-sm leading-none">W</span>
                     </div>
-                    <span className="font-serif text-xl font-semibold text-accent tracking-tight hidden sm:block">
+                    <span className="font-serif text-xl font-semibold text-text-1 tracking-tight hidden sm:block">
                         WealthVue
                     </span>
                 </button>
@@ -245,7 +245,7 @@ export function AppNav({
 
                                             {/* Plan badge */}
                                             <div className="px-5 py-2.5 border-b border-border/50">
-                                                <span className="inline-block px-2 py-0.5 bg-accent-light text-accent text-[9px] font-bold rounded-full uppercase tracking-wider">
+                                                <span className="inline-block px-2 py-0.5 bg-surface-3 text-text-2 text-[9px] font-bold rounded-full uppercase tracking-wider">
                                                     {user.plan} Plan
                                                 </span>
                                             </div>

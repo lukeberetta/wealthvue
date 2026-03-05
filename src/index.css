@@ -3,46 +3,48 @@
 /* ============================================================
    FONT IMPORTS
    ============================================================ */
-@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&display=swap");
 
 /* ============================================================
    THEME TOKENS — applied via :root.dark / :root.light
    The `dark` class is the primary, emotional home of the brand.
    ============================================================ */
 
-/* ── DARK MODE (default) ── Anthropic / Claude Code feel */
+/* ── DARK MODE (default) ── editorial minimal */
 :root,
 :root.dark {
-  --color-bg:         #1A1714;   /* warm near-black */
-  --color-surface:    #262119;   /* elevated warm dark */
-  --color-surface-2:  #302A22;   /* second elevation */
-  --color-surface-3:  #3B342B;   /* third elevation / hover */
-  --color-accent:     #C96442;   /* terracotta */
-  --color-accent-light: rgba(201,100,66,0.15);
-  --color-text-1:     #F7F3ED;   /* warm off-white */
-  --color-text-2:     #BDB3A7;   /* warm mid */
-  --color-text-3:     #857A6E;   /* warm muted */
-  --color-border:     #3A342C;   /* subtle warm border */
-  --color-positive:   #6BA07C;   /* muted sage */
-  --color-negative:   #B85E58;   /* muted rose */
-  --color-overlay:    rgba(8,6,4,0.72);
+  --color-bg:           #111111;
+  --color-surface:      #1A1A1A;
+  --color-surface-2:    #222222;
+  --color-surface-3:    #2C2C2C;
+  --color-accent:       #F0FA96;
+  --color-accent-light: rgba(240,250,150,0.10);
+  --color-on-accent:    #111111;
+  --color-text-1:       #F5F5F5;
+  --color-text-2:       #888888;
+  --color-text-3:       #555555;
+  --color-border:       rgba(255,255,255,0.08);
+  --color-positive:     #2DA85C;
+  --color-negative:     #E04E4E;
+  --color-overlay:      rgba(0,0,0,0.80);
 }
 
-/* ── LIGHT MODE ── warm cream reading environment */
+/* ── LIGHT MODE ── warm editorial */
 :root.light {
-  --color-bg:         #F5F1EB;   /* warm cream */
-  --color-surface:    #FDFAF6;   /* warm white surface */
-  --color-surface-2:  #EDE8E0;   /* slightly deeper */
-  --color-surface-3:  #E4DDD3;   /* hover state */
-  --color-accent:     #C96442;   /* same accent, unchanged */
-  --color-accent-light: rgba(201,100,66,0.10);
-  --color-text-1:     #1C1714;   /* warm near-black */
-  --color-text-2:     #5C5249;   /* warm brown-grey */
-  --color-text-3:     #8C837A;   /* warm muted */
-  --color-border:     #DDD7CE;   /* soft warm border */
-  --color-positive:   #3D6B4F;   /* slightly darker sage for light bg */
-  --color-negative:   #8C3F3A;   /* slightly darker rose for light bg */
-  --color-overlay:    rgba(20,16,12,0.55);
+  --color-bg:           #FFFFFF;
+  --color-surface:      #F7F6F2;
+  --color-surface-2:    #EEEDE8;
+  --color-surface-3:    #D8DBE0;
+  --color-accent:       #F0FA96;
+  --color-accent-light: rgba(240,250,150,0.20);
+  --color-on-accent:    #111111;
+  --color-text-1:       #111111;
+  --color-text-2:       #4A4A4A;
+  --color-text-3:       #888888;
+  --color-border:       #E2E0DB;
+  --color-positive:     #1A9448;
+  --color-negative:     #C83C3C;
+  --color-overlay:      rgba(0,0,0,0.55);
 }
 
 /* ============================================================
@@ -50,7 +52,7 @@
    ============================================================ */
 @theme {
   --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
-  --font-serif: "Playfair Display", ui-serif, Georgia, serif;
+  --font-serif: "Inter", ui-sans-serif, system-ui, sans-serif;
 
   --color-bg:          var(--color-bg);
   --color-surface:     var(--color-surface);
@@ -64,6 +66,7 @@
   --color-border:      var(--color-border);
   --color-positive:    var(--color-positive);
   --color-negative:    var(--color-negative);
+  --color-on-accent:   var(--color-on-accent);
 }
 
 /* ============================================================
@@ -94,9 +97,9 @@
   }
 
   h1, h2, h3, h4 {
-    font-family: "Playfair Display", ui-serif, Georgia, serif;
+    font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
     line-height: 1.15;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.02em;
   }
 
   /* Tabular figures for all financial numbers */
@@ -107,7 +110,7 @@
   }
 
   ::selection {
-    background-color: rgba(201,100,66,0.2);
+    background-color: rgba(240,250,150,0.4);
   }
 }
 
@@ -120,18 +123,13 @@
   .card {
     background-color: var(--color-surface);
     border: 1px solid var(--color-border);
-    border-radius: 16px;
-  }
-
-  /* Light mode gets a touch more shadow since there's less contrast */
-  :root.light .card {
-    box-shadow: 0 1px 4px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+    border-radius: 10px;
   }
 
   /* ── Buttons ── */
   .btn-primary {
     background-color: var(--color-accent);
-    color: #fff;
+    color: var(--color-on-accent);
     font-weight: 500;
     padding: 0.75rem 2rem;
     border-radius: 9999px;
@@ -140,8 +138,8 @@
     transition-property: opacity, transform, box-shadow;
   }
   .btn-primary:hover {
-    opacity: 0.88;
-    box-shadow: 0 4px 20px rgba(201,100,66,0.25);
+    opacity: 0.90;
+    box-shadow: 0 4px 24px rgba(240,250,150,0.20);
   }
   .btn-primary:active { transform: scale(0.98); }
   .btn-primary:disabled { opacity: 0.4; pointer-events: none; }
@@ -213,8 +211,8 @@
     color: var(--color-text-1);
   }
   .theme-toggle-btn.active {
-    background-color: var(--color-accent);
-    color: #fff;
+    background-color: var(--color-text-1);
+    color: var(--color-bg);
   }
 }
 
