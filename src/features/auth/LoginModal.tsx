@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Loader2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { Modal } from "../../components/ui/Modal";
 import { useAuth } from "../../contexts/AuthContext";
 
@@ -10,6 +11,7 @@ interface LoginModalProps {
 
 export const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
     const { signInWithGoogle } = useAuth();
+    const navigate = useNavigate();
     const [isSigningIn, setIsSigningIn] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -19,6 +21,7 @@ export const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
         try {
             await signInWithGoogle();
             onClose();
+            navigate("/app");
         } catch (err: unknown) {
             console.error("Google sign-in failed:", err);
             // Don't show an error for user-cancelled popups
