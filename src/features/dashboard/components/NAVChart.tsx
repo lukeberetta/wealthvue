@@ -141,12 +141,12 @@ export const NAVChart = ({ navHistory, displayCurrency, fxRates, onResetTracking
         <div className="bg-surface rounded-2xl p-6">
             {/* Header */}
             {!isEmpty && (
-                <div className="mb-5 flex flex-wrap items-center gap-x-3 gap-y-2">
-                    <h3 className="order-1 flex-1 sm:flex-none text-[10px] font-bold text-text-3 uppercase tracking-widest">
+                <div className="mb-5 flex items-center gap-3">
+                    <h3 className="text-[10px] font-bold text-text-3 uppercase tracking-widest">
                         Net Worth History
                     </h3>
 
-                    <div className="order-2 flex items-center gap-2 w-full sm:w-auto">
+                    <div className="flex items-center gap-2">
                         <span className={cn(
                             "text-[10px] font-bold tabular-nums px-2 py-0.5 rounded-full",
                             isUp ? "text-positive bg-positive/10" : "text-negative bg-negative/10"
