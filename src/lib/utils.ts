@@ -10,15 +10,15 @@ export function formatCurrency(value: number, currency: string) {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: currency || "USD",
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
     }).format(value);
   } catch (e) {
     // Fallback if currency code is invalid
     return new Intl.NumberFormat("en-US", {
       style: "decimal",
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
     }).format(value) + " " + (currency || "USD");
   }
 }
