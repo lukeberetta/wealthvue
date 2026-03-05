@@ -8,7 +8,7 @@ import {
     ResponsiveContainer,
     ReferenceLine,
 } from "recharts";
-import { TrendingUp, RotateCcw } from "lucide-react";
+import { TrendingUp, RotateCcw, ChevronDown } from "lucide-react";
 import { Asset, NAVHistoryEntry } from "../../../types";
 import { convertCurrency } from "../../../lib/fx";
 import { formatCurrencyCompact, cn } from "../../../lib/utils";
@@ -220,19 +220,21 @@ export const NAVChart = ({ navHistory, displayCurrency, fxRates, assets = [], on
                     )}
                 </div>
                 {categoryBreakdown.length > 0 && (
-                    <select
-                        value={selectedCategory}
-                        onChange={e => setSelectedCategory(e.target.value)}
-                        className="text-[11px] font-medium text-text-2 bg-surface-2/60 border border-border rounded-lg px-2 py-1 cursor-pointer hover:bg-surface-2 transition-colors appearance-none pr-5 relative"
-                        style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E")`, backgroundRepeat: "no-repeat", backgroundPosition: "right 6px center" }}
-                    >
-                        <option value="all">All</option>
-                        {categoryBreakdown.map(({ type }) => (
-                            <option key={type} value={type}>
-                                {TYPE_LABELS[type] || type}
-                            </option>
-                        ))}
-                    </select>
+                    <div className="relative">
+                        <select
+                            value={selectedCategory}
+                            onChange={e => setSelectedCategory(e.target.value)}
+                            className="appearance-none bg-surface-2 border border-border rounded-lg px-3 py-1.5 pr-7 text-xs font-bold text-text-1 focus:outline-none focus:ring-2 focus:ring-accent/20"
+                        >
+                            <option value="all">All</option>
+                            {categoryBreakdown.map(({ type }) => (
+                                <option key={type} value={type}>
+                                    {TYPE_LABELS[type] || type}
+                                </option>
+                            ))}
+                        </select>
+                        <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-text-3" size={12} />
+                    </div>
                 )}
             </div>
 
