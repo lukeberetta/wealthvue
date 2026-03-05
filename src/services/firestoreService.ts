@@ -194,6 +194,7 @@ export async function saveNAVSnapshot(
         date: entry.date,
         totalNAV: entry.totalNAV,
         displayCurrency: entry.displayCurrency,
+        ...(entry.categoryBreakdown && { categoryBreakdown: entry.categoryBreakdown }),
         recordedAt: serverTimestamp(),
     });
 }
