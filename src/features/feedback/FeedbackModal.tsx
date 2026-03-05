@@ -101,7 +101,7 @@ export function FeedbackModal({ isOpen, onClose, user }: FeedbackModalProps) {
                 <div className="flex items-center justify-between px-6 py-5 border-b border-border">
                     <div className="flex items-center gap-2.5">
                         <MessageSquare size={18} className="text-accent" />
-                        <h3 className="text-base font-semibold text-text-1">Send Feedback</h3>
+                        <h3 className="text-base font-normal text-text-1">Send Feedback</h3>
                     </div>
                     <button
                         onClick={handleClose}
@@ -123,12 +123,12 @@ export function FeedbackModal({ isOpen, onClose, user }: FeedbackModalProps) {
                                 <CheckCircle size={28} className="text-positive" />
                             </div>
                             <div>
-                                <p className="text-base font-semibold text-text-1 mb-1">Thanks for the feedback!</p>
+                                <p className="text-base font-normal text-text-1 mb-1">Thanks for the feedback!</p>
                                 <p className="text-sm text-text-3">We read every submission and use it to make WealthVue better.</p>
                             </div>
                             <button
                                 onClick={handleClose}
-                                className="mt-2 px-5 py-2 bg-accent text-on-accent text-sm font-medium rounded-full hover:bg-accent/90 transition-colors"
+                                className="mt-2 px-5 py-2 bg-accent text-on-accent text-sm font-normal rounded-full hover:bg-accent/90 transition-colors"
                             >
                                 Done
                             </button>
@@ -137,7 +137,7 @@ export function FeedbackModal({ isOpen, onClose, user }: FeedbackModalProps) {
                         <form onSubmit={handleSubmit} className="space-y-5">
                             {/* Type selector */}
                             <div>
-                                <label className="block text-xs font-semibold text-text-3 uppercase tracking-wider mb-3">
+                                <label className="block text-xs font-normal text-text-3 uppercase tracking-wider mb-3">
                                     Type
                                 </label>
                                 <div className="grid grid-cols-3 gap-2">
@@ -154,7 +154,7 @@ export function FeedbackModal({ isOpen, onClose, user }: FeedbackModalProps) {
                                             )}
                                         >
                                             <span className={cn(
-                                                "text-xs font-semibold",
+                                                "text-xs font-normal",
                                                 type === t.value ? "text-accent" : "text-text-1"
                                             )}>
                                                 {t.label}
@@ -168,7 +168,7 @@ export function FeedbackModal({ isOpen, onClose, user }: FeedbackModalProps) {
                             {/* From — read-only display */}
                             {user && (
                                 <div>
-                                    <label className="block text-xs font-semibold text-text-3 uppercase tracking-wider mb-2">
+                                    <label className="block text-xs font-normal text-text-3 uppercase tracking-wider mb-2">
                                         From
                                     </label>
                                     <div className="bg-surface-2 border border-border rounded-xl px-4 py-2.5 text-sm text-text-2">
@@ -179,7 +179,7 @@ export function FeedbackModal({ isOpen, onClose, user }: FeedbackModalProps) {
 
                             {/* Message */}
                             <div>
-                                <label className="block text-xs font-semibold text-text-3 uppercase tracking-wider mb-2">
+                                <label className="block text-xs font-normal text-text-3 uppercase tracking-wider mb-2">
                                     Message
                                 </label>
                                 <textarea
@@ -214,7 +214,7 @@ export function FeedbackModal({ isOpen, onClose, user }: FeedbackModalProps) {
                                 <button
                                     type="submit"
                                     disabled={!message.trim() || status === "sending"}
-                                    className="flex items-center gap-2 px-5 py-2 bg-accent text-on-accent text-sm font-medium rounded-full hover:bg-accent/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                                    className="flex items-center gap-2 px-5 py-2 bg-accent text-on-accent text-sm font-normal rounded-full hover:bg-accent/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                                 >
                                     <Send size={14} />
                                     {status === "sending" ? "Sending…" : "Send Feedback"}

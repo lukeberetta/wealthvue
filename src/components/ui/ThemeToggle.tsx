@@ -26,7 +26,7 @@ export function ThemeToggle({ variant = "compact" }: ThemeToggleProps) {
                         <button
                             key={m.value}
                             onClick={() => setTheme(m.value)}
-                            className={cn("theme-toggle-btn flex-1 gap-1.5 text-xs font-medium whitespace-nowrap", mode === m.value && "active")}
+                            className={cn("theme-toggle-btn flex-1 gap-1.5 text-xs font-normal whitespace-nowrap", mode === m.value && "active")}
                             style={{ width: "auto", paddingLeft: 10, paddingRight: 10 }}
                             aria-pressed={mode === m.value}
                             title={m.label}

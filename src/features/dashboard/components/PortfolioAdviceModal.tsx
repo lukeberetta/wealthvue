@@ -288,7 +288,7 @@ export const PortfolioAdviceModal = ({
                         >
                             {/* Summary */}
                             <div>
-                                <p className="text-[10px] font-bold text-text-3 uppercase tracking-widest mb-3">Summary</p>
+                                <p className="text-[10px] font-normal text-text-3 uppercase tracking-widest mb-3">Summary</p>
                                 <p className="text-sm text-text-1 leading-relaxed">{result.summary}</p>
                             </div>
 
@@ -296,7 +296,7 @@ export const PortfolioAdviceModal = ({
 
                             {/* Advice */}
                             <div>
-                                <p className="text-[10px] font-bold text-text-3 uppercase tracking-widest mb-4">What to focus on</p>
+                                <p className="text-[10px] font-normal text-text-3 uppercase tracking-widest mb-4">What to focus on</p>
                                 <ul className="space-y-3">
                                     {result.advice.map((item, i) => (
                                         <li key={i} className="flex items-start gap-3">

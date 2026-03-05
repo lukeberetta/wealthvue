@@ -65,11 +65,11 @@ function CustomTooltip({ active, payload, displayCurrency }: any) {
     return (
         <div className="bg-surface border border-border rounded-xl px-3.5 py-2.5 shadow-lg text-left min-w-[160px]">
             <p className="text-[10px] text-text-3 mb-1">{date}</p>
-            <p className="text-sm font-bold tabular-nums text-text-1">
+            <p className="text-sm font-normal tabular-nums text-text-1">
                 {formatCurrencyCompact(nav, displayCurrency)}
             </p>
             {change !== null && (
-                <p className={cn("text-[11px] tabular-nums font-medium mt-0.5", isPositive ? "text-positive" : "text-negative")}>
+                <p className={cn("text-[11px] tabular-nums font-normal mt-0.5", isPositive ? "text-positive" : "text-negative")}>
                     {isPositive ? "+" : ""}{formatCurrencyCompact(change, displayCurrency)}{" "}
                     ({isPositive ? "+" : ""}{changePct.toFixed(2)}%)
                 </p>
@@ -203,12 +203,12 @@ export const NAVChart = ({ navHistory, displayCurrency, fxRates, assets = [], on
             {/* Header */}
             <div className="mb-5 flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
-                    <h3 className="text-[10px] font-bold text-text-3 uppercase tracking-widest">
+                    <h3 className="text-[10px] font-normal text-text-3 uppercase tracking-widest">
                         Net Worth History
                     </h3>
                     {activeChangePct !== null && (
                         <span className={cn(
-                            "text-[10px] font-bold tabular-nums px-2 py-0.5 rounded-full",
+                            "text-[10px] font-normal tabular-nums px-2 py-0.5 rounded-full",
                             activeIsUp ? "text-positive bg-positive/10" : "text-negative bg-negative/10"
                         )}>
                             {activeIsUp ? "+" : ""}{activeChangePct.toFixed(2)}%
@@ -220,7 +220,7 @@ export const NAVChart = ({ navHistory, displayCurrency, fxRates, assets = [], on
                         <select
                             value={selectedCategory}
                             onChange={e => setSelectedCategory(e.target.value)}
-                            className="appearance-none bg-surface-2 border border-border rounded-lg px-3 py-1.5 pr-7 text-xs font-bold text-text-1 focus:outline-none focus:ring-2 focus:ring-accent/20"
+                            className="appearance-none bg-surface-2 border border-border rounded-lg px-3 py-1.5 pr-7 text-xs font-normal text-text-1 focus:outline-none focus:ring-2 focus:ring-accent/20"
                         >
                             <option value="all">All</option>
                             {categoryBreakdown.map(({ type }) => (
@@ -238,7 +238,7 @@ export const NAVChart = ({ navHistory, displayCurrency, fxRates, assets = [], on
             {isEmpty ? (
                 <div className="h-[200px] flex flex-col items-center justify-center text-center bg-surface-2/30 rounded-2xl border border-dashed border-border">
                     <TrendingUp className="text-text-3/30 mb-3" size={28} />
-                    <p className="text-xs text-text-3 font-medium">
+                    <p className="text-xs text-text-3 font-normal">
                         {navHistory.length < 2
                             ? "History builds up over time — check back tomorrow"
                             : `No data for this period`}
@@ -320,7 +320,7 @@ export const NAVChart = ({ navHistory, displayCurrency, fxRates, assets = [], on
                             <button
                                 onClick={handleResetClick}
                                 disabled={isResetting}
-                                className="text-[10px] font-bold text-negative hover:text-negative/80 transition-colors disabled:opacity-40"
+                                className="text-[10px] font-normal text-negative hover:text-negative/80 transition-colors disabled:opacity-40"
                             >
                                 {isResetting ? "Resetting…" : "Yes, reset"}
                             </button>

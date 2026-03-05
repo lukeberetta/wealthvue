@@ -211,7 +211,7 @@ export const Dashboard = ({ user, isDemo, isAuthLoading = false, onSignIn, onSig
                 <div className="space-y-5">
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                         <div className="flex-1">
-                            <p className="text-[10px] font-bold text-text-3 uppercase tracking-[0.22em] mb-3">
+                            <p className="text-[10px] font-normal text-text-3 uppercase tracking-[0.22em] mb-3">
                                 Total Net Worth
                             </p>
                             <h2 className="text-[clamp(1.5rem,9vw,4.5rem)] md:text-7xl font-serif tabular-nums text-text-1 leading-none">
@@ -226,7 +226,7 @@ export const Dashboard = ({ user, isDemo, isAuthLoading = false, onSignIn, onSig
                                             key={p}
                                             onClick={isDemo ? onSignIn : () => setChangePeriod(p)}
                                             className={cn(
-                                                "px-3 py-1 rounded-full text-xs font-bold transition-all duration-200",
+                                                "px-3 py-1 rounded-full text-xs font-normal transition-all duration-200",
                                                 changePeriod === p
                                                     ? "bg-surface text-text-1 shadow-sm"
                                                     : "text-text-3 hover:text-text-2"
@@ -237,7 +237,7 @@ export const Dashboard = ({ user, isDemo, isAuthLoading = false, onSignIn, onSig
 
                                 <div className="flex items-center gap-2 min-w-0">
                                     <div className={cn(
-                                        "flex items-center gap-1 px-2.5 py-1 rounded-full text-sm font-medium shrink-0",
+                                        "flex items-center gap-1 px-2.5 py-1 rounded-full text-sm font-normal shrink-0",
                                         change >= 0 ? "bg-positive/10 text-positive" : "bg-negative/10 text-negative"
                                     )}>
                                         {change >= 0 ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
@@ -289,7 +289,7 @@ export const Dashboard = ({ user, isDemo, isAuthLoading = false, onSignIn, onSig
                                 />
                                 <button
                                     onClick={submitGoal}
-                                    className="flex items-center gap-1 bg-accent text-on-accent rounded-lg px-3 py-1.5 text-xs font-bold hover:bg-accent/90 transition-colors"
+                                    className="flex items-center gap-1 bg-accent text-on-accent rounded-lg px-3 py-1.5 text-xs font-normal hover:bg-accent/90 transition-colors"
                                 >
                                     <Check size={12} /> Save
                                 </button>
@@ -335,7 +335,7 @@ export const Dashboard = ({ user, isDemo, isAuthLoading = false, onSignIn, onSig
                                                     <p className="text-xs text-text-3 tabular-nums">
                                                         {formatCurrencyCompact(totalNAV, displayCurrency)} of {formatCurrencyCompact(convertedTarget, displayCurrency)}
                                                         {' '}
-                                                        <span className="text-text-2 font-medium">({(progress * 100).toFixed(1)}%)</span>
+                                                        <span className="text-text-2 font-normal">({(progress * 100).toFixed(1)}%)</span>
                                                         {remaining > 0 && (
                                                             <> · {formatCurrencyCompact(remaining, displayCurrency)} to go</>
                                                         )}
@@ -391,7 +391,7 @@ export const Dashboard = ({ user, isDemo, isAuthLoading = false, onSignIn, onSig
                                     key={p}
                                     onClick={() => setNavPeriod(p)}
                                     className={cn(
-                                        "px-3 py-1 rounded-full text-xs font-bold transition-all duration-200",
+                                        "px-3 py-1 rounded-full text-xs font-normal transition-all duration-200",
                                         navPeriod === p
                                             ? "bg-surface text-text-1 shadow-sm"
                                             : "text-text-3 hover:text-text-2"
@@ -446,7 +446,7 @@ export const Dashboard = ({ user, isDemo, isAuthLoading = false, onSignIn, onSig
                 {/* Mobile FAB — sticky so it stays above the footer */}
                 <div className="md:hidden sticky bottom-4 flex justify-center pointer-events-none">
                     <motion.button
-                        className="pointer-events-auto w-fit z-40 flex items-center h-12 bg-accent text-on-accent rounded-full px-5 text-sm font-semibold shadow-lg shadow-accent/30"
+                        className="pointer-events-auto w-fit z-40 flex items-center h-12 bg-accent text-on-accent rounded-full px-5 text-sm font-normal shadow-lg shadow-accent/30"
                         onClick={isDemo ? onSignIn : () => guard(() => setIsAddModalOpen(true))}
                         whileTap={{ scale: 0.95 }}
                         aria-label="Add Asset"

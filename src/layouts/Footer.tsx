@@ -6,7 +6,7 @@ export const Footer = () => (
         <div className="max-w-[1120px] mx-auto px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-3">
 
             <div className="flex items-center gap-2">
-                <span className="font-serif text-sm text-text-1 font-semibold">WealthVue</span>
+                <span className="font-serif text-sm text-text-1 font-normal">WealthVue</span>
                 <span className="text-border select-none">·</span>
                 <span className="text-xs text-text-3">© {new Date().getFullYear()}</span>
                 <span className="text-border select-none">·</span>
@@ -24,7 +24,7 @@ export const Footer = () => (
                 className="group flex items-center gap-1.5 text-xs text-text-3 hover:text-text-1 transition-colors duration-200"
             >
                 <span>Vibe coded by</span>
-                <span className="font-medium text-text-2 group-hover:text-accent transition-colors duration-200">
+                <span className="font-normal text-text-2 group-hover:text-accent transition-colors duration-200">
                     Luke Beretta
                 </span>
                 <svg

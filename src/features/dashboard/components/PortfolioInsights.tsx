@@ -209,17 +209,17 @@ export const PortfolioInsights = ({ assets, displayCurrency, fxRates, onOpenAdvi
         return (
             <div className="grid lg:grid-cols-5 gap-6">
                 <div className="lg:col-span-3 bg-surface rounded-2xl p-6">
-                    <h3 className="text-[10px] font-bold text-text-3 uppercase tracking-widest mb-6">Allocation</h3>
+                    <h3 className="text-[10px] font-normal text-text-3 uppercase tracking-widest mb-6">Allocation</h3>
                     <div className="h-[220px] flex flex-col items-center justify-center text-center bg-surface-2/30 rounded-2xl border border-dashed border-border">
                         <PieChart className="text-text-3/30 mb-4" size={28} />
-                        <p className="text-xs text-text-3 font-medium">No data to show</p>
+                        <p className="text-xs text-text-3 font-normal">No data to show</p>
                     </div>
                 </div>
                 <div className="lg:col-span-2 bg-surface rounded-2xl p-6">
-                    <h3 className="text-[10px] font-bold text-text-3 uppercase tracking-widest mb-6">Portfolio Profile</h3>
+                    <h3 className="text-[10px] font-normal text-text-3 uppercase tracking-widest mb-6">Portfolio Profile</h3>
                     <div className="h-[220px] flex flex-col items-center justify-center text-center bg-surface-2/30 rounded-2xl border border-dashed border-border">
                         <Sparkles className="text-text-3/30 mb-4" size={28} />
-                        <p className="text-xs text-text-3 font-medium">Add assets to reveal your profile</p>
+                        <p className="text-xs text-text-3 font-normal">Add assets to reveal your profile</p>
                     </div>
                 </div>
             </div>
@@ -234,14 +234,14 @@ export const PortfolioInsights = ({ assets, displayCurrency, fxRates, onOpenAdvi
             {/* ── Left: Allocation Breakdown ── */}
             <div className="lg:col-span-3 bg-surface rounded-2xl p-6">
                 <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-[10px] font-bold text-text-3 uppercase tracking-widest">Allocation</h3>
+                    <h3 className="text-[10px] font-normal text-text-3 uppercase tracking-widest">Allocation</h3>
                     <div className="flex items-center gap-0.5 bg-surface-2 rounded-full p-0.5">
                         {(["type", "account"] as const).map(t => (
                             <button
                                 key={t}
                                 onClick={() => { setTab(t); setActiveIndex(null); }}
                                 className={cn(
-                                    "px-2.5 py-1 rounded-full text-[10px] font-bold transition-all duration-200",
+                                    "px-2.5 py-1 rounded-full text-[10px] font-normal transition-all duration-200",
                                     tab === t
                                         ? "bg-surface text-text-1 shadow-sm"
                                         : "text-text-3 hover:text-text-2"
@@ -303,12 +303,12 @@ export const PortfolioInsights = ({ assets, displayCurrency, fxRates, onOpenAdvi
                                         className="text-center"
                                     >
                                         <div
-                                            className="text-xl font-bold tabular-nums leading-none"
+                                            className="text-xl font-normal tabular-nums leading-none"
                                             style={{ color: getColor(activeEntry.name) }}
                                         >
                                             {(displayPct[activeEntry.name] || 0).toFixed(0)}%
                                         </div>
-                                        <div className="text-[9px] text-text-3 font-medium mt-1 leading-tight max-w-[72px] text-center">
+                                        <div className="text-[9px] text-text-3 font-normal mt-1 leading-tight max-w-[72px] text-center">
                                             {getLabel(activeEntry.name)}
                                         </div>
                                     </motion.div>
@@ -321,10 +321,10 @@ export const PortfolioInsights = ({ assets, displayCurrency, fxRates, onOpenAdvi
                                         transition={{ duration: 0.15 }}
                                         className="text-center"
                                     >
-                                        <div className="text-lg font-bold text-text-1 tabular-nums leading-none">
+                                        <div className="text-lg font-normal text-text-1 tabular-nums leading-none">
                                             {displayData.length}
                                         </div>
-                                        <div className="text-[9px] text-text-3 font-medium mt-1">
+                                        <div className="text-[9px] text-text-3 font-normal mt-1">
                                             {tab === "type"
                                                 ? (displayData.length === 1 ? "class" : "classes")
                                                 : (displayData.length === 1 ? "account" : "accounts")}
@@ -360,7 +360,7 @@ export const PortfolioInsights = ({ assets, displayCurrency, fxRates, onOpenAdvi
                                                 }}
                                             />
                                             <span className={cn(
-                                                "font-semibold transition-colors duration-150",
+                                                "font-normal transition-colors duration-150",
                                                 isActive ? "text-text-1" : "text-text-2"
                                             )}>
                                                 {getLabel(entry.name)}
@@ -369,7 +369,7 @@ export const PortfolioInsights = ({ assets, displayCurrency, fxRates, onOpenAdvi
                                         <div className="flex items-center gap-3 tabular-nums">
                                             <span className="text-text-3">{p.toFixed(1)}%</span>
                                             <span className={cn(
-                                                "font-bold transition-colors duration-150",
+                                                "font-normal transition-colors duration-150",
                                                 isActive ? "text-text-1" : "text-text-2"
                                             )}>
                                                 {formatCurrency(entry.value, displayCurrency)}
@@ -397,11 +397,11 @@ export const PortfolioInsights = ({ assets, displayCurrency, fxRates, onOpenAdvi
                                     <div className="flex items-center justify-between text-[11px]">
                                         <div className="flex items-center gap-2">
                                             <div className="w-2 h-2 rounded-full shrink-0 bg-negative/60" />
-                                            <span className="font-semibold text-text-1">Liabilities</span>
+                                            <span className="font-normal text-text-1">Liabilities</span>
                                         </div>
                                         <div className="flex items-center gap-3 tabular-nums">
                                             <span className="text-text-3">{liabPct.toFixed(1)}%</span>
-                                            <span className="font-bold text-negative">
+                                            <span className="font-normal text-negative">
                                                 {formatCurrency(totalLiabilities, displayCurrency)}
                                             </span>
                                         </div>
@@ -435,12 +435,12 @@ export const PortfolioInsights = ({ assets, displayCurrency, fxRates, onOpenAdvi
                 const liquidity = getLiquidityScore(pct);
                 return (
                     <div className="lg:col-span-2 bg-surface rounded-2xl p-6 flex flex-col min-h-[320px]">
-                        <h3 className="text-[10px] font-bold text-text-3 uppercase tracking-widest mb-5">Portfolio Profile</h3>
+                        <h3 className="text-[10px] font-normal text-text-3 uppercase tracking-widest mb-5">Portfolio Profile</h3>
 
                         {/* Archetype identity */}
                         <div>
                             <div className="inline-flex items-center bg-surface-2 border border-border rounded-full px-3 py-0.5 mb-3">
-                                <span className="text-[10px] font-bold text-text-3 uppercase tracking-widest">Investor Type</span>
+                                <span className="text-[10px] font-normal text-text-3 uppercase tracking-widest">Investor Type</span>
                             </div>
 
                             <motion.h2
@@ -459,8 +459,8 @@ export const PortfolioInsights = ({ assets, displayCurrency, fxRates, onOpenAdvi
                         <div className="space-y-4 mt-4 mb-4">
                             <div>
                                 <div className="flex items-center justify-between mb-2">
-                                    <p className="text-[10px] font-bold text-text-3 uppercase tracking-widest">Risk Level</p>
-                                    <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: risk.color }}>{risk.label}</span>
+                                    <p className="text-[10px] font-normal text-text-3 uppercase tracking-widest">Risk Level</p>
+                                    <span className="text-[10px] font-normal uppercase tracking-widest" style={{ color: risk.color }}>{risk.label}</span>
                                 </div>
                                 <div className="h-1.5 bg-surface-2 rounded-full overflow-hidden">
                                     <motion.div
@@ -474,8 +474,8 @@ export const PortfolioInsights = ({ assets, displayCurrency, fxRates, onOpenAdvi
                             </div>
                             <div>
                                 <div className="flex items-center justify-between mb-2">
-                                    <p className="text-[10px] font-bold text-text-3 uppercase tracking-widest">Diversification</p>
-                                    <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: diversification.color }}>{diversification.label}</span>
+                                    <p className="text-[10px] font-normal text-text-3 uppercase tracking-widest">Diversification</p>
+                                    <span className="text-[10px] font-normal uppercase tracking-widest" style={{ color: diversification.color }}>{diversification.label}</span>
                                 </div>
                                 <div className="h-1.5 bg-surface-2 rounded-full overflow-hidden">
                                     <motion.div
@@ -489,8 +489,8 @@ export const PortfolioInsights = ({ assets, displayCurrency, fxRates, onOpenAdvi
                             </div>
                             <div>
                                 <div className="flex items-center justify-between mb-2">
-                                    <p className="text-[10px] font-bold text-text-3 uppercase tracking-widest">Liquidity</p>
-                                    <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: liquidity.color }}>{liquidity.label}</span>
+                                    <p className="text-[10px] font-normal text-text-3 uppercase tracking-widest">Liquidity</p>
+                                    <span className="text-[10px] font-normal uppercase tracking-widest" style={{ color: liquidity.color }}>{liquidity.label}</span>
                                 </div>
                                 <div className="h-1.5 bg-surface-2 rounded-full overflow-hidden">
                                     <motion.div
@@ -506,7 +506,7 @@ export const PortfolioInsights = ({ assets, displayCurrency, fxRates, onOpenAdvi
 
                         <button
                             onClick={onOpenAdvice}
-                            className="mt-auto w-full flex items-center justify-center gap-2 bg-surface-2 hover:bg-surface-2/80 text-text-1 rounded-xl py-3 px-4 text-sm font-medium transition-colors"
+                            className="mt-auto w-full flex items-center justify-center gap-2 bg-surface-2 hover:bg-surface-2/80 text-text-1 rounded-xl py-3 px-4 text-sm font-normal transition-colors"
                         >
                             <Sparkles size={15} className="text-text-2" />
                             Analyse Portfolio

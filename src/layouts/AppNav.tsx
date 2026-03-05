@@ -91,7 +91,7 @@ export function AppNav({
             {isDemo && isOnApp && (
                 <button onClick={onSignIn} className="bg-accent text-on-accent py-2 shrink-0 overflow-hidden w-full cursor-pointer hover:bg-accent/90 transition-colors">
                     <div
-                        className="flex whitespace-nowrap text-xs font-bold uppercase tracking-widest"
+                        className="flex whitespace-nowrap text-xs font-normal uppercase tracking-widest"
                         style={{ animation: "ticker 35s linear infinite" }}
                     >
                         {[0, 1].map(i => (
@@ -122,9 +122,9 @@ export function AppNav({
                     aria-label="WealthVue home"
                 >
                     <div className="w-7 h-7 bg-text-1 rounded-md flex items-center justify-center">
-                        <span className="text-bg font-serif font-bold text-sm leading-none">W</span>
+                        <span className="text-bg font-serif font-normal text-sm leading-none">W</span>
                     </div>
-                    <span className="font-serif text-xl font-semibold text-text-1 tracking-tight hidden sm:block">
+                    <span className="font-serif text-xl font-normal text-text-1 tracking-tight hidden sm:block">
                         WealthVue
                     </span>
                 </button>
@@ -136,7 +136,7 @@ export function AppNav({
                     {isOnApp && (
                         <button
                             onClick={() => navigate("/")}
-                            className="hidden sm:flex items-center gap-1.5 text-xs font-medium text-text-3 hover:text-text-1 transition-colors px-3 py-1.5 rounded-full hover:bg-surface-2 border border-transparent hover:border-border"
+                            className="hidden sm:flex items-center gap-1.5 text-xs font-normal text-text-3 hover:text-text-1 transition-colors px-3 py-1.5 rounded-full hover:bg-surface-2 border border-transparent hover:border-border"
                         >
                             <Globe size={13} />
                             Website
@@ -151,7 +151,7 @@ export function AppNav({
                                     navigate("/app");
                                 }
                             }}
-                            className="hidden sm:flex items-center gap-1.5 text-xs font-medium text-text-3 hover:text-text-1 transition-colors px-3 py-1.5 rounded-full hover:bg-surface-2 border border-transparent hover:border-border"
+                            className="hidden sm:flex items-center gap-1.5 text-xs font-normal text-text-3 hover:text-text-1 transition-colors px-3 py-1.5 rounded-full hover:bg-surface-2 border border-transparent hover:border-border"
                         >
                             <LayoutDashboard size={13} />
                             Dashboard
@@ -170,7 +170,7 @@ export function AppNav({
                                 <select
                                     value={displayCurrency}
                                     onChange={e => onDisplayCurrencyChange(e.target.value)}
-                                    className="appearance-none bg-surface-2 border border-border rounded-full pl-3 pr-8 py-1.5 text-xs font-bold text-text-1 focus:outline-none focus:ring-2 focus:ring-accent/20 cursor-pointer"
+                                    className="appearance-none bg-surface-2 border border-border rounded-full pl-3 pr-8 py-1.5 text-xs font-normal text-text-1 focus:outline-none focus:ring-2 focus:ring-accent/20 cursor-pointer"
                                     aria-label="Display currency"
                                 >
                                     {Object.keys(fxRates).sort().map(c => (
@@ -206,7 +206,7 @@ export function AppNav({
                                 aria-haspopup="true"
                             >
                                 <div className={cn(
-                                    "w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold tracking-wide shrink-0",
+                                    "w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-normal tracking-wide shrink-0",
                                     palette
                                 )}>
                                     {initials}
@@ -232,20 +232,20 @@ export function AppNav({
                                             {/* User info */}
                                             <div className="px-5 py-4 border-b border-border bg-surface-2/30 flex items-center gap-3">
                                                 <div className={cn(
-                                                    "w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold shrink-0",
+                                                    "w-9 h-9 rounded-full flex items-center justify-center text-sm font-normal shrink-0",
                                                     palette
                                                 )}>
                                                     {initials}
                                                 </div>
                                                 <div className="min-w-0">
-                                                    <p className="text-sm font-medium text-text-1 truncate">{user.displayName}</p>
+                                                    <p className="text-sm font-normal text-text-1 truncate">{user.displayName}</p>
                                                     <p className="text-[11px] text-text-3 truncate">{user.email}</p>
                                                 </div>
                                             </div>
 
                                             {/* Plan badge */}
                                             <div className="px-5 py-2.5 border-b border-border/50">
-                                                <span className="inline-block px-2 py-0.5 bg-surface-3 text-text-2 text-[9px] font-bold rounded-full uppercase tracking-wider">
+                                                <span className="inline-block px-2 py-0.5 bg-surface-3 text-text-2 text-[9px] font-normal rounded-full uppercase tracking-wider">
                                                     {user.plan} Plan
                                                 </span>
                                             </div>

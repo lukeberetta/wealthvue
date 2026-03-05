@@ -70,7 +70,7 @@ export const AssetList = ({
         return (
             <div className="flex flex-col items-center justify-center text-center py-16 bg-surface-2/30 rounded-2xl border border-dashed border-border">
                 <Sparkles className="text-text-3/30 mb-3" size={24} />
-                <p className="text-xs text-text-3 font-medium mb-5">No assets yet</p>
+                <p className="text-xs text-text-3 font-normal mb-5">No assets yet</p>
                 <Button onClick={onAddAsset} className="flex items-center gap-2 rounded-full px-6 py-2 text-sm">
                     <Plus size={15} />
                     Add Your First Asset
@@ -167,7 +167,7 @@ export const AssetList = ({
                         <select
                             value={accountFilter ?? ''}
                             onChange={e => setAccountFilter(e.target.value || null)}
-                            className="appearance-none bg-surface-2 border border-border rounded-lg px-3 py-1.5 pr-7 text-xs font-bold text-text-1 focus:outline-none focus:ring-2 focus:ring-accent/20"
+                            className="appearance-none bg-surface-2 border border-border rounded-lg px-3 py-1.5 pr-7 text-xs font-normal text-text-1 focus:outline-none focus:ring-2 focus:ring-accent/20"
                         >
                             <option value="">All accounts</option>
                             {presentAccounts.map(account => (
@@ -183,7 +183,7 @@ export const AssetList = ({
                     <select
                         value={sortBy}
                         onChange={e => onSortChange(e.target.value as 'value_desc' | 'value_asc' | 'name_asc')}
-                        className="appearance-none bg-surface-2 border border-border rounded-lg px-3 py-1.5 pr-7 text-xs font-bold text-text-1 focus:outline-none focus:ring-2 focus:ring-accent/20"
+                        className="appearance-none bg-surface-2 border border-border rounded-lg px-3 py-1.5 pr-7 text-xs font-normal text-text-1 focus:outline-none focus:ring-2 focus:ring-accent/20"
                     >
                         <option value="value_desc">High to Low</option>
                         <option value="value_asc">Low to High</option>
@@ -196,7 +196,7 @@ export const AssetList = ({
                 {selectedAssetIds.length > 0 && onBulkDelete && (
                     <button
                         onClick={onBulkDelete}
-                        className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-negative bg-negative/10 hover:bg-negative/20 transition-all"
+                        className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-normal text-negative bg-negative/10 hover:bg-negative/20 transition-all"
                     >
                         <Trash2 size={12} />
                         <span className="hidden sm:inline">Delete </span>({selectedAssetIds.length})
@@ -215,11 +215,11 @@ export const AssetList = ({
 
             {/* Column headers */}
             <div className="flex items-center gap-3 pb-2 px-3">
-                <span className="flex-1 text-[9px] font-bold text-text-3 uppercase tracking-widest">Asset</span>
-                <span className="hidden sm:block text-[9px] font-bold text-text-3 uppercase tracking-widest w-24 text-right">Account</span>
-                <span className="hidden sm:block text-[9px] font-bold text-text-3 uppercase tracking-widest w-16 text-right">Source</span>
+                <span className="flex-1 text-[9px] font-normal text-text-3 uppercase tracking-widest">Asset</span>
+                <span className="hidden sm:block text-[9px] font-normal text-text-3 uppercase tracking-widest w-24 text-right">Account</span>
+                <span className="hidden sm:block text-[9px] font-normal text-text-3 uppercase tracking-widest w-16 text-right">Source</span>
                 <span className="hidden sm:block w-6 shrink-0" />
-                <span className="text-[9px] font-bold text-text-3 uppercase tracking-widest text-right w-32">Value</span>
+                <span className="text-[9px] font-normal text-text-3 uppercase tracking-widest text-right w-32">Value</span>
             </div>
 
             {filteredAssets.length === 0 ? (
@@ -238,12 +238,12 @@ export const AssetList = ({
                                 "flex items-center justify-between px-3 py-2 rounded-lg bg-surface-2/60",
                                 groupIndex > 0 && "mt-4"
                             )}>
-                                <span className="flex items-center gap-1.5 text-[9px] font-bold text-text-2 uppercase tracking-widest">
+                                <span className="flex items-center gap-1.5 text-[9px] font-normal text-text-2 uppercase tracking-widest">
                                     {getTypeIcon(type)}
                                     {TYPE_LABELS[type] ?? type}
                                 </span>
                                 <span className={cn(
-                                    "text-[9px] font-bold tabular-nums",
+                                    "text-[9px] font-normal tabular-nums",
                                     typeTotal < 0 ? "text-negative" : "text-text-2"
                                 )}>
                                     {formatCurrency(typeTotal, displayCurrency)}

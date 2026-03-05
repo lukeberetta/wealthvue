@@ -21,18 +21,18 @@ export const PrivacyPage = () => {
             </header>
 
             <main className="flex-1 max-w-[760px] mx-auto px-6 py-16 w-full">
-                <h1 className="font-serif text-4xl font-bold mb-3">Privacy Policy</h1>
+                <h1 className="font-serif text-4xl font-normal mb-3">Privacy Policy</h1>
                 <p className="text-sm text-text-3 mb-12">Last updated: March 2026</p>
 
                 <div className="prose prose-sm max-w-none space-y-10 text-text-2 leading-relaxed">
 
                     <section className="space-y-3">
-                        <h2 className="font-serif text-xl font-semibold text-text-1">1. Overview</h2>
+                        <h2 className="font-serif text-xl font-normal text-text-1">1. Overview</h2>
                         <p>WealthVue ("we", "us", "our") respects your privacy. This policy explains what data we collect, how we use it, and your rights regarding that data.</p>
                     </section>
 
                     <section className="space-y-3">
-                        <h2 className="font-serif text-xl font-semibold text-text-1">2. Data We Collect</h2>
+                        <h2 className="font-serif text-xl font-normal text-text-1">2. Data We Collect</h2>
                         <p><strong className="text-text-1">Account information:</strong> When you sign in with Google, we receive your name, email address, and profile photo from your Google account.</p>
                         <p><strong className="text-text-1">Portfolio data:</strong> Asset names, values, quantities, types, and any descriptions you enter. This data is stored in your private account and is never shared with other users.</p>
                         <p><strong className="text-text-1">Usage data:</strong> We collect basic analytics (page views, feature usage) via Firebase Analytics to help us improve the Service. This data is aggregated and not linked to your identity.</p>
@@ -40,7 +40,7 @@ export const PrivacyPage = () => {
                     </section>
 
                     <section className="space-y-3">
-                        <h2 className="font-serif text-xl font-semibold text-text-1">3. How We Use Your Data</h2>
+                        <h2 className="font-serif text-xl font-normal text-text-1">3. How We Use Your Data</h2>
                         <ul className="list-disc pl-5 space-y-1">
                             <li>To provide and personalise the Service</li>
                             <li>To process subscription payments via Paddle</li>
@@ -51,7 +51,7 @@ export const PrivacyPage = () => {
                     </section>
 
                     <section className="space-y-3">
-                        <h2 className="font-serif text-xl font-semibold text-text-1">4. Third-Party Services</h2>
+                        <h2 className="font-serif text-xl font-normal text-text-1">4. Third-Party Services</h2>
                         <p>We use the following third-party services to operate WealthVue:</p>
                         <ul className="list-disc pl-5 space-y-1">
                             <li><strong className="text-text-1">Firebase (Google)</strong> — authentication, database, and hosting</li>
@@ -63,27 +63,27 @@ export const PrivacyPage = () => {
                     </section>
 
                     <section className="space-y-3">
-                        <h2 className="font-serif text-xl font-semibold text-text-1">5. Data Storage and Security</h2>
+                        <h2 className="font-serif text-xl font-normal text-text-1">5. Data Storage and Security</h2>
                         <p>Your data is stored in Google Firestore with security rules that restrict access strictly to your own account. We do not sell or share your personal data with third parties for marketing purposes.</p>
                     </section>
 
                     <section className="space-y-3">
-                        <h2 className="font-serif text-xl font-semibold text-text-1">6. Data Retention and Deletion</h2>
+                        <h2 className="font-serif text-xl font-normal text-text-1">6. Data Retention and Deletion</h2>
                         <p>Your data is retained for as long as your account is active. You may request deletion of your account and all associated data at any time by contacting us at <a href="mailto:hello@lukeberetta.com" className="text-accent hover:underline">hello@lukeberetta.com</a>. We will process deletion requests within 30 days.</p>
                     </section>
 
                     <section className="space-y-3">
-                        <h2 className="font-serif text-xl font-semibold text-text-1">7. Your Rights</h2>
+                        <h2 className="font-serif text-xl font-normal text-text-1">7. Your Rights</h2>
                         <p>Depending on your location, you may have rights under GDPR, CCPA, or other applicable laws, including the right to access, correct, or delete your personal data. To exercise these rights, contact us at <a href="mailto:hello@lukeberetta.com" className="text-accent hover:underline">hello@lukeberetta.com</a>.</p>
                     </section>
 
                     <section className="space-y-3">
-                        <h2 className="font-serif text-xl font-semibold text-text-1">8. Changes to This Policy</h2>
+                        <h2 className="font-serif text-xl font-normal text-text-1">8. Changes to This Policy</h2>
                         <p>We may update this policy periodically. We will notify users of material changes. Continued use of the Service constitutes acceptance of the updated policy.</p>
                     </section>
 
                     <section className="space-y-3">
-                        <h2 className="font-serif text-xl font-semibold text-text-1">9. Contact</h2>
+                        <h2 className="font-serif text-xl font-normal text-text-1">9. Contact</h2>
                         <p>Questions about this Privacy Policy? Email us at <a href="mailto:hello@lukeberetta.com" className="text-accent hover:underline">hello@lukeberetta.com</a>.</p>
                     </section>
 

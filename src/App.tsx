@@ -47,7 +47,7 @@ function Inner() {
   React.useEffect(() => {
     setOnCheckoutComplete(() => {
       setShowUpgradeSuccess(true);
-      const colors = ["#F0FA96", "#E8F5A0", "#F5F5F5", "#2DA85C", "#111111"];
+      const colors = ["#dce344", "#dce344", "#F5F5F5", "#2DA85C", "#111111"];
       const end = Date.now() + 2500;
       const fire = () => {
         confetti({ particleCount: 5, angle: 60, spread: 60, origin: { x: 0, y: 0.65 }, colors });

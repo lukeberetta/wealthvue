@@ -60,7 +60,7 @@ export const AssetRow: React.FC<AssetRowProps> = ({
 
             {/* Name + subtitle */}
             <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-text-1 truncate">{asset.name}</p>
+                <p className="text-sm font-normal text-text-1 truncate">{asset.name}</p>
                 <p className="text-[10px] text-text-3 tabular-nums">
                     {asset.quantity !== 1 ? `${asset.quantity} × ` : ""}
                     {formatCurrency(asset.unitPrice, asset.unitPriceCurrency)}
@@ -70,7 +70,7 @@ export const AssetRow: React.FC<AssetRowProps> = ({
             {/* Held at */}
             <div className="hidden sm:flex w-24 justify-end shrink-0">
                 {asset.source && (
-                    <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-surface-2 text-text-2 truncate max-w-full">
+                    <span className="text-[9px] font-normal uppercase tracking-wider px-2 py-0.5 rounded-full bg-surface-2 text-text-2 truncate max-w-full">
                         {asset.source}
                     </span>
                 )}
@@ -79,7 +79,7 @@ export const AssetRow: React.FC<AssetRowProps> = ({
             {/* Price source */}
             <div className="hidden sm:flex w-16 justify-end shrink-0">
                 <span className={cn(
-                    "text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full",
+                    "text-[9px] font-normal uppercase tracking-wider px-2 py-0.5 rounded-full",
                     asset.valueSource === "live_price"
                         ? "bg-positive/10 text-positive"
                         : asset.valueSource === "ai_estimate"
@@ -109,7 +109,7 @@ export const AssetRow: React.FC<AssetRowProps> = ({
 
             {/* Value + allocation % */}
             <div className="text-right w-32 shrink-0">
-                <p className={cn("text-sm font-medium tabular-nums", isLiability && "text-negative")}>
+                <p className={cn("text-sm font-normal tabular-nums", isLiability && "text-negative")}>
                     {formatCurrency(converted, displayCurrency)}
                 </p>
                 {allocationPct !== null && (

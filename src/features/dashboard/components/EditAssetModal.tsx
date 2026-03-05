@@ -28,7 +28,7 @@ export const EditAssetModal = ({
             <div className="space-y-6">
                 <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                        <label className="text-[10px] font-bold text-text-3 uppercase tracking-widest">Asset Name</label>
+                        <label className="text-[10px] font-normal text-text-3 uppercase tracking-widest">Asset Name</label>
                         <input
                             className="w-full bg-surface-2 border border-border rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent/20"
                             value={selectedAsset.name}
@@ -37,7 +37,7 @@ export const EditAssetModal = ({
                         />
                     </div>
                     <div className="space-y-1.5">
-                        <label className="text-[10px] font-bold text-text-3 uppercase tracking-widest">Type</label>
+                        <label className="text-[10px] font-normal text-text-3 uppercase tracking-widest">Type</label>
                         <div className="relative">
                             <select
                                 className="appearance-none w-full bg-surface-2 border border-border rounded-xl p-3 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-accent/20"
@@ -61,7 +61,7 @@ export const EditAssetModal = ({
 
                 <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                        <label className="text-[10px] font-bold text-text-3 uppercase tracking-widest">Quantity</label>
+                        <label className="text-[10px] font-normal text-text-3 uppercase tracking-widest">Quantity</label>
                         <input
                             type="number"
                             className="w-full bg-surface-2 border border-border rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent/20"
@@ -74,7 +74,7 @@ export const EditAssetModal = ({
                         />
                     </div>
                     <div className="space-y-1.5">
-                        <label className="text-[10px] font-bold text-text-3 uppercase tracking-widest">Unit Price ({selectedAsset.unitPriceCurrency})</label>
+                        <label className="text-[10px] font-normal text-text-3 uppercase tracking-widest">Unit Price ({selectedAsset.unitPriceCurrency})</label>
                         <input
                             type="number"
                             className="w-full bg-surface-2 border border-border rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent/20"
@@ -89,7 +89,7 @@ export const EditAssetModal = ({
                 </div>
 
                 <div className="space-y-1.5">
-                    <label className="text-[10px] font-bold text-text-3 uppercase tracking-widest">Source (e.g. Robinhood, Binance)</label>
+                    <label className="text-[10px] font-normal text-text-3 uppercase tracking-widest">Source (e.g. Robinhood, Binance)</label>
                     <input
                         className="w-full bg-surface-2 border border-border rounded-xl p-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent/20"
                         value={selectedAsset.source || ""}

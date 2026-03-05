@@ -64,7 +64,7 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({ isOpen, onClose }) =
                 <div className="p-6 grid grid-cols-2 gap-5">
                     {/* Trial card */}
                     <div className="bg-surface-2 p-8 rounded-2xl border border-border flex flex-col">
-                        <p className="text-[10px] font-bold text-text-3 uppercase tracking-widest mb-3">Free Trial</p>
+                        <p className="text-[10px] font-normal text-text-3 uppercase tracking-widest mb-3">Free Trial</p>
                         <div className="flex items-end gap-1.5 mb-1">
                             <span className="text-4xl font-serif text-text-1">$0</span>
                         </div>
@@ -81,10 +81,10 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({ isOpen, onClose }) =
 
                     {/* Pro card */}
                     <div className="bg-surface p-8 rounded-2xl border border-accent shadow-xl shadow-accent/10 flex flex-col relative">
-                        <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-accent text-on-accent text-[9px] font-bold uppercase tracking-wider px-4 py-1 rounded-full whitespace-nowrap">
+                        <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-accent text-on-accent text-[9px] font-normal uppercase tracking-wider px-4 py-1 rounded-full whitespace-nowrap">
                             Most Popular
                         </div>
-                        <p className="text-[10px] font-bold text-accent uppercase tracking-widest mb-3">Pro</p>
+                        <p className="text-[10px] font-normal text-accent uppercase tracking-widest mb-3">Pro</p>
                         <div className="flex items-end gap-1.5 mb-1">
                             <span className="text-4xl font-serif text-text-1">$5</span>
                         </div>

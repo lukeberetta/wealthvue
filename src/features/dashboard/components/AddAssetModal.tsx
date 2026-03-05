@@ -118,7 +118,7 @@ function EditableNumber({
 
     return (
         <div className="text-right">
-            {label && <p className="text-[10px] text-text-3 font-bold uppercase tracking-widest mb-0.5">{label}</p>}
+            {label && <p className="text-[10px] text-text-3 font-normal uppercase tracking-widest mb-0.5">{label}</p>}
             {editing ? (
                 <div className="flex items-center justify-end gap-1">
                     <span className="text-[10px] text-text-3">{currency}</span>
@@ -128,7 +128,7 @@ function EditableNumber({
                         onChange={e => setRaw(e.target.value)}
                         onBlur={commit}
                         onKeyDown={e => { if (e.key === "Enter") commit(); if (e.key === "Escape") setEditing(false); }}
-                        className="w-20 text-right font-medium text-sm text-text-1 bg-transparent border-b border-accent/50 focus:outline-none tabular-nums"
+                        className="w-20 text-right font-normal text-sm text-text-1 bg-transparent border-b border-accent/50 focus:outline-none tabular-nums"
                     />
                 </div>
             ) : (
@@ -137,7 +137,7 @@ function EditableNumber({
                     className="group flex items-center justify-end gap-1 text-right"
                     title={`Edit ${label || "value"}`}
                 >
-                    <span className="font-medium text-sm tabular-nums text-text-1 group-hover:text-accent transition-colors">
+                    <span className="font-normal text-sm tabular-nums text-text-1 group-hover:text-accent transition-colors">
                         {formatCurrency(value, currency)}
                     </span>
                     <Pencil size={10} className="text-text-3 opacity-0 group-hover:opacity-60 transition-opacity" />
@@ -208,21 +208,21 @@ function DraftCard({
                                 onChange={e => setName(e.target.value)}
                                 onBlur={() => { setNameEditing(false); onUpdate({ ...asset, name }); }}
                                 onKeyDown={e => { if (e.key === "Enter") { setNameEditing(false); onUpdate({ ...asset, name }); } }}
-                                className="font-medium text-sm text-text-1 bg-transparent border-b border-accent/40 focus:outline-none w-full"
+                                className="font-normal text-sm text-text-1 bg-transparent border-b border-accent/40 focus:outline-none w-full"
                             />
                         ) : (
-                            <h3 className="font-sans font-medium text-sm text-text-1 group-hover:text-accent transition-colors truncate">
+                            <h3 className="font-sans font-normal text-sm text-text-1 group-hover:text-accent transition-colors truncate">
                                 {name}
                                 <span className="ml-1 opacity-0 group-hover:opacity-40 transition-opacity font-sans font-normal text-xs">✎</span>
                             </h3>
                         )}
                     </div>
                     <div className="flex items-center flex-wrap gap-x-2 gap-y-1 mt-0.5">
-                        <span className="text-[10px] text-text-3 font-medium capitalize">{asset.assetType}</span>
+                        <span className="text-[10px] text-text-3 font-normal capitalize">{asset.assetType}</span>
                         {asset.ticker && (
                             <>
                                 <span className="text-text-3/40 text-[10px]">•</span>
-                                <span className="text-[10px] font-bold text-accent bg-accent-light/60 px-1 rounded-sm">{asset.ticker}</span>
+                                <span className="text-[10px] font-normal text-accent bg-accent-light/60 px-1 rounded-sm">{asset.ticker}</span>
                             </>
                         )}
                         {qty > 1 && (
@@ -234,7 +234,7 @@ function DraftCard({
                         {confidence !== "high" && (
                             <>
                                 <span className="text-text-3/40 text-[10px]">•</span>
-                                <span className={cn("text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-sm border", conf.cls)}>
+                                <span className={cn("text-[9px] font-normal uppercase tracking-wider px-1.5 py-0.5 rounded-sm border", conf.cls)}>
                                     {conf.label}
                                 </span>
                             </>
@@ -426,7 +426,7 @@ export const AddAssetModal = ({
                     <div className="flex items-center justify-between px-7 pt-7 pb-0">
                         <div>
                             <h2 className="font-serif text-2xl text-text-1">Add Asset</h2>
-                            <p className="text-xs text-text-3 mt-0.5 font-medium">
+                            <p className="text-xs text-text-3 mt-0.5 font-normal">
                                 {state === "input" && "Describe your asset or upload a screenshot"}
                                 {state === "analyzing" && "AI is thinking…"}
                                 {state === "result" && `${draftAssets.length} asset${draftAssets.length !== 1 ? "s" : ""} found — review and adjust before saving`}
@@ -465,7 +465,7 @@ export const AddAssetModal = ({
                                             key={mode}
                                             onClick={() => setInputMode(mode)}
                                             className={cn(
-                                                "flex-1 flex items-center justify-center gap-2 py-2 rounded-xl text-sm font-semibold transition-all duration-200",
+                                                "flex-1 flex items-center justify-center gap-2 py-2 rounded-xl text-sm font-normal transition-all duration-200",
                                                 inputMode === mode
                                                     ? "bg-surface text-text-1 shadow-sm"
                                                     : "text-text-3 hover:text-text-2"
@@ -506,7 +506,7 @@ export const AddAssetModal = ({
                                                 {hasText && (
                                                     <motion.span
                                                         initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
-                                                        className="absolute bottom-3 right-4 text-[10px] text-text-3 font-medium pointer-events-none select-none"
+                                                        className="absolute bottom-3 right-4 text-[10px] text-text-3 font-normal pointer-events-none select-none"
                                                     >
                                                         ⌘↵ to analyse
                                                     </motion.span>
@@ -561,7 +561,7 @@ export const AddAssetModal = ({
                                                         >
                                                             <X size={12} />
                                                         </button>
-                                                        <p className="text-xs text-center text-text-3 mt-2 font-medium">AI will extract all visible assets</p>
+                                                        <p className="text-xs text-center text-text-3 mt-2 font-normal">AI will extract all visible assets</p>
                                                     </div>
                                                 ) : (
                                                     <div className="flex flex-col items-center gap-3 py-8 px-6 text-center">
@@ -572,7 +572,7 @@ export const AddAssetModal = ({
                                                             <ImagePlus size={22} />
                                                         </div>
                                                         <div>
-                                                            <p className="text-sm font-semibold text-text-2">
+                                                            <p className="text-sm font-normal text-text-2">
                                                                 {isDragOver ? "Drop it here" : "Drag & drop or click to browse"}
                                                             </p>
                                                             <p className="text-xs text-text-3 mt-1">PNG, JPG, WEBP · up to 10 MB</p>
@@ -613,7 +613,7 @@ export const AddAssetModal = ({
                                     disabled={!canSubmit || isAnalyzing}
                                     className={cn(
                                         "w-full flex items-center justify-center gap-2.5 py-3.5 rounded-2xl",
-                                        "text-sm font-semibold bg-accent text-on-accent shadow-md shadow-accent/20",
+                                        "text-sm font-normal bg-accent text-on-accent shadow-md shadow-accent/20",
                                         "hover:opacity-90 active:scale-[0.98] transition-all duration-200",
                                         "disabled:opacity-40 disabled:pointer-events-none"
                                     )}
@@ -667,7 +667,7 @@ export const AddAssetModal = ({
                                 </div>
 
                                 <div className="pt-2 px-1">
-                                    <label className="block text-xs font-semibold text-text-2 mb-1.5">Account / Institution <span className="text-text-3/60 font-normal">(Optional)</span></label>
+                                    <label className="block text-xs font-normal text-text-2 mb-1.5">Account / Institution <span className="text-text-3/60 font-normal">(Optional)</span></label>
                                     <input
                                         type="text"
                                         value={globalSource}
@@ -684,7 +684,7 @@ export const AddAssetModal = ({
                                             onDiscardDrafts();
                                             setGlobalSource("");
                                         }}
-                                        className="flex-1 py-3 rounded-2xl border border-border text-sm font-semibold text-text-2 hover:bg-surface-2 transition-colors"
+                                        className="flex-1 py-3 rounded-2xl border border-border text-sm font-normal text-text-2 hover:bg-surface-2 transition-colors"
                                     >
                                         Try again
                                     </button>
@@ -694,7 +694,7 @@ export const AddAssetModal = ({
                                             onSaveDrafts(globalSource);
                                             setGlobalSource("");
                                         }}
-                                        className="flex-[2] flex items-center justify-center gap-2 py-3 rounded-2xl bg-accent text-on-accent text-sm font-semibold hover:opacity-90 active:scale-[0.98] transition-all duration-200"
+                                        className="flex-[2] flex items-center justify-center gap-2 py-3 rounded-2xl bg-accent text-on-accent text-sm font-normal hover:opacity-90 active:scale-[0.98] transition-all duration-200"
                                     >
                                         <Check size={16} />
                                         {draftAssets.length > 1 ? `Save all ${draftAssets.length} assets` : "Save to portfolio"}

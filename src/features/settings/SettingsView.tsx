@@ -123,23 +123,23 @@ export const SettingsView = ({ user, onSignOut, onBack, onUpdateUser }: Settings
 
             {/* Profile */}
             <section className="space-y-3">
-                <h3 className="text-[10px] font-bold text-text-3 uppercase tracking-[0.18em]">Profile</h3>
+                <h3 className="text-[10px] font-normal text-text-3 uppercase tracking-[0.18em]">Profile</h3>
                 <Card className="p-6 space-y-6">
                     <div className="flex items-center gap-4">
                         <div className={cn(
-                            "w-14 h-14 rounded-full flex items-center justify-center text-xl font-bold shrink-0",
+                            "w-14 h-14 rounded-full flex items-center justify-center text-xl font-normal shrink-0",
                             displayName ? avatarPalette(displayName) : "bg-surface-2 text-text-3"
                         )}>
                             {displayName ? getInitials(displayName) : ""}
                         </div>
                         <div>
-                            <p className="font-medium text-text-1">{displayName || user?.displayName}</p>
+                            <p className="font-normal text-text-1">{displayName || user?.displayName}</p>
                             <p className="text-sm text-text-3">{user?.email}</p>
                         </div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-1.5">
-                            <label className="text-[10px] uppercase font-bold text-text-3 tracking-widest">Display Name</label>
+                            <label className="text-[10px] uppercase font-normal text-text-3 tracking-widest">Display Name</label>
                             <input
                                 className="w-full bg-surface-2 border border-border rounded-xl px-3 py-2 text-sm text-text-1 focus:outline-none focus:ring-2 focus:ring-accent/20"
                                 value={displayName}
@@ -148,7 +148,7 @@ export const SettingsView = ({ user, onSignOut, onBack, onUpdateUser }: Settings
                             />
                         </div>
                         <div className="space-y-1.5">
-                            <label className="text-[10px] uppercase font-bold text-text-3 tracking-widest">Default Currency</label>
+                            <label className="text-[10px] uppercase font-normal text-text-3 tracking-widest">Default Currency</label>
                             <div className="relative">
                                 <select
                                     className="appearance-none w-full bg-surface-2 border border-border rounded-xl px-3 py-2 pr-10 text-sm text-text-1 focus:outline-none focus:ring-2 focus:ring-accent/20"
@@ -166,7 +166,7 @@ export const SettingsView = ({ user, onSignOut, onBack, onUpdateUser }: Settings
                             </div>
                         </div>
                         <div className="space-y-1.5">
-                            <label className="text-[10px] uppercase font-bold text-text-3 tracking-widest">Country Location</label>
+                            <label className="text-[10px] uppercase font-normal text-text-3 tracking-widest">Country Location</label>
                             <div className="relative">
                                 <select
                                     className="appearance-none w-full bg-surface-2 border border-border rounded-xl px-3 py-2 pr-10 text-sm text-text-1 focus:outline-none focus:ring-2 focus:ring-accent/20"
@@ -186,7 +186,7 @@ export const SettingsView = ({ user, onSignOut, onBack, onUpdateUser }: Settings
 
             {/* Appearance */}
             <section className="space-y-3">
-                <h3 className="text-[10px] font-bold text-text-3 uppercase tracking-[0.18em]">Appearance</h3>
+                <h3 className="text-[10px] font-normal text-text-3 uppercase tracking-[0.18em]">Appearance</h3>
                 <Card className="p-6">
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between sm:gap-8">
                         <div className="flex items-start gap-3">
@@ -194,7 +194,7 @@ export const SettingsView = ({ user, onSignOut, onBack, onUpdateUser }: Settings
                                 <Palette size={17} />
                             </div>
                             <div>
-                                <p className="font-medium text-text-1 text-sm">Theme</p>
+                                <p className="font-normal text-text-1 text-sm">Theme</p>
                                 <p className="text-xs text-text-3 mt-0.5 leading-relaxed max-w-xs">
                                     Dark mode is the native WealthVue experience. Light follows the same warm palette in daylight. Device respects your OS setting.
                                 </p>
@@ -209,7 +209,7 @@ export const SettingsView = ({ user, onSignOut, onBack, onUpdateUser }: Settings
 
             {/* Plan & Billing */}
             <section className="space-y-3">
-                <h3 className="text-[10px] font-bold text-text-3 uppercase tracking-[0.18em]">Plan & Billing</h3>
+                <h3 className="text-[10px] font-normal text-text-3 uppercase tracking-[0.18em]">Plan & Billing</h3>
                 <Card className="p-6 space-y-5">
                     {/* Plan header row */}
                     <div className="flex items-center justify-between">
@@ -222,9 +222,9 @@ export const SettingsView = ({ user, onSignOut, onBack, onUpdateUser }: Settings
                             </div>
                             <div>
                                 <div className="flex items-center gap-2">
-                                    <p className="font-medium text-text-1 text-sm capitalize">{isPro ? "Pro" : "Trial"} Plan</p>
+                                    <p className="font-normal text-text-1 text-sm capitalize">{isPro ? "Pro" : "Trial"} Plan</p>
                                     {isPro && (
-                                        <span className="text-[9px] font-bold uppercase tracking-wider bg-accent/10 text-accent px-2 py-0.5 rounded-full">Active</span>
+                                        <span className="text-[9px] font-normal uppercase tracking-wider bg-accent/10 text-accent px-2 py-0.5 rounded-full">Active</span>
                                     )}
                                 </div>
                                 {!isPro && (
@@ -258,7 +258,7 @@ export const SettingsView = ({ user, onSignOut, onBack, onUpdateUser }: Settings
                     {/* Trial progress bar */}
                     {!isPro && (
                         <div className="space-y-1.5">
-                            <div className="flex justify-between text-[10px] text-text-3 uppercase tracking-widest font-bold">
+                            <div className="flex justify-between text-[10px] text-text-3 uppercase tracking-widest font-normal">
                                 <span>Trial period</span>
                                 <span>{trialDaysRemaining} / {trialTotalDays} days left</span>
                             </div>
@@ -276,7 +276,7 @@ export const SettingsView = ({ user, onSignOut, onBack, onUpdateUser }: Settings
 
                     {/* AI credits bar */}
                     <div className="space-y-1.5">
-                        <div className="flex justify-between text-[10px] text-text-3 uppercase tracking-widest font-bold">
+                        <div className="flex justify-between text-[10px] text-text-3 uppercase tracking-widest font-normal">
                             <span>AI Credits</span>
                             <span>{aiCreditsRemaining === Infinity ? "Unlimited" : `${aiCreditsRemaining} / ${aiCreditLimit} remaining`}</span>
                         </div>
@@ -310,12 +310,12 @@ export const SettingsView = ({ user, onSignOut, onBack, onUpdateUser }: Settings
 
             {/* Danger Zone */}
             <section className="space-y-3">
-                <h3 className="text-[10px] font-bold text-negative uppercase tracking-[0.18em]">Danger Zone</h3>
+                <h3 className="text-[10px] font-normal text-negative uppercase tracking-[0.18em]">Danger Zone</h3>
                 <Card className="p-6 border-negative/20 bg-negative/5">
                     {!showDeleteConfirm ? (
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="font-medium text-negative text-sm">Delete Account</p>
+                                <p className="font-normal text-negative text-sm">Delete Account</p>
                                 <p className="text-xs text-text-3 mt-0.5">Permanently removes all your data and assets.</p>
                             </div>
                             <Button variant="ghost" className="text-negative hover:bg-negative/10 flex items-center gap-2 text-sm" onClick={() => setShowDeleteConfirm(true)}>
@@ -328,7 +328,7 @@ export const SettingsView = ({ user, onSignOut, onBack, onUpdateUser }: Settings
                             <div className="flex gap-3">
                                 <AlertTriangle className="text-negative shrink-0 mt-0.5" size={16} />
                                 <div>
-                                    <p className="font-medium text-negative text-sm">Are you sure?</p>
+                                    <p className="font-normal text-negative text-sm">Are you sure?</p>
                                     <p className="text-xs text-text-3 mt-0.5 leading-relaxed">This will sign you out and your account data will be permanently deleted. This cannot be undone.</p>
                                 </div>
                             </div>

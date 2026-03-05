@@ -38,16 +38,16 @@ export const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
         <Modal isOpen={isOpen} onClose={onClose} title="Sign In">
             <div className="flex flex-col items-center text-center py-4">
                 <div className="w-16 h-16 bg-accent rounded-2xl flex items-center justify-center mb-6 shadow-sm">
-                    <span className="text-white font-serif font-bold text-4xl leading-none">W</span>
+                    <span className="text-white font-serif font-normal text-4xl leading-none">W</span>
                 </div>
-                <h2 className="text-2xl font-medium mb-2">Welcome to WealthVue</h2>
+                <h2 className="text-2xl font-normal mb-2">Welcome to WealthVue</h2>
                 <p className="text-text-2 mb-8">Sign in to start managing your portfolio.</p>
 
                 <button
                     id="btn-google-signin"
                     onClick={handleSignIn}
                     disabled={isSigningIn}
-                    className="w-full flex items-center justify-center gap-3 bg-white text-gray-900 border border-border hover:bg-gray-50 transition-colors py-3 rounded-lg font-medium shadow-sm disabled:opacity-50"
+                    className="w-full flex items-center justify-center gap-3 bg-white text-gray-900 border border-border hover:bg-gray-50 transition-colors py-3 rounded-lg font-normal shadow-sm disabled:opacity-50"
                 >
                     {isSigningIn ? (
                         <Loader2 className="animate-spin text-gray-900" size={20} />

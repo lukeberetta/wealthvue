@@ -24,7 +24,7 @@ export const Modal = ({ isOpen, onClose, title, children }: ModalProps) => {
                 className="bg-surface w-full max-w-2xl rounded-xl shadow-2xl overflow-hidden"
             >
                 <div className="flex items-center justify-between p-6 border-b border-border">
-                    <h3 className="text-xl font-medium">{title}</h3>
+                    <h3 className="text-xl font-normal">{title}</h3>
                     <button onClick={onClose} className="text-text-3 hover:text-text-1 transition-colors">
                         <X size={20} />
                     </button>
