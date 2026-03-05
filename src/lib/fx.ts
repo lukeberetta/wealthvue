@@ -4,7 +4,7 @@ import { FXCache } from "../types";
 
 const BASE_URL = "https://api.frankfurter.app";
 
-export async function fetchFXRates(): Promise<FXCache> {
+export async function fetchFXRates(isAuthenticated = true): Promise<FXCache> {
   // 1. Check localStorage first (fast, avoids a Firestore read on every load)
   const localCached = storage.getFXCache();
   if (localCached) {
@@ -16,10 +16,13 @@ export async function fetchFXRates(): Promise<FXCache> {
   }
 
   // 2. Check shared Firestore cache (avoids redundant API calls across users)
-  const firestoreCached = await loadFXCache();
-  if (firestoreCached) {
-    storage.saveFXCache(firestoreCached); // warm local cache
-    return firestoreCached;
+  //    Skip for unauthenticated users (e.g. demo mode) — Firestore requires auth.
+  if (isAuthenticated) {
+    const firestoreCached = await loadFXCache();
+    if (firestoreCached) {
+      storage.saveFXCache(firestoreCached); // warm local cache
+      return firestoreCached;
+    }
   }
 
   // 3. Fetch fresh rates from Frankfurter API
@@ -30,8 +33,8 @@ export async function fetchFXRates(): Promise<FXCache> {
       rates: { ...data.rates, USD: 1 },
       fetchedAt: new Date().toISOString(),
     };
-    storage.saveFXCache(cache);         // local cache
-    await saveFXCache(cache);           // shared Firestore cache
+    storage.saveFXCache(cache);                    // local cache
+    if (isAuthenticated) await saveFXCache(cache); // shared Firestore cache (auth only)
     return cache;
   } catch (error) {
     console.error("Error fetching FX rates:", error);

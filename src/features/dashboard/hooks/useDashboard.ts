@@ -80,7 +80,7 @@ export const useDashboard = (user: User | null, isDemo: boolean) => {
                 setGoalState(storage.getGoal(true));
                 setIsLoading(false);
                 // Fetch FX rates in the background (non-blocking)
-                fetchFXRates().then(rates => setFxRates(rates.rates));
+                fetchFXRates(false).then(rates => setFxRates(rates.rates));
                 return;
             }
 
