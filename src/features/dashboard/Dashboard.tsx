@@ -34,6 +34,7 @@ import { UpgradeModal } from "../subscription/UpgradeModal";
 interface DashboardProps {
     user: User | null;
     isDemo: boolean;
+    isAuthLoading?: boolean;
     onSignIn: () => void;
     onSignOut: () => void;
     onGoHome: () => void;
@@ -41,7 +42,7 @@ interface DashboardProps {
     onOpenFeedback?: () => void;
 }
 
-export const Dashboard = ({ user, isDemo, onSignIn, onSignOut, onGoHome, onUpdateUser, onOpenFeedback }: DashboardProps) => {
+export const Dashboard = ({ user, isDemo, isAuthLoading = false, onSignIn, onSignOut, onGoHome, onUpdateUser, onOpenFeedback }: DashboardProps) => {
     const [isAdviceModalOpen, setIsAdviceModalOpen] = useState(false);
     const [isUpgradeModalOpen, setIsUpgradeModalOpen] = useState(false);
     const [upgradeReason, setUpgradeReason] = useState<string | undefined>();
@@ -145,7 +146,7 @@ export const Dashboard = ({ user, isDemo, onSignIn, onSignOut, onGoHome, onUpdat
         handleSaveGoal({ targetAmount: amount, currency: displayCurrency });
     };
 
-    if (isLoading) {
+    if (isLoading || isAuthLoading) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-bg">
                 <Loader2 className="animate-spin text-accent" size={36} />

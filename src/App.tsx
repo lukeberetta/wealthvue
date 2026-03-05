@@ -32,27 +32,6 @@ export const ThemeContext = createContext<ThemeContextValue>({
 export const useThemeContext = () => useContext(ThemeContext);
 
 // ---------------------------------------------------------------------------
-// Protected route — allows access if signed in OR in demo mode
-// ---------------------------------------------------------------------------
-function AppRoute() {
-  const { user, isDemo, loading } = useAuth();
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-bg flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
-  }
-
-  if (!user && !isDemo) {
-    return <Navigate to="/" replace />;
-  }
-
-  return null; // renders the Dashboard below via the outer Routes
-}
-
-// ---------------------------------------------------------------------------
 // Inner app — must be inside AuthProvider so useAuth() works
 // ---------------------------------------------------------------------------
 function Inner() {
@@ -117,16 +96,13 @@ const handleTryDemo = () => { if (user) { navigate("/app"); } else { setDemo(tru
               <Route
                 path="/app"
                 element={
-                  loading ? (
-                    <div className="min-h-screen bg-bg flex items-center justify-center">
-                      <div className="w-8 h-8 border-2 border-accent border-t-transparent rounded-full animate-spin" />
-                    </div>
-                  ) : (!user && !isDemo) ? (
+                  (!loading && !user && !isDemo) ? (
                     <Navigate to="/" replace />
                   ) : (
                     <Dashboard
                       user={user}
                       isDemo={isDemo}
+                      isAuthLoading={loading}
                       onSignIn={() => setIsLoginModalOpen(true)}
                       onSignOut={handleSignOut}
                       onGoHome={handleGoHome}
