@@ -108,7 +108,7 @@ export const EditAssetModal = ({
 
                 {!isDemo ? (
                     <div className="pt-4 flex gap-3">
-                        <Button variant="ghost" className="text-negative hover:bg-negative/5 px-4 py-2 rounded-xl" onClick={() => onDeleteAsset(selectedAsset.id)}>
+                        <Button variant="ghost" className="bg-negative/10 text-negative hover:bg-negative/20 px-4 py-2 rounded-xl" onClick={() => onDeleteAsset(selectedAsset.id)}>
                             <Trash2 size={18} />
                         </Button>
                         <Button variant="secondary" className="flex-1 py-3 rounded-xl" onClick={onClose}>

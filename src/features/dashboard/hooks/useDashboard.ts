@@ -120,6 +120,7 @@ export const useDashboard = (user: User | null, isDemo: boolean) => {
                                 unitPriceCurrency: quote.currency || asset.unitPriceCurrency,
                                 totalValueCurrency: quote.currency || asset.unitPriceCurrency,
                                 valueSource: "live_price" as const,
+                                priceChangePercent: quote.regularMarketChangePercent ?? null,
                                 lastRefreshed: new Date().toISOString(),
                             };
                         }
@@ -139,10 +140,13 @@ export const useDashboard = (user: User | null, isDemo: boolean) => {
                 const hasToday = loadedHistory.some(h => h.date === today);
                 if (!hasToday) {
                     const navAssets = updated ? newAssets : loadedAssets;
+                    const categoryBreakdown: Record<string, number> = {};
                     const totalNAV = navAssets.reduce((acc, asset) => {
-                        return acc + convertCurrency(asset.totalValue, asset.totalValueCurrency, "USD", rates.rates);
+                        const val = convertCurrency(asset.totalValue, asset.totalValueCurrency, "USD", rates.rates);
+                        categoryBreakdown[asset.assetType] = (categoryBreakdown[asset.assetType] || 0) + val;
+                        return acc + val;
                     }, 0);
-                    const entry: NAVHistoryEntry = { date: today, totalNAV, displayCurrency: "USD" };
+                    const entry: NAVHistoryEntry = { date: today, totalNAV, displayCurrency: "USD", categoryBreakdown };
                     setNavHistory(prev => [...prev, entry]);
                     await saveNAVSnapshot(uid, entry);
                 }
@@ -356,6 +360,7 @@ export const useDashboard = (user: User | null, isDemo: boolean) => {
                     unitPriceCurrency: quote.currency || asset.unitPriceCurrency,
                     totalValueCurrency: quote.currency || asset.unitPriceCurrency,
                     valueSource: "live_price",
+                    priceChangePercent: quote.regularMarketChangePercent ?? null,
                     lastRefreshed: new Date().toISOString(),
                 };
                 setAssets(prev => prev.map(a => a.id === asset.id ? updated : a));

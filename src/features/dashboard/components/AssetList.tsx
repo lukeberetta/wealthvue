@@ -196,7 +196,7 @@ export const AssetList = ({
                 {selectedAssetIds.length > 0 && onBulkDelete && (
                     <button
                         onClick={onBulkDelete}
-                        className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-negative hover:bg-negative/5 border border-negative/20 transition-all"
+                        className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-negative bg-negative/10 hover:bg-negative/20 transition-all"
                     >
                         <Trash2 size={12} />
                         <span className="hidden sm:inline">Delete </span>({selectedAssetIds.length})

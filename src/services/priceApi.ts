@@ -1,5 +1,6 @@
 export interface LiveQuote {
   regularMarketPrice: number;
+  regularMarketChangePercent?: number;
   currency: string;
   shortName?: string;
   longName?: string;

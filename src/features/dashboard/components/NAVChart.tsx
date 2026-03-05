@@ -9,14 +9,26 @@ import {
     ReferenceLine,
 } from "recharts";
 import { TrendingUp, RotateCcw } from "lucide-react";
-import { NAVHistoryEntry } from "../../../types";
+import { Asset, NAVHistoryEntry } from "../../../types";
 import { convertCurrency } from "../../../lib/fx";
 import { formatCurrencyCompact, cn } from "../../../lib/utils";
+
+const TYPE_LABELS: Record<string, string> = {
+    stock: "Stocks",
+    etf: "ETFs",
+    crypto: "Crypto",
+    commodities: "Commodities",
+    vehicle: "Vehicles",
+    property: "Property",
+    cash: "Cash",
+    other: "Other",
+};
 
 interface NAVChartProps {
     navHistory: NAVHistoryEntry[];
     displayCurrency: string;
     fxRates: { [key: string]: number };
+    assets?: Asset[];
     onResetTracking?: () => Promise<void>;
     period: Period;
 }
@@ -66,7 +78,7 @@ function CustomTooltip({ active, payload, displayCurrency }: any) {
     );
 }
 
-export const NAVChart = ({ navHistory, displayCurrency, fxRates, onResetTracking, period }: NAVChartProps) => {
+export const NAVChart = ({ navHistory, displayCurrency, fxRates, assets = [], onResetTracking, period }: NAVChartProps) => {
     const [resetArmed, setResetArmed] = useState(false);
     const [isResetting, setIsResetting] = useState(false);
 
@@ -133,6 +145,33 @@ export const NAVChart = ({ navHistory, displayCurrency, fxRates, onResetTracking
     const lastNav = chartData[chartData.length - 1]?.nav ?? 0;
     const periodChange = lastNav - firstNav;
     const periodChangePct = firstNav > 0 ? (periodChange / firstNav) * 100 : 0;
+
+    // Category breakdown — current value per type + period % change from navHistory
+    const categoryBreakdown = useMemo(() => {
+        const currentByType: Record<string, number> = {};
+        for (const asset of assets) {
+            const val = convertCurrency(asset.totalValue, asset.totalValueCurrency, displayCurrency, fxRates);
+            currentByType[asset.assetType] = (currentByType[asset.assetType] || 0) + val;
+        }
+
+        // Find anchor navHistory entry for the selected period
+        const sorted = [...navHistory].sort((a, b) => a.date.localeCompare(b.date));
+        const cutoff = cutoffDate(period);
+        const anchor = period === "All"
+            ? sorted[0]
+            : sorted.filter(e => e.date <= cutoff).at(-1) ?? sorted[0];
+
+        return Object.entries(currentByType)
+            .map(([type, value]) => {
+                let changePct: number | null = null;
+                if (anchor?.categoryBreakdown && anchor.categoryBreakdown[type] != null) {
+                    const anchorVal = convertCurrency(anchor.categoryBreakdown[type], "USD", displayCurrency, fxRates);
+                    changePct = anchorVal > 0 ? ((value - anchorVal) / anchorVal) * 100 : null;
+                }
+                return { type, value, changePct };
+            })
+            .sort((a, b) => b.value - a.value);
+    }, [assets, navHistory, displayCurrency, fxRates, period]);
 
     // Decide how many X ticks to show
     const xTickCount = period === "1W" ? 7 : period === "1M" ? 5 : period === "3M" ? 6 : 6;
@@ -267,6 +306,32 @@ export const NAVChart = ({ navHistory, displayCurrency, fxRates, onResetTracking
                             Reset tracking
                         </button>
                     )}
+                </div>
+            )}
+            {/* Category breakdown */}
+            {categoryBreakdown.length > 0 && (
+                <div className="mt-5">
+                    <h3 className="text-[10px] font-bold text-text-3 uppercase tracking-widest mb-3">By category</h3>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                        {categoryBreakdown.map(({ type, changePct }) => {
+                            const isPos = changePct !== null && changePct >= 0;
+                            return (
+                                <div key={type} className="flex items-center justify-between gap-2 bg-surface-2/50 rounded-xl px-3 py-2">
+                                    <span className="text-[11px] font-medium text-text-2 truncate">{TYPE_LABELS[type] || type}</span>
+                                    <span className={cn(
+                                        "text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full shrink-0",
+                                        changePct === null
+                                            ? "bg-surface-2 text-text-3"
+                                            : isPos
+                                            ? "bg-positive/10 text-positive"
+                                            : "bg-negative/10 text-negative"
+                                    )}>
+                                        {changePct === null ? "N/A" : `${isPos ? "+" : ""}${changePct.toFixed(2)}%`}
+                                    </span>
+                                </div>
+                            );
+                        })}
+                    </div>
                 </div>
             )}
         </div>

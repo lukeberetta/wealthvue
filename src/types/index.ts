@@ -47,6 +47,7 @@ export interface Asset {
   aiConfidence: AIConfidence | null;
   aiRationale: string | null;
   inputMethod: "text" | "screenshot" | "manual";
+  priceChangePercent?: number | null;
   lastRefreshed: string;
   createdAt: string;
   updatedAt: string;
@@ -56,6 +57,7 @@ export interface NAVHistoryEntry {
   date: string;
   totalNAV: number;
   displayCurrency: string;
+  categoryBreakdown?: Record<string, number>; // USD values per asset type
 }
 
 export interface FXCache {

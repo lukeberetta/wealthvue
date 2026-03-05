@@ -405,6 +405,7 @@ export const Dashboard = ({ user, isDemo, onSignIn, onSignOut, onGoHome, onUpdat
                         navHistory={navHistory}
                         displayCurrency={displayCurrency}
                         fxRates={fxRates}
+                        assets={assets}
                         onResetTracking={isDemo ? undefined : handleResetTracking}
                         period={navPeriod}
                     />
@@ -413,7 +414,7 @@ export const Dashboard = ({ user, isDemo, onSignIn, onSignOut, onGoHome, onUpdat
                 {/* Asset list */}
                 <div>
                     <div className="mb-6">
-                        <h3 className="text-xl font-serif text-text-1">Holdings</h3>
+                        <h3 className="text-xl font-serif text-text-1">My Assets</h3>
                     </div>
                     <AssetList
                         assets={sortedAssets}
