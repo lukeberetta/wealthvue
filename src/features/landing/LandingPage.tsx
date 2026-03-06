@@ -55,70 +55,70 @@ export const LandingPage = ({ user, firebaseUid, isDemo = false, onSignIn, onTry
                 <section className="min-h-screen flex flex-col pt-20 relative overflow-hidden">
                     {/* Centered text content */}
                     <div className="flex-1 flex flex-col items-center justify-center text-center px-6">
-                    {/* Ambient glow */}
-                    <div
-                        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-2/3 w-[700px] h-[500px] rounded-full pointer-events-none"
-                        style={{ background: 'radial-gradient(ellipse, var(--color-accent), transparent 70%)', opacity: 0.05 }}
-                    />
+                        {/* Ambient glow */}
+                        <div
+                            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-2/3 w-[700px] h-[500px] rounded-full pointer-events-none"
+                            style={{ background: 'radial-gradient(ellipse, var(--color-accent), transparent 70%)', opacity: 0.05 }}
+                        />
 
-                    <motion.p
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5 }}
-                        className="text-[10px] font-normal tracking-[0.25em] text-text-3 uppercase mb-10"
-                    >
-                        AI-powered wealth tracking
-                    </motion.p>
-
-                    <motion.h1
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6, delay: 0.08 }}
-                        className="text-[3.25rem] sm:text-[4.5rem] md:text-[6rem] lg:text-[7rem] font-serif leading-[1.02] text-text-1"
-                    >
-                        Every asset.<br />
-                        One clear{" "}
-                        <span className="text-accent italic">picture.</span>
-                    </motion.h1>
-
-                    <motion.p
-                        initial={{ opacity: 0, y: 14 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, delay: 0.2 }}
-                        className="text-base md:text-lg text-text-2 max-w-xs sm:max-w-sm mt-8 leading-relaxed"
-                    >
-                        Stocks, crypto, property, vehicles, and cash — unified in one AI-powered net worth dashboard.
-                    </motion.p>
-
-                    <motion.div
-                        initial={{ opacity: 0, y: 12 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, delay: 0.3 }}
-                        className="flex flex-wrap items-center justify-center gap-4 mt-10"
-                    >
-                        <button
-                            onClick={onTryDemo}
-                            className="btn-primary flex items-center gap-2 px-8 py-3.5 text-sm"
+                        <motion.p
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.5 }}
+                            className="text-[10px] font-normal tracking-[0.25em] text-text-3 uppercase mb-10"
                         >
-                            Try it free
-                            <ArrowRight size={15} />
-                        </button>
-                        <button
-                            onClick={onSignIn}
-                            className="text-sm text-text-2 hover:text-text-1 transition-colors underline underline-offset-4 decoration-text-3/50"
-                        >
-                            Sign in
-                        </button>
-                    </motion.div>
+                            AI-powered wealth tracking
+                        </motion.p>
 
-                    <motion.p
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ duration: 0.5, delay: 0.45 }}
-                        className="text-xs text-text-3 mt-5"
-                    >
-                        30-day free trial · No credit card required
-                    </motion.p>
+                        <motion.h1
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.6, delay: 0.08 }}
+                            className="text-[3.25rem] sm:text-[4.5rem] md:text-[6rem] lg:text-[7rem] font-serif leading-[1.02] text-text-1"
+                        >
+                            Every asset.<br />
+                            One clear{" "}
+                            <span className="text-accent italic">picture.</span>
+                        </motion.h1>
+
+                        <motion.p
+                            initial={{ opacity: 0, y: 14 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.5, delay: 0.2 }}
+                            className="text-base md:text-lg text-text-2 max-w-xs sm:max-w-sm mt-8 leading-relaxed"
+                        >
+                            Stocks, crypto, property, vehicles, and cash — unified in one AI-powered net worth dashboard.
+                        </motion.p>
+
+                        <motion.div
+                            initial={{ opacity: 0, y: 12 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.5, delay: 0.3 }}
+                            className="flex flex-wrap items-center justify-center gap-4 mt-10"
+                        >
+                            <button
+                                onClick={onTryDemo}
+                                className="btn-primary flex items-center gap-2 px-8 py-3.5 text-sm"
+                            >
+                                Try it free
+                                <ArrowRight size={15} />
+                            </button>
+                            <button
+                                onClick={onSignIn}
+                                className="text-sm text-text-2 hover:text-text-1 transition-colors underline underline-offset-4 decoration-text-3/50"
+                            >
+                                Sign in
+                            </button>
+                        </motion.div>
+
+                        <motion.p
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ duration: 0.5, delay: 0.45 }}
+                            className="text-xs text-text-3 mt-5"
+                        >
+                            30-day free trial · No credit card required
+                        </motion.p>
                     </div>{/* end centered content */}
 
                     {/* Asset ticker strip — pinned to bottom */}
@@ -218,171 +218,171 @@ export const LandingPage = ({ user, firebaseUid, isDemo = false, onSignIn, onTry
                             className="max-w-[860px] mx-auto bg-surface rounded-2xl border border-border overflow-hidden fade-up"
                             style={{ boxShadow: '0 40px 80px rgba(0,0,0,0.35)' }}
                         >
-                                {/* Mockup nav */}
-                                <div className="bg-surface-2/60 border-b border-border px-5 py-3 flex justify-between items-center">
-                                    <div className="flex items-center gap-2">
-                                        <svg width="20" height="20" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-text-1 shrink-0">
-                                            <rect width="256" height="256" rx="48" fill="currentColor"/>
-                                            <path d="M83.3 159.841C82.3363 162.681 79.6704 164.591 76.6713 164.591H60.9572C58.1196 164.591 55.5627 162.878 54.4834 160.254L29.9741 100.663C28.0794 96.0558 31.4667 91 36.448 91H46.2728C49.1908 91 51.8026 92.81 52.8272 95.5421L63.0808 122.885C65.4071 129.089 74.2504 128.889 76.2938 122.586L84.9651 95.8411C85.9009 92.9548 88.5896 91 91.6238 91H106.061C109.054 91 111.716 92.9027 112.684 95.7345L121.588 121.765C123.711 127.971 132.438 128.111 134.759 121.976L144.765 95.5234C145.795 92.8011 148.401 91 151.312 91H158.744C163.708 91 167.094 96.0236 165.233 100.625L141.124 160.216C140.054 162.861 137.487 164.591 134.635 164.591H121.032C118.079 164.591 115.443 162.738 114.445 159.959L105.181 134.188C102.94 127.953 94.0946 128.032 91.9654 134.306L83.3 159.841Z" style={{ fill: 'var(--color-surface-2)' }}/>
-                                            <path d="M143.344 159.841C142.38 162.681 139.715 164.591 136.716 164.591H121.001C118.164 164.591 115.607 162.878 114.528 160.254L90.0183 100.663C88.1236 96.0558 91.5109 91 96.4922 91H106.317C109.235 91 111.847 92.81 112.871 95.5421L123.125 122.885C125.451 129.089 134.295 128.889 136.338 122.586L145.009 95.8411C145.945 92.9548 148.634 91 151.668 91H166.105C169.098 91 171.76 92.9027 172.729 95.7345L181.632 121.765C183.755 127.971 192.482 128.111 194.803 121.976L204.809 95.5234C205.839 92.8011 208.446 91 211.356 91H218.788C223.752 91 227.139 96.0236 225.277 100.625L201.168 160.216C200.098 162.861 197.531 164.591 194.679 164.591H181.076C178.123 164.591 175.488 162.738 174.489 159.959L165.226 134.188C162.984 127.953 154.139 128.032 152.01 134.306L143.344 159.841Z" style={{ fill: 'var(--color-surface-2)' }}/>
-                                        </svg>
-                                        <span className="text-sm font-normal text-text-1 tracking-tight">WealthVue</span>
+                            {/* Mockup nav */}
+                            <div className="bg-surface-2/60 border-b border-border px-5 py-3 flex justify-between items-center">
+                                <div className="flex items-center gap-2">
+                                    <svg width="20" height="20" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-text-1 shrink-0">
+                                        <rect width="256" height="256" rx="48" fill="currentColor" />
+                                        <path d="M83.3 159.841C82.3363 162.681 79.6704 164.591 76.6713 164.591H60.9572C58.1196 164.591 55.5627 162.878 54.4834 160.254L29.9741 100.663C28.0794 96.0558 31.4667 91 36.448 91H46.2728C49.1908 91 51.8026 92.81 52.8272 95.5421L63.0808 122.885C65.4071 129.089 74.2504 128.889 76.2938 122.586L84.9651 95.8411C85.9009 92.9548 88.5896 91 91.6238 91H106.061C109.054 91 111.716 92.9027 112.684 95.7345L121.588 121.765C123.711 127.971 132.438 128.111 134.759 121.976L144.765 95.5234C145.795 92.8011 148.401 91 151.312 91H158.744C163.708 91 167.094 96.0236 165.233 100.625L141.124 160.216C140.054 162.861 137.487 164.591 134.635 164.591H121.032C118.079 164.591 115.443 162.738 114.445 159.959L105.181 134.188C102.94 127.953 94.0946 128.032 91.9654 134.306L83.3 159.841Z" style={{ fill: 'var(--color-surface-2)' }} />
+                                        <path d="M143.344 159.841C142.38 162.681 139.715 164.591 136.716 164.591H121.001C118.164 164.591 115.607 162.878 114.528 160.254L90.0183 100.663C88.1236 96.0558 91.5109 91 96.4922 91H106.317C109.235 91 111.847 92.81 112.871 95.5421L123.125 122.885C125.451 129.089 134.295 128.889 136.338 122.586L145.009 95.8411C145.945 92.9548 148.634 91 151.668 91H166.105C169.098 91 171.76 92.9027 172.729 95.7345L181.632 121.765C183.755 127.971 192.482 128.111 194.803 121.976L204.809 95.5234C205.839 92.8011 208.446 91 211.356 91H218.788C223.752 91 227.139 96.0236 225.277 100.625L201.168 160.216C200.098 162.861 197.531 164.591 194.679 164.591H181.076C178.123 164.591 175.488 162.738 174.489 159.959L165.226 134.188C162.984 127.953 154.139 128.032 152.01 134.306L143.344 159.841Z" style={{ fill: 'var(--color-surface-2)' }} />
+                                    </svg>
+                                    <span className="text-sm font-normal text-text-1 tracking-tight">WealthVue</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <div className="bg-surface border border-border rounded-full px-2.5 py-0.5 text-[9px] font-normal text-text-3">ZAR</div>
+                                    <div className="w-6 h-6 bg-surface-3 rounded-full" />
+                                </div>
+                            </div>
+
+                            {/* Mockup content */}
+                            <div className="p-5 space-y-5">
+
+                                {/* NAV header + period pills */}
+                                <div className="flex items-start justify-between gap-4">
+                                    <div>
+                                        <p className="text-[9px] font-normal text-text-3 uppercase tracking-[0.2em] mb-1.5">Total Net Worth</p>
+                                        <div className="flex items-end gap-2.5 flex-wrap">
+                                            <p className="text-[1.9rem] font-normal tabular-nums leading-none">R 6,421,380</p>
+                                            <p className="text-[10px] font-normal text-positive pb-0.5">↑ +R 78,420 · +1.23%</p>
+                                        </div>
                                     </div>
-                                    <div className="flex items-center gap-2">
-                                        <div className="bg-surface border border-border rounded-full px-2.5 py-0.5 text-[9px] font-normal text-text-3">ZAR</div>
-                                        <div className="w-6 h-6 bg-surface-3 rounded-full" />
+                                    <div className="flex items-center gap-0.5 mt-1 shrink-0 bg-surface-2/60 border border-border rounded-full p-0.5">
+                                        {["1W", "1M", "3M", "All"].map(p => (
+                                            <div key={p} className={cn(
+                                                "px-2.5 py-1 rounded-full text-[9px] font-normal",
+                                                p === "1M" ? "bg-surface text-text-1" : "text-text-3"
+                                            )}>{p}</div>
+                                        ))}
                                     </div>
                                 </div>
 
-                                {/* Mockup content */}
-                                <div className="p-5 space-y-5">
+                                {/* Performance chart */}
+                                <div>
+                                    <p className="text-[9px] font-normal text-text-3 uppercase tracking-[0.15em] mb-2">Performance</p>
+                                    <div className="h-16">
+                                        <svg viewBox="0 0 500 64" className="w-full h-full" preserveAspectRatio="none">
+                                            <defs>
+                                                <linearGradient id="productGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                                                    <stop offset="0%" style={{ stopColor: 'var(--color-accent)', stopOpacity: 0.2 }} />
+                                                    <stop offset="100%" style={{ stopColor: 'var(--color-accent)', stopOpacity: 0 }} />
+                                                </linearGradient>
+                                            </defs>
+                                            <path d="M0,55 C50,52 100,44 150,36 C190,30 220,40 265,30 C310,20 345,13 400,9 C440,6 470,4 500,3" fill="none" style={{ stroke: 'var(--color-accent)' }} strokeWidth="1.5" strokeLinecap="round" />
+                                            <path d="M0,55 C50,52 100,44 150,36 C190,30 220,40 265,30 C310,20 345,13 400,9 C440,6 470,4 500,3 V64 H0 Z" fill="url(#productGrad)" />
+                                        </svg>
+                                    </div>
+                                    <div className="flex justify-between text-[8px] text-text-3 mt-1.5">
+                                        {["Jan", "Feb", "Mar", "Apr", "May", "Jun"].map(m => <span key={m}>{m}</span>)}
+                                    </div>
+                                </div>
 
-                                    {/* NAV header + period pills */}
-                                    <div className="flex items-start justify-between gap-4">
+                                {/* Allocation + Portfolio Profile */}
+                                <div className="grid grid-cols-5 gap-3">
+                                    {/* Allocation */}
+                                    <div className="col-span-3 bg-surface-2/50 rounded-xl p-3 space-y-2.5">
+                                        <p className="text-[9px] font-normal text-text-3 uppercase tracking-[0.15em]">Allocation</p>
+                                        {[
+                                            { label: "Stocks", pct: "42%", w: 0.9 },
+                                            { label: "Crypto", pct: "31%", w: 0.68 },
+                                            { label: "Property", pct: "14%", w: 0.46 },
+                                            { label: "Vehicles", pct: "8%", w: 0.28 },
+                                            { label: "Cash", pct: "5%", w: 0.14 },
+                                        ].map((a) => (
+                                            <div key={a.label}>
+                                                <div className="flex justify-between text-[9px] mb-1">
+                                                    <span className="text-text-2">{a.label}</span>
+                                                    <span className="text-text-1 tabular-nums">{a.pct}</span>
+                                                </div>
+                                                <div className="h-px bg-surface-3 rounded-full overflow-hidden">
+                                                    <div className="h-full bg-text-1 rounded-full" style={{ width: a.pct, opacity: a.w }} />
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    {/* Portfolio Profile */}
+                                    <div className="col-span-2 bg-surface-2/50 rounded-xl p-3 space-y-3">
+                                        <p className="text-[9px] font-normal text-text-3 uppercase tracking-[0.15em]">Profile</p>
                                         <div>
-                                            <p className="text-[9px] font-normal text-text-3 uppercase tracking-[0.2em] mb-1.5">Total Net Worth</p>
-                                            <div className="flex items-end gap-2.5 flex-wrap">
-                                                <p className="text-[1.9rem] font-normal tabular-nums leading-none">R 6,421,380</p>
-                                                <p className="text-[10px] font-normal text-positive pb-0.5">↑ +R 78,420 · +1.23%</p>
-                                            </div>
+                                            <p className="text-[11px] font-normal text-text-1 leading-tight">The Market Bull</p>
+                                            <p className="text-[9px] text-text-3 italic mt-0.5">Equity-heavy growth</p>
                                         </div>
-                                        <div className="flex items-center gap-0.5 mt-1 shrink-0 bg-surface-2/60 border border-border rounded-full p-0.5">
-                                            {["1W", "1M", "3M", "All"].map(p => (
-                                                <div key={p} className={cn(
-                                                    "px-2.5 py-1 rounded-full text-[9px] font-normal",
-                                                    p === "1M" ? "bg-surface text-text-1" : "text-text-3"
-                                                )}>{p}</div>
-                                            ))}
-                                        </div>
-                                    </div>
-
-                                    {/* Performance chart */}
-                                    <div>
-                                        <p className="text-[9px] font-normal text-text-3 uppercase tracking-[0.15em] mb-2">Performance</p>
-                                        <div className="h-16">
-                                            <svg viewBox="0 0 500 64" className="w-full h-full" preserveAspectRatio="none">
-                                                <defs>
-                                                    <linearGradient id="productGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                                                        <stop offset="0%" style={{ stopColor: 'var(--color-accent)', stopOpacity: 0.2 }} />
-                                                        <stop offset="100%" style={{ stopColor: 'var(--color-accent)', stopOpacity: 0 }} />
-                                                    </linearGradient>
-                                                </defs>
-                                                <path d="M0,55 C50,52 100,44 150,36 C190,30 220,40 265,30 C310,20 345,13 400,9 C440,6 470,4 500,3" fill="none" style={{ stroke: 'var(--color-accent)' }} strokeWidth="1.5" strokeLinecap="round" />
-                                                <path d="M0,55 C50,52 100,44 150,36 C190,30 220,40 265,30 C310,20 345,13 400,9 C440,6 470,4 500,3 V64 H0 Z" fill="url(#productGrad)" />
-                                            </svg>
-                                        </div>
-                                        <div className="flex justify-between text-[8px] text-text-3 mt-1.5">
-                                            {["Jan", "Feb", "Mar", "Apr", "May", "Jun"].map(m => <span key={m}>{m}</span>)}
-                                        </div>
-                                    </div>
-
-                                    {/* Allocation + Portfolio Profile */}
-                                    <div className="grid grid-cols-5 gap-3">
-                                        {/* Allocation */}
-                                        <div className="col-span-3 bg-surface-2/50 rounded-xl p-3 space-y-2.5">
-                                            <p className="text-[9px] font-normal text-text-3 uppercase tracking-[0.15em]">Allocation</p>
+                                        <div className="space-y-2">
                                             {[
-                                                { label: "Stocks", pct: "42%", w: 0.9 },
-                                                { label: "Crypto", pct: "31%", w: 0.68 },
-                                                { label: "Property", pct: "14%", w: 0.46 },
-                                                { label: "Vehicles", pct: "8%", w: 0.28 },
-                                                { label: "Cash", pct: "5%", w: 0.14 },
-                                            ].map((a) => (
-                                                <div key={a.label}>
-                                                    <div className="flex justify-between text-[9px] mb-1">
-                                                        <span className="text-text-2">{a.label}</span>
-                                                        <span className="text-text-1 tabular-nums">{a.pct}</span>
-                                                    </div>
-                                                    <div className="h-px bg-surface-3 rounded-full overflow-hidden">
-                                                        <div className="h-full bg-text-1 rounded-full" style={{ width: a.pct, opacity: a.w }} />
+                                                { label: "Risk", level: 2 },
+                                                { label: "Diversity", level: 1 },
+                                                { label: "Liquidity", level: 1 },
+                                            ].map(item => (
+                                                <div key={item.label} className="flex items-center gap-2">
+                                                    <span className="text-[8px] text-text-3 w-11 shrink-0">{item.label}</span>
+                                                    <div className="flex gap-0.5 flex-1">
+                                                        {[0, 1, 2].map(i => (
+                                                            <div key={i} className="h-1 flex-1 rounded-full" style={{ background: i <= item.level ? 'var(--color-accent)' : 'var(--color-surface-3)' }} />
+                                                        ))}
                                                     </div>
                                                 </div>
                                             ))}
                                         </div>
+                                    </div>
+                                </div>
 
-                                        {/* Portfolio Profile */}
-                                        <div className="col-span-2 bg-surface-2/50 rounded-xl p-3 space-y-3">
-                                            <p className="text-[9px] font-normal text-text-3 uppercase tracking-[0.15em]">Profile</p>
-                                            <div>
-                                                <p className="text-[11px] font-normal text-text-1 leading-tight">The Market Bull</p>
-                                                <p className="text-[9px] text-text-3 italic mt-0.5">Equity-heavy growth</p>
+                                {/* My Assets */}
+                                <div>
+                                    {/* Toolbar */}
+                                    <div className="flex items-center justify-between mb-2">
+                                        <p className="text-[9px] font-normal text-text-3 uppercase tracking-[0.15em]">My Assets</p>
+                                        <div className="flex items-center gap-1.5">
+                                            <div className="bg-surface-2 border border-border rounded-full px-2 py-1 text-[8px] text-text-3 flex items-center gap-1">
+                                                <Search size={8} /><span>Search</span>
                                             </div>
-                                            <div className="space-y-2">
-                                                {[
-                                                    { label: "Risk", level: 2 },
-                                                    { label: "Diversity", level: 1 },
-                                                    { label: "Liquidity", level: 1 },
-                                                ].map(item => (
-                                                    <div key={item.label} className="flex items-center gap-2">
-                                                        <span className="text-[8px] text-text-3 w-11 shrink-0">{item.label}</span>
-                                                        <div className="flex gap-0.5 flex-1">
-                                                            {[0, 1, 2].map(i => (
-                                                                <div key={i} className="h-1 flex-1 rounded-full" style={{ background: i <= item.level ? 'var(--color-accent)' : 'var(--color-surface-3)' }} />
-                                                            ))}
-                                                        </div>
-                                                    </div>
-                                                ))}
-                                            </div>
+                                            <div className="bg-surface-2 border border-border rounded-full px-2 py-1 text-[8px] text-text-3">High → Low</div>
                                         </div>
                                     </div>
 
-                                    {/* My Assets */}
-                                    <div>
-                                        {/* Toolbar */}
-                                        <div className="flex items-center justify-between mb-2">
-                                            <p className="text-[9px] font-normal text-text-3 uppercase tracking-[0.15em]">My Assets</p>
-                                            <div className="flex items-center gap-1.5">
-                                                <div className="bg-surface-2 border border-border rounded-full px-2 py-1 text-[8px] text-text-3 flex items-center gap-1">
-                                                    <Search size={8} /><span>Search</span>
+                                    {/* Group header */}
+                                    <div className="flex justify-between items-center px-2 py-1.5 bg-surface-2/60 rounded-lg mb-0.5 text-[8px] text-text-3 uppercase tracking-wider">
+                                        <span>Stocks</span>
+                                        <span className="tabular-nums text-text-2">R 268,600</span>
+                                    </div>
+
+                                    {/* Asset rows */}
+                                    <div className="divide-y divide-border">
+                                        {([
+                                            { name: "Apple Inc", note: "24 shares · R 3,594/sh", value: "R 86,200", alloc: "1.3%", source: "Live", up: true, change: "+1.8%" },
+                                            { name: "Bitcoin", note: "0.45 BTC", value: "R 534,100", alloc: "8.3%", source: "Live", up: true, change: "+4.3%" },
+                                            { name: "Cape Town Apt", note: "Property · AI-estimated", value: "R 2,800,000", alloc: "43.6%", source: "AI Est.", up: null, change: null },
+                                            { name: "Tesla", note: "10 shares · R 18,240/sh", value: "R 182,400", alloc: "2.8%", source: "Live", up: false, change: "−0.8%" },
+                                        ] as Array<{ name: string; note: string; value: string; alloc: string; source: string; up: boolean | null; change: string | null }>).map(row => (
+                                            <div key={row.name} className="flex items-center justify-between py-2.5">
+                                                <div className="flex items-center gap-2.5">
+                                                    <div className="w-7 h-7 bg-surface-2 rounded-lg flex items-center justify-center text-[9px] font-normal text-text-2 shrink-0">
+                                                        {row.name[0]}
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-[11px] font-normal text-text-1">{row.name}</p>
+                                                        <p className="text-[9px] text-text-3">{row.note}</p>
+                                                    </div>
                                                 </div>
-                                                <div className="bg-surface-2 border border-border rounded-full px-2 py-1 text-[8px] text-text-3">High → Low</div>
+                                                <div className="flex items-center gap-2">
+                                                    <div className={cn(
+                                                        "text-[8px] px-1.5 py-0.5 rounded-full",
+                                                        row.source === "Live" ? "bg-positive/10 text-positive" : "bg-surface-3 text-text-3"
+                                                    )}>
+                                                        {row.source}
+                                                    </div>
+                                                    <div className="text-right">
+                                                        <p className="text-[11px] font-normal tabular-nums text-text-1">{row.value}</p>
+                                                        <p className={cn("text-[9px] tabular-nums", row.change ? (row.up ? "text-positive" : "text-negative") : "text-text-3")}>
+                                                            {row.change ?? row.alloc}
+                                                        </p>
+                                                    </div>
+                                                </div>
                                             </div>
-                                        </div>
-
-                                        {/* Group header */}
-                                        <div className="flex justify-between items-center px-2 py-1.5 bg-surface-2/60 rounded-lg mb-0.5 text-[8px] text-text-3 uppercase tracking-wider">
-                                            <span>Stocks</span>
-                                            <span className="tabular-nums text-text-2">R 268,600</span>
-                                        </div>
-
-                                        {/* Asset rows */}
-                                        <div className="divide-y divide-border">
-                                            {([
-                                                { name: "Apple Inc", note: "24 shares · R 3,594/sh", value: "R 86,200", alloc: "1.3%", source: "Live", up: true, change: "+1.8%" },
-                                                { name: "Bitcoin", note: "0.45 BTC", value: "R 534,100", alloc: "8.3%", source: "Live", up: true, change: "+4.3%" },
-                                                { name: "Cape Town Apt", note: "Property · AI-estimated", value: "R 2,800,000", alloc: "43.6%", source: "AI Est.", up: null, change: null },
-                                                { name: "Tesla", note: "10 shares · R 18,240/sh", value: "R 182,400", alloc: "2.8%", source: "Live", up: false, change: "−0.8%" },
-                                            ] as Array<{ name: string; note: string; value: string; alloc: string; source: string; up: boolean | null; change: string | null }>).map(row => (
-                                                <div key={row.name} className="flex items-center justify-between py-2.5">
-                                                    <div className="flex items-center gap-2.5">
-                                                        <div className="w-7 h-7 bg-surface-2 rounded-lg flex items-center justify-center text-[9px] font-normal text-text-2 shrink-0">
-                                                            {row.name[0]}
-                                                        </div>
-                                                        <div>
-                                                            <p className="text-[11px] font-normal text-text-1">{row.name}</p>
-                                                            <p className="text-[9px] text-text-3">{row.note}</p>
-                                                        </div>
-                                                    </div>
-                                                    <div className="flex items-center gap-2">
-                                                        <div className={cn(
-                                                            "text-[8px] px-1.5 py-0.5 rounded-full",
-                                                            row.source === "Live" ? "bg-positive/10 text-positive" : "bg-surface-3 text-text-3"
-                                                        )}>
-                                                            {row.source}
-                                                        </div>
-                                                        <div className="text-right">
-                                                            <p className="text-[11px] font-normal tabular-nums text-text-1">{row.value}</p>
-                                                            <p className={cn("text-[9px] tabular-nums", row.change ? (row.up ? "text-positive" : "text-negative") : "text-text-3")}>
-                                                                {row.change ?? row.alloc}
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
+                                        ))}
                                     </div>
                                 </div>
                             </div>
+                        </div>
                     </div>
                 </section>
 

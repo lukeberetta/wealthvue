@@ -190,7 +190,7 @@ export const SettingsView = ({ user, onSignOut, onBack, onUpdateUser }: Settings
                 <Card className="p-6">
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between sm:gap-8">
                         <div className="flex items-start gap-3">
-                            <div className="w-9 h-9 rounded-xl bg-accent-light flex items-center justify-center text-accent shrink-0 mt-0.5">
+                            <div className="w-9 h-9 rounded-xl bg-surface-2 flex items-center justify-center text-text-1 shrink-0 mt-0.5">
                                 <Palette size={17} />
                             </div>
                             <div>
@@ -216,7 +216,7 @@ export const SettingsView = ({ user, onSignOut, onBack, onUpdateUser }: Settings
                         <div className="flex items-center gap-3">
                             <div className={cn(
                                 "w-9 h-9 rounded-xl flex items-center justify-center shrink-0",
-                                isPro ? "bg-accent-light text-accent" : "bg-surface-2 text-text-3"
+                                isPro ? "bg-surface-2 text-text-1" : "bg-surface-2 text-text-3"
                             )}>
                                 {isPro ? <Crown size={17} /> : <CreditCard size={17} />}
                             </div>
@@ -224,7 +224,7 @@ export const SettingsView = ({ user, onSignOut, onBack, onUpdateUser }: Settings
                                 <div className="flex items-center gap-2">
                                     <p className="font-normal text-text-1 text-sm capitalize">{isPro ? "Pro" : "Trial"} Plan</p>
                                     {isPro && (
-                                        <span className="text-[9px] font-normal uppercase tracking-wider bg-accent/10 text-accent px-2 py-0.5 rounded-full">Active</span>
+                                        <span className="text-[9px] font-normal uppercase tracking-wider bg-surface-2 text-text-2 px-2 py-0.5 rounded-full">Active</span>
                                     )}
                                 </div>
                                 {!isPro && (
@@ -266,7 +266,7 @@ export const SettingsView = ({ user, onSignOut, onBack, onUpdateUser }: Settings
                                 <div
                                     className={cn(
                                         "h-full rounded-full transition-all",
-                                        isTrialExpired ? "bg-negative" : trialPct > 80 ? "bg-amber-400" : "bg-accent"
+                                        isTrialExpired ? "bg-negative" : trialPct > 80 ? "bg-amber-400" : "bg-text-1"
                                     )}
                                     style={{ width: `${100 - trialPct}%` }}
                                 />
@@ -284,7 +284,7 @@ export const SettingsView = ({ user, onSignOut, onBack, onUpdateUser }: Settings
                             <div
                                 className={cn(
                                     "h-full rounded-full transition-all",
-                                    aiCreditsRemaining === 0 ? "bg-negative" : aiUsedPct > 75 ? "bg-amber-400" : "bg-accent"
+                                    aiCreditsRemaining === 0 ? "bg-negative" : aiUsedPct > 75 ? "bg-amber-400" : "bg-text-1"
                                 )}
                                 style={{ width: aiCreditLimit === Infinity ? "100%" : `${100 - aiUsedPct}%` }}
                             />
