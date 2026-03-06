@@ -91,9 +91,9 @@ function getDiversificationScore(pct: Record<string, number>): { label: string; 
     const maxHHI = 1;
     const minHHI = 1 / n;
     const score = Math.round(((maxHHI - hhi) / (maxHHI - minHHI)) * 100);
-    if (score >= 70) return { label: "Diversified", pct: score, color: "var(--color-positive)" };
-    if (score >= 40) return { label: "Moderate", pct: score, color: "var(--color-accent)" };
-    return { label: "Concentrated", pct: score, color: "var(--color-negative)" };
+    if (score >= 70) return { label: "Diversified", pct: score, color: "var(--color-text-1)" };
+    if (score >= 40) return { label: "Moderate", pct: score, color: "var(--color-text-1)" };
+    return { label: "Concentrated", pct: score, color: "var(--color-text-1)" };
 }
 
 
@@ -103,29 +103,29 @@ function getLiquidityScore(pct: Record<string, number>): { label: string; pct: n
     const liquidPct = Object.entries(pct)
         .filter(([type]) => LIQUID_TYPES.has(type))
         .reduce((sum, [, p]) => sum + p, 0);
-    if (liquidPct >= 70) return { label: "High", pct: liquidPct, color: "var(--color-positive)" };
-    if (liquidPct >= 40) return { label: "Moderate", pct: liquidPct, color: "var(--color-accent)" };
-    return { label: "Low", pct: liquidPct, color: "var(--color-negative)" };
+    if (liquidPct >= 70) return { label: "High", pct: liquidPct, color: "var(--color-text-1)" };
+    if (liquidPct >= 40) return { label: "Moderate", pct: liquidPct, color: "var(--color-text-1)" };
+    return { label: "Low", pct: liquidPct, color: "var(--color-text-1)" };
 }
 
 function getRiskProfile(pct: Record<string, number>): { label: string; value: 1 | 2 | 3; color: string } {
     const score = (pct.crypto || 0) * 0.9 + (pct.stock || 0) * 0.5 + (pct.etf || 0) * 0.5 + (pct.commodities || 0) * 0.5
         - (pct.cash || 0) * 0.7 - (pct.property || 0) * 0.4;
-    if (score > 40) return { label: "High", value: 3, color: "var(--color-negative)" };
-    if (score > 15) return { label: "Medium", value: 2, color: "var(--color-accent)" };
-    return { label: "Low", value: 1, color: "var(--color-positive)" };
+    if (score > 40) return { label: "High", value: 3, color: "var(--color-text-1)" };
+    if (score > 15) return { label: "Medium", value: 2, color: "var(--color-text-1)" };
+    return { label: "Low", value: 1, color: "var(--color-text-1)" };
 }
 
 // Monochromatic shades for donut chart — uses color-mix so text-1 auto-adapts dark/light
 const CHART_TYPE_SHADES: Record<string, string> = {
-    stock:       'color-mix(in srgb, var(--color-text-1) 90%, transparent)',
-    etf:         'color-mix(in srgb, var(--color-text-1) 74%, transparent)',
-    crypto:      'color-mix(in srgb, var(--color-text-1) 59%, transparent)',
+    stock: 'color-mix(in srgb, var(--color-text-1) 90%, transparent)',
+    etf: 'color-mix(in srgb, var(--color-text-1) 74%, transparent)',
+    crypto: 'color-mix(in srgb, var(--color-text-1) 59%, transparent)',
     commodities: 'color-mix(in srgb, var(--color-text-1) 46%, transparent)',
-    property:    'color-mix(in srgb, var(--color-text-1) 34%, transparent)',
-    vehicle:     'color-mix(in srgb, var(--color-text-1) 24%, transparent)',
-    cash:        'color-mix(in srgb, var(--color-text-1) 15%, transparent)',
-    other:       'color-mix(in srgb, var(--color-text-1) 8%, transparent)',
+    property: 'color-mix(in srgb, var(--color-text-1) 34%, transparent)',
+    vehicle: 'color-mix(in srgb, var(--color-text-1) 24%, transparent)',
+    cash: 'color-mix(in srgb, var(--color-text-1) 15%, transparent)',
+    other: 'color-mix(in srgb, var(--color-text-1) 8%, transparent)',
 };
 
 // Same shade ladder for account tab
@@ -459,8 +459,6 @@ export const PortfolioInsights = ({ assets, displayCurrency, fxRates, onOpenAdvi
 
                         {/* Archetype identity */}
                         <div>
-                            <p className="text-[10px] font-normal text-text-3 uppercase tracking-widest mb-3">Investor Type</p>
-
                             <motion.h2
                                 key={archetype.title}
                                 initial={{ opacity: 0, y: 6 }}

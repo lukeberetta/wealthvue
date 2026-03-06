@@ -100,8 +100,8 @@ export const EditAssetModal = ({
                 </div>
 
                 {selectedAsset.aiRationale && (
-                    <div className="bg-accent-light/30 p-4 rounded-xl border border-accent/10 flex gap-3">
-                        <Sparkles className="text-accent shrink-0" size={16} />
+                    <div className="bg-surface-2 p-4 rounded-xl border border-border flex gap-3">
+                        <Sparkles className="text-text-1 shrink-0" size={16} />
                         <p className="text-xs text-text-2 leading-relaxed">{selectedAsset.aiRationale}</p>
                     </div>
                 )}
@@ -114,7 +114,7 @@ export const EditAssetModal = ({
                         <Button variant="secondary" className="flex-1 py-3 rounded-xl" onClick={onClose}>
                             Cancel
                         </Button>
-                        <Button className="flex-[2] py-3 rounded-xl" onClick={() => onUpdateAsset(selectedAsset)}>
+                        <Button variant="primary" className="flex-[2] py-3 rounded-xl" onClick={() => onUpdateAsset(selectedAsset)}>
                             Save Changes
                         </Button>
                     </div>

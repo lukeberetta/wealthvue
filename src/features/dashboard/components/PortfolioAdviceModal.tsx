@@ -238,9 +238,9 @@ export const PortfolioAdviceModal = ({
             <div className="space-y-6">
 
                 {/* Archetype header */}
-                <div className="flex items-start gap-4 p-4 bg-accent/6 border border-accent/15 rounded-xl">
-                    <div className="w-8 h-8 rounded-full bg-accent/15 flex items-center justify-center shrink-0 mt-0.5">
-                        <Sparkles size={14} className="text-accent" />
+                <div className="flex items-start gap-4 p-4 bg-surface-2 border border-border rounded-xl">
+                    <div className="w-8 h-8 rounded-full bg-surface-3 flex items-center justify-center shrink-0 mt-0.5">
+                        <Sparkles size={14} className="text-text-2" />
                     </div>
                     <div>
                         <p className="font-serif text-lg text-text-1">{archetypeTitle}</p>
@@ -251,7 +251,7 @@ export const PortfolioAdviceModal = ({
                 {/* Loading */}
                 {isLoading && (
                     <div className="flex flex-col items-center justify-center py-12 gap-6">
-                        <div className="w-10 h-10 rounded-full border-2 border-accent/20 border-t-accent animate-spin" />
+                        <div className="w-10 h-10 rounded-full border-2 border-border border-t-text-3 animate-spin" />
                         <div className="text-center space-y-2">
                             <AnalysisMessages />
                             <p className="text-[11px] text-text-3">Using live market data for context</p>
@@ -300,8 +300,8 @@ export const PortfolioAdviceModal = ({
                                 <ul className="space-y-3">
                                     {result.advice.map((item, i) => (
                                         <li key={i} className="flex items-start gap-3">
-                                            <div className="w-5 h-5 rounded-full bg-accent/10 flex items-center justify-center shrink-0 mt-0.5">
-                                                <ArrowRight size={10} className="text-accent" />
+                                            <div className="w-5 h-5 rounded-full bg-surface-2 flex items-center justify-center shrink-0 mt-0.5">
+                                                <ArrowRight size={10} className="text-text-3" />
                                             </div>
                                             <p className="text-sm text-text-1 leading-relaxed">{item}</p>
                                         </li>
@@ -319,7 +319,7 @@ export const PortfolioAdviceModal = ({
                                 <button
                                     onClick={handleRefresh}
                                     disabled={isLoading}
-                                    className="flex items-center gap-1 text-[10px] text-text-3 hover:text-accent transition-colors disabled:opacity-40"
+                                    className="flex items-center gap-1 text-[10px] text-text-3 hover:text-text-1 transition-colors disabled:opacity-40"
                                     title="Run fresh analysis"
                                 >
                                     <RefreshCw size={10} />

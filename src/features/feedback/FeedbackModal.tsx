@@ -100,7 +100,6 @@ export function FeedbackModal({ isOpen, onClose, user }: FeedbackModalProps) {
                 {/* Header */}
                 <div className="flex items-center justify-between px-6 py-5 border-b border-border">
                     <div className="flex items-center gap-2.5">
-                        <MessageSquare size={18} className="text-accent" />
                         <h3 className="text-base font-normal text-text-1">Send Feedback</h3>
                     </div>
                     <button
@@ -149,14 +148,11 @@ export function FeedbackModal({ isOpen, onClose, user }: FeedbackModalProps) {
                                             className={cn(
                                                 "flex flex-col items-start p-3 rounded-xl border text-left transition-all duration-150",
                                                 type === t.value
-                                                    ? "border-accent bg-accent-light text-accent"
+                                                    ? "border-text-3 bg-surface shadow-sm"
                                                     : "border-border bg-surface-2 text-text-2 hover:border-border/80 hover:bg-surface-2/80"
                                             )}
                                         >
-                                            <span className={cn(
-                                                "text-xs font-normal",
-                                                type === t.value ? "text-accent" : "text-text-1"
-                                            )}>
+                                            <span className="text-xs font-normal text-text-1">
                                                 {t.label}
                                             </span>
                                             <span className="text-[10px] mt-0.5 text-text-3 leading-tight">{t.description}</span>

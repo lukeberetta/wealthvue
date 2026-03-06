@@ -7,7 +7,6 @@ import {
 import { motion, AnimatePresence, useReducedMotion } from "motion/react";
 import { Asset } from "../../../types";
 import { formatCurrency, cn } from "../../../lib/utils";
-import { AssetIcon } from "./AssetIcon";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -194,8 +193,8 @@ function DraftCard({
             {/* Main row */}
             <div className="flex items-center gap-3">
                 {/* Icon */}
-                <div className="w-8 h-8 rounded-lg bg-surface-2 flex items-center justify-center text-accent shrink-0">
-                    <AssetIcon asset={asset} size={14} />
+                <div className="w-8 h-8 rounded-lg bg-surface-2 flex items-center justify-center text-[11px] font-normal text-text-2 shrink-0">
+                    {((asset.ticker || asset.name) || "?").charAt(0).toUpperCase()}
                 </div>
 
                 {/* Name + meta */}
@@ -222,7 +221,7 @@ function DraftCard({
                         {asset.ticker && (
                             <>
                                 <span className="text-text-3/40 text-[10px]">•</span>
-                                <span className="text-[10px] font-normal text-accent bg-accent-light/60 px-1 rounded-sm">{asset.ticker}</span>
+                                <span className="text-[10px] font-normal text-text-2 bg-surface-2 px-1 rounded-sm">{asset.ticker}</span>
                             </>
                         )}
                         {qty > 1 && (
