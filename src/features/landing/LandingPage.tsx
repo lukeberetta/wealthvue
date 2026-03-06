@@ -468,19 +468,14 @@ export const LandingPage = ({ user, firebaseUid, isDemo = false, onSignIn, onTry
 
                             {/* Pro */}
                             <div
-                                className="bg-surface-2 p-10 rounded-2xl border border-accent/25 flex flex-col relative fade-up"
+                                className="bg-accent p-10 rounded-2xl flex flex-col fade-up"
                                 style={{ transitionDelay: "80ms" }}
                             >
-                                <div className="absolute top-5 right-5">
-                                    <span className="text-[9px] font-normal tracking-[0.15em] text-text-2 uppercase bg-surface-3 px-2.5 py-1 rounded-full">
-                                        Popular
-                                    </span>
-                                </div>
                                 <div className="mb-8">
-                                    <h3 className="font-serif text-xl text-text-1 mb-3">Pro</h3>
+                                    <h3 className="font-serif text-xl text-on-accent mb-3">Pro</h3>
                                     <div className="flex items-baseline gap-1.5">
-                                        <span className="text-4xl font-serif text-text-1">$5</span>
-                                        <span className="text-text-3 text-sm">per month</span>
+                                        <span className="text-4xl font-serif text-on-accent">$5</span>
+                                        <span className="text-on-accent/60 text-sm">per month</span>
                                     </div>
                                 </div>
                                 <ul className="space-y-3 mb-10 flex-1">
@@ -491,8 +486,8 @@ export const LandingPage = ({ user, firebaseUid, isDemo = false, onSignIn, onTry
                                         "Priority support",
                                         "Export to CSV"
                                     ].map(f => (
-                                        <li key={f} className="flex items-start gap-3 text-sm text-text-2">
-                                            <Check size={13} className="text-positive shrink-0 mt-0.5" />
+                                        <li key={f} className="flex items-start gap-3 text-sm text-on-accent/80">
+                                            <Check size={13} className="text-on-accent/60 shrink-0 mt-0.5" />
                                             {f}
                                         </li>
                                     ))}
@@ -505,11 +500,11 @@ export const LandingPage = ({ user, firebaseUid, isDemo = false, onSignIn, onTry
                                             openCheckout(user.email, firebaseUid ?? user.email);
                                         });
                                     }}
-                                    className="w-full bg-accent text-on-accent py-3 rounded-full text-sm font-normal hover:opacity-90 transition-all"
+                                    className="w-full bg-on-accent text-accent py-3 rounded-full text-sm font-normal hover:opacity-90 transition-all"
                                 >
                                     Get Started
                                 </button>
-                                <p className="text-center text-[10px] text-text-3 mt-3">Billed monthly. Cancel anytime.</p>
+                                <p className="text-center text-[10px] text-on-accent/50 mt-3">Billed monthly. Cancel anytime.</p>
                             </div>
                         </div>
                     </div>

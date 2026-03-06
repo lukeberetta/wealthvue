@@ -32,6 +32,15 @@ export const ThemeContext = createContext<ThemeContextValue>({
 export const useThemeContext = () => useContext(ThemeContext);
 
 // ---------------------------------------------------------------------------
+// Scroll-to-top on route change
+// ---------------------------------------------------------------------------
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  React.useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
+  return null;
+}
+
+// ---------------------------------------------------------------------------
 // Inner app — must be inside AuthProvider so useAuth() works
 // ---------------------------------------------------------------------------
 function Inner() {
@@ -69,6 +78,7 @@ const handleTryDemo = () => { if (user) { navigate("/app"); } else { setDemo(tru
   return (
     <ThemeContext.Provider value={{ mode, setTheme }}>
       <div className="min-h-screen bg-bg text-text-1">
+        <ScrollToTop />
         <AnimatePresence mode="wait">
           <motion.div
             key={location.pathname}
