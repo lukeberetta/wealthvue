@@ -214,8 +214,9 @@ export const LandingPage = ({ user, firebaseUid, isDemo = false, onSignIn, onTry
                         </div>
 
                         {/* Dashboard mockup — centered */}
+                        <div className="max-w-[860px] mx-auto relative fade-up group cursor-pointer" onClick={onTryDemo}>
                         <div
-                            className="max-w-[860px] mx-auto bg-surface rounded-2xl border border-border overflow-hidden fade-up"
+                            className="bg-surface rounded-2xl border border-border overflow-hidden h-[600px] transition-transform duration-500 ease-out group-hover:-translate-y-2"
                             style={{ boxShadow: '0 40px 80px rgba(0,0,0,0.35)' }}
                         >
                             {/* Mockup nav */}
@@ -382,6 +383,19 @@ export const LandingPage = ({ user, firebaseUid, isDemo = false, onSignIn, onTry
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                        {/* CTA overlay */}
+                        <div
+                            className="absolute bottom-0 left-0 right-0 h-48 flex flex-col items-center justify-end pb-8 rounded-b-2xl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                            style={{ background: 'linear-gradient(to bottom, transparent, var(--color-bg) 85%)' }}
+                        >
+                            <div className="translate-y-3 group-hover:translate-y-0 transition-transform duration-500 delay-75 pointer-events-auto">
+                                <button className="btn-primary flex items-center gap-2 px-6 py-3 text-sm">
+                                    See it in action
+                                    <ArrowRight size={14} />
+                                </button>
+                            </div>
+                        </div>
                         </div>
                     </div>
                 </section>
