@@ -3,7 +3,6 @@ import { RefreshCw, Check } from "lucide-react";
 import { Asset } from "../../../types";
 import { formatCurrency, cn } from "../../../lib/utils";
 import { convertCurrency } from "../../../lib/fx";
-import { AssetIcon } from "./AssetIcon";
 
 interface AssetRowProps {
     asset: Asset;
@@ -57,8 +56,8 @@ export const AssetRow: React.FC<AssetRowProps> = ({
             )}
 
             {/* Icon */}
-            <div className="w-8 h-8 rounded-lg bg-surface-2 flex items-center justify-center text-accent shrink-0">
-                <AssetIcon asset={asset} size={14} />
+            <div className="w-8 h-8 rounded-lg bg-surface-2 flex items-center justify-center text-[11px] font-normal text-text-2 shrink-0">
+                {(asset.ticker || asset.name).charAt(0).toUpperCase()}
             </div>
 
             {/* Name + subtitle */}
@@ -86,7 +85,7 @@ export const AssetRow: React.FC<AssetRowProps> = ({
                     asset.valueSource === "live_price"
                         ? "bg-positive/10 text-positive"
                         : asset.valueSource === "ai_estimate"
-                        ? "bg-accent/10 text-accent"
+                        ? "bg-surface-3 text-text-2"
                         : "bg-surface-2 text-text-3"
                 )}>
                     {asset.valueSource === "live_price" ? "Live" : asset.valueSource === "ai_estimate" ? "AI Est." : "Manual"}

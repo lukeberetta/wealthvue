@@ -163,7 +163,7 @@ export const LandingPage = ({ user, firebaseUid, isDemo = false, onSignIn, onTry
                 <section id="how-it-works" className="py-32 px-6 border-t border-border">
                     <div className="max-w-[1120px] mx-auto">
                         <div className="max-w-2xl mb-20 fade-up">
-                            <p className="text-[10px] font-normal tracking-[0.22em] text-accent uppercase mb-5">How it works</p>
+                            <p className="text-[10px] font-normal tracking-[0.22em] text-text-3 uppercase mb-5">How it works</p>
                             <h2 className="text-4xl md:text-5xl font-serif text-text-1 mb-5">
                                 From screenshot to<br />net worth in{" "}
                                 <span className="text-accent italic">seconds.</span>
@@ -177,21 +177,21 @@ export const LandingPage = ({ user, firebaseUid, isDemo = false, onSignIn, onTry
 
                             {/* Step 01 */}
                             <div className="bg-surface p-8 rounded-2xl space-y-4 fade-up">
-                                <div className="text-[9px] font-normal tracking-[0.2em] text-accent uppercase">01</div>
+                                <div className="text-[9px] font-normal tracking-[0.2em] text-text-3 uppercase">01</div>
                                 <h3 className="text-lg font-serif text-text-1 leading-snug">Upload or describe</h3>
                                 <p className="text-sm text-text-2 leading-relaxed">A screenshot from your brokerage, '2020 VW Polo 50k km', or '0.5 Bitcoin'. Any format works.</p>
                             </div>
 
                             {/* Step 02 */}
                             <div className="bg-surface p-8 rounded-2xl space-y-4 fade-up" style={{ transitionDelay: "80ms" }}>
-                                <div className="text-[9px] font-normal tracking-[0.2em] text-accent uppercase">02</div>
+                                <div className="text-[9px] font-normal tracking-[0.2em] text-text-3 uppercase">02</div>
                                 <h3 className="text-lg font-serif text-text-1 leading-snug">AI does the valuation</h3>
                                 <p className="text-sm text-text-2 leading-relaxed">Gemini reads your input, identifies the asset, and fetches live market data. Stocks, crypto, and cars handled automatically.</p>
                             </div>
 
                             {/* Step 03 */}
                             <div className="bg-surface p-8 rounded-2xl space-y-4 fade-up" style={{ transitionDelay: "160ms" }}>
-                                <div className="text-[9px] font-normal tracking-[0.2em] text-accent uppercase">03</div>
+                                <div className="text-[9px] font-normal tracking-[0.2em] text-text-3 uppercase">03</div>
                                 <h3 className="text-lg font-serif text-text-1 leading-snug">Your net worth, updated</h3>
                                 <p className="text-sm text-text-2 leading-relaxed">Every asset tracked in your preferred currency. One clean number — updated whenever the markets move.</p>
                             </div>
@@ -204,7 +204,7 @@ export const LandingPage = ({ user, firebaseUid, isDemo = false, onSignIn, onTry
                 <section className="py-32 px-6 border-t border-border">
                     <div className="max-w-[1120px] mx-auto">
                         <div className="text-center mb-14 fade-up">
-                            <p className="text-[10px] font-normal tracking-[0.22em] text-accent uppercase mb-5">The dashboard</p>
+                            <p className="text-[10px] font-normal tracking-[0.22em] text-text-3 uppercase mb-5">The dashboard</p>
                             <h2 className="text-4xl md:text-5xl font-serif text-text-1 mb-5">
                                 One view. Every number that matters.
                             </h2>
@@ -366,8 +366,8 @@ export const LandingPage = ({ user, firebaseUid, isDemo = false, onSignIn, onTry
                                                     <div className="flex items-center gap-2">
                                                         <div className={cn(
                                                             "text-[8px] px-1.5 py-0.5 rounded-full",
-                                                            row.source === "Live" ? "bg-positive/10 text-positive" : "text-accent"
-                                                        )} style={row.source === "AI Est." ? { background: 'var(--color-accent-light)' } : {}}>
+                                                            row.source === "Live" ? "bg-positive/10 text-positive" : "bg-surface-3 text-text-3"
+                                                        )}>
                                                             {row.source}
                                                         </div>
                                                         <div className="text-right">
@@ -390,7 +390,7 @@ export const LandingPage = ({ user, firebaseUid, isDemo = false, onSignIn, onTry
                 <section className="py-32 px-6 border-t border-border">
                     <div className="max-w-[1120px] mx-auto">
                         <div className="mb-16 fade-up">
-                            <p className="text-[10px] font-normal tracking-[0.22em] text-accent uppercase mb-5">What you can track</p>
+                            <p className="text-[10px] font-normal tracking-[0.22em] text-text-3 uppercase mb-5">What you can track</p>
                             <h2 className="text-4xl md:text-5xl font-serif text-text-1">
                                 If you own it,{" "}
                                 <span className="text-accent italic">we can value it.</span>
@@ -411,7 +411,7 @@ export const LandingPage = ({ user, firebaseUid, isDemo = false, onSignIn, onTry
                                     className="bg-surface p-7 rounded-2xl fade-up"
                                     style={{ transitionDelay: `${i * 40}ms` }}
                                 >
-                                    <div className="w-8 h-8 bg-surface-2 rounded-lg flex items-center justify-center text-accent mb-5">
+                                    <div className="w-8 h-8 bg-surface-2 rounded-lg flex items-center justify-center text-text-2 mb-5">
                                         {item.i}
                                     </div>
                                     <h3 className="font-serif text-base text-text-1 mb-2">{item.t}</h3>
@@ -426,7 +426,7 @@ export const LandingPage = ({ user, firebaseUid, isDemo = false, onSignIn, onTry
                 <section className="py-32 px-6 border-t border-border">
                     <div className="max-w-[1120px] mx-auto">
                         <div className="mb-16 text-center fade-up">
-                            <p className="text-[10px] font-normal tracking-[0.22em] text-accent uppercase mb-5">Pricing</p>
+                            <p className="text-[10px] font-normal tracking-[0.22em] text-text-3 uppercase mb-5">Pricing</p>
                             <h2 className="text-4xl md:text-5xl font-serif text-text-1 mb-4">
                                 Simple. Honest.{" "}
                                 <span className="text-accent italic">Affordable.</span>
@@ -472,7 +472,7 @@ export const LandingPage = ({ user, firebaseUid, isDemo = false, onSignIn, onTry
                                 style={{ transitionDelay: "80ms" }}
                             >
                                 <div className="absolute top-5 right-5">
-                                    <span className="text-[9px] font-normal tracking-[0.15em] text-accent uppercase bg-accent/10 px-2.5 py-1 rounded-full">
+                                    <span className="text-[9px] font-normal tracking-[0.15em] text-text-2 uppercase bg-surface-3 px-2.5 py-1 rounded-full">
                                         Popular
                                     </span>
                                 </div>
@@ -492,7 +492,7 @@ export const LandingPage = ({ user, firebaseUid, isDemo = false, onSignIn, onTry
                                         "Export to CSV"
                                     ].map(f => (
                                         <li key={f} className="flex items-start gap-3 text-sm text-text-2">
-                                            <Check size={13} className="text-accent shrink-0 mt-0.5" />
+                                            <Check size={13} className="text-positive shrink-0 mt-0.5" />
                                             {f}
                                         </li>
                                     ))}
