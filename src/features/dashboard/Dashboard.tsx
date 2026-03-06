@@ -372,7 +372,7 @@ export const Dashboard = ({ user, isDemo, isAuthLoading = false, onSignIn, onSig
 
                 {/* Portfolio Insights */}
                 <div>
-                    <h3 className="text-xl font-serif text-text-1 mb-6">Portfolio Snapshot</h3>
+                    <p className="text-[10px] font-normal uppercase tracking-[0.22em] text-text-3 mb-6">Portfolio Snapshot</p>
                     <PortfolioInsights
                         assets={assets}
                         displayCurrency={displayCurrency}
@@ -384,7 +384,7 @@ export const Dashboard = ({ user, isDemo, isAuthLoading = false, onSignIn, onSig
                 {/* NAV History Chart */}
                 <div>
                     <div className="flex items-center justify-between mb-6">
-                        <h3 className="text-xl font-serif text-text-1">Performance</h3>
+                        <p className="text-[10px] font-normal uppercase tracking-[0.22em] text-text-3">Performance</p>
                         <div className="flex items-center gap-0.5 bg-surface-2 rounded-full p-0.5">
                             {PERIODS.map(p => (
                                 <button
@@ -415,7 +415,7 @@ export const Dashboard = ({ user, isDemo, isAuthLoading = false, onSignIn, onSig
                 {/* Asset list */}
                 <div>
                     <div className="mb-6">
-                        <h3 className="text-xl font-serif text-text-1">My Assets</h3>
+                        <p className="text-[10px] font-normal uppercase tracking-[0.22em] text-text-3">My Assets</p>
                     </div>
                     <AssetList
                         assets={sortedAssets}

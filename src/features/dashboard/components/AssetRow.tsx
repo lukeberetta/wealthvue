@@ -11,6 +11,7 @@ interface AssetRowProps {
     fxRates: { [key: string]: number };
     totalNAV: number;
     isSelected: boolean;
+    selectModeActive: boolean;
     isRefreshing?: boolean;
     onSelect: (id: string, checked: boolean) => void;
     onClick: (asset: Asset) => void;
@@ -21,7 +22,7 @@ const canRefresh = (asset: Asset) =>
     !!asset.ticker && (asset.assetType === "stock" || asset.assetType === "crypto");
 
 export const AssetRow: React.FC<AssetRowProps> = ({
-    asset, displayCurrency, fxRates, totalNAV, isSelected, isRefreshing, onSelect, onClick, onRefresh,
+    asset, displayCurrency, fxRates, totalNAV, isSelected, selectModeActive, isRefreshing, onSelect, onClick, onRefresh,
 }) => {
     const converted = convertCurrency(asset.totalValue, asset.totalValueCurrency, displayCurrency, fxRates);
     const isLiability = converted < 0;
@@ -35,23 +36,25 @@ export const AssetRow: React.FC<AssetRowProps> = ({
             )}
             onClick={() => onClick(asset)}
         >
-            {/* Checkbox */}
-            <div className="w-5 shrink-0" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
-                <label className="block w-4 h-4 cursor-pointer">
-                    <input
-                        type="checkbox"
-                        checked={isSelected}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => onSelect(asset.id, e.target.checked)}
-                        className="sr-only"
-                    />
-                    <div className={cn(
-                        "w-4 h-4 rounded border flex items-center justify-center transition-all",
-                        isSelected ? "bg-accent border-accent" : "bg-surface-2 border-border hover:border-text-3"
-                    )}>
-                        {isSelected && <Check size={10} strokeWidth={3} className="text-white" />}
-                    </div>
-                </label>
-            </div>
+            {/* Checkbox — only visible when select mode is active */}
+            {selectModeActive && (
+                <div className="w-5 shrink-0" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
+                    <label className="block w-4 h-4 cursor-pointer">
+                        <input
+                            type="checkbox"
+                            checked={isSelected}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => onSelect(asset.id, e.target.checked)}
+                            className="sr-only"
+                        />
+                        <div className={cn(
+                            "w-4 h-4 rounded border flex items-center justify-center transition-all",
+                            isSelected ? "bg-accent border-accent" : "bg-surface-2 border-border hover:border-text-3"
+                        )}>
+                            {isSelected && <Check size={10} strokeWidth={3} className="text-on-accent" />}
+                        </div>
+                    </label>
+                </div>
+            )}
 
             {/* Icon */}
             <div className="w-8 h-8 rounded-lg bg-surface-2 flex items-center justify-center text-accent shrink-0">

@@ -259,6 +259,7 @@ export const AssetList = ({
                                     fxRates={fxRates}
                                     totalNAV={totalNAV}
                                     isSelected={selectedAssetIds.includes(asset.id)}
+                                    selectModeActive={true}
                                     isRefreshing={refreshingAssetId === asset.id}
                                     onSelect={onSelectAsset}
                                     onClick={onEditAsset}

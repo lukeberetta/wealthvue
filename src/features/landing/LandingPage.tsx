@@ -86,7 +86,7 @@ export const LandingPage = ({ user, firebaseUid, isDemo = false, onSignIn, onTry
                                 </button>
                                 <a
                                     href="#how-it-works"
-                                    className="text-sm text-text-3 hover:text-text-1 transition-colors underline underline-offset-4"
+                                    className="text-sm text-text-2 hover:text-text-1 transition-colors underline underline-offset-4"
                                 >
                                     See how it works
                                 </a>
@@ -129,7 +129,7 @@ export const LandingPage = ({ user, firebaseUid, isDemo = false, onSignIn, onTry
                                         <div className="grid grid-cols-2 gap-3">
                                             <div className="bg-surface-2/40 rounded-xl p-4 border border-border/60">
                                                 {/* Mini donut */}
-                                                <div className="w-16 h-16 mx-auto rounded-full" style={{ background: "conic-gradient(#094D92 0% 42%, #18206F 42% 73%, #283D3B 73% 87%, #1A1A1A 87% 100%)" }} />
+                                                <div className="w-16 h-16 mx-auto rounded-full" style={{ background: "conic-gradient(var(--color-accent) 0% 42%, rgba(255,255,255,0.12) 42% 73%, rgba(255,255,255,0.06) 73% 87%, rgba(255,255,255,0.03) 87% 100%)" }} />
                                                 <div className="mt-2.5 space-y-0.5">
                                                     <div className="flex justify-between text-[8px] font-normal text-text-3 uppercase">
                                                         <span>Stocks 42%</span><span>Crypto 31%</span>
@@ -176,15 +176,6 @@ export const LandingPage = ({ user, firebaseUid, isDemo = false, onSignIn, onTry
                     </div>
                 </section>
 
-                {/* ── TICKER BAR ── */}
-                <section className="bg-surface-2/60 py-3.5 border-y border-border">
-                    <div className="max-w-[1120px] mx-auto px-6 text-center">
-                        <p className="text-[9px] font-normal text-text-3 uppercase tracking-[0.35em]">
-                            Track stocks · crypto · vehicles · property · cash · anything
-                        </p>
-                    </div>
-                </section>
-
                 {/* ── HOW IT WORKS ── */}
                 <section id="how-it-works" className="py-32 px-6">
                     <div className="max-w-[1120px] mx-auto">
@@ -222,7 +213,7 @@ export const LandingPage = ({ user, firebaseUid, isDemo = false, onSignIn, onTry
                                     className="bg-surface p-8 rounded-2xl border border-border hover:-translate-y-1 hover:shadow-lg transition-all duration-300 fade-up"
                                     style={{ transitionDelay: `${i * 80}ms` }}
                                 >
-                                    <div className="text-5xl font-serif font-light text-accent/25 mb-6">{step.id}</div>
+                                    <div className="inline-block text-[9px] font-normal tracking-[0.2em] text-accent uppercase mb-5">{step.id}</div>
                                     <h3 className="text-lg font-serif text-text-1 mb-3">{step.t}</h3>
                                     <p className="text-sm text-text-2 leading-relaxed">{step.b}</p>
                                 </div>
@@ -303,7 +294,7 @@ export const LandingPage = ({ user, firebaseUid, isDemo = false, onSignIn, onTry
                                     preview: <p className="text-sm font-normal text-text-1">FNB Savings — R 142,000</p>
                                 }
                             ].map((item, i) => (
-                                <div key={i} className="bg-surface p-5 rounded-2xl border-l-4 border-accent border border-border/50 shadow-sm">
+                                <div key={i} className="bg-surface p-5 rounded-2xl border border-border shadow-sm">
                                     <div className="flex items-center gap-2 mb-3">
                                         {item.icon}
                                         <span className="text-[10px] font-normal text-text-3 uppercase tracking-wider">{item.label}</span>
@@ -351,9 +342,6 @@ export const LandingPage = ({ user, firebaseUid, isDemo = false, onSignIn, onTry
 
                             {/* Pro */}
                             <div className="bg-surface p-10 rounded-2xl border border-accent shadow-xl shadow-accent/10 flex flex-col relative fade-up">
-                                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-accent text-on-accent px-4 py-1 rounded-full text-[9px] font-normal uppercase tracking-wider whitespace-nowrap">
-                                    Most Popular
-                                </div>
                                 <div className="mb-8">
                                     <h3 className="font-serif text-xl text-text-1 mb-2">Pro</h3>
                                     <div className="flex items-baseline gap-1.5">
@@ -384,7 +372,7 @@ export const LandingPage = ({ user, firebaseUid, isDemo = false, onSignIn, onTry
                 </section>
 
                 {/* ── FINAL CTA ── */}
-                <section className="py-32 px-6 text-center overflow-hidden bg-surface-2/30">
+                <section className="py-32 px-6 text-center overflow-hidden bg-bg">
                     <div className="max-w-[1120px] mx-auto space-y-8 fade-up">
                         <h2 className="text-5xl md:text-7xl font-serif text-text-1">
                             Know your{" "}

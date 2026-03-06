@@ -85,15 +85,15 @@ export function getArchetype(pct: Record<string, number>): Archetype {
 function getDiversificationScore(pct: Record<string, number>): { label: string; pct: number; color: string } {
     const values = Object.values(pct);
     const n = values.length;
-    if (n <= 1) return { label: "Concentrated", pct: 8, color: "var(--color-text-1)" };
+    if (n <= 1) return { label: "Concentrated", pct: 8, color: "var(--color-negative)" };
     // Herfindahl–Hirschman Index: 1 = fully concentrated, 1/n = perfectly spread
     const hhi = values.reduce((sum, v) => sum + (v / 100) ** 2, 0);
     const maxHHI = 1;
     const minHHI = 1 / n;
     const score = Math.round(((maxHHI - hhi) / (maxHHI - minHHI)) * 100);
-    if (score >= 70) return { label: "Diversified", pct: score, color: "var(--color-text-1)" };
-    if (score >= 40) return { label: "Moderate", pct: score, color: "var(--color-text-1)" };
-    return { label: "Concentrated", pct: score, color: "var(--color-text-1)" };
+    if (score >= 70) return { label: "Diversified", pct: score, color: "var(--color-positive)" };
+    if (score >= 40) return { label: "Moderate", pct: score, color: "var(--color-accent)" };
+    return { label: "Concentrated", pct: score, color: "var(--color-negative)" };
 }
 
 
@@ -103,17 +103,17 @@ function getLiquidityScore(pct: Record<string, number>): { label: string; pct: n
     const liquidPct = Object.entries(pct)
         .filter(([type]) => LIQUID_TYPES.has(type))
         .reduce((sum, [, p]) => sum + p, 0);
-    if (liquidPct >= 70) return { label: "High", pct: liquidPct, color: "var(--color-text-1)" };
-    if (liquidPct >= 40) return { label: "Moderate", pct: liquidPct, color: "var(--color-text-1)" };
-    return { label: "Low", pct: liquidPct, color: "var(--color-text-1)" };
+    if (liquidPct >= 70) return { label: "High", pct: liquidPct, color: "var(--color-positive)" };
+    if (liquidPct >= 40) return { label: "Moderate", pct: liquidPct, color: "var(--color-accent)" };
+    return { label: "Low", pct: liquidPct, color: "var(--color-negative)" };
 }
 
 function getRiskProfile(pct: Record<string, number>): { label: string; value: 1 | 2 | 3; color: string } {
     const score = (pct.crypto || 0) * 0.9 + (pct.stock || 0) * 0.5 + (pct.etf || 0) * 0.5 + (pct.commodities || 0) * 0.5
         - (pct.cash || 0) * 0.7 - (pct.property || 0) * 0.4;
-    if (score > 40) return { label: "High", value: 3, color: "var(--color-text-1)" };
-    if (score > 15) return { label: "Medium", value: 2, color: "var(--color-text-1)" };
-    return { label: "Low", value: 1, color: "var(--color-text-1)" };
+    if (score > 40) return { label: "High", value: 3, color: "var(--color-negative)" };
+    if (score > 15) return { label: "Medium", value: 2, color: "var(--color-accent)" };
+    return { label: "Low", value: 1, color: "var(--color-positive)" };
 }
 
 // Monochromatic shades for donut chart — uses color-mix so text-1 auto-adapts dark/light
@@ -459,9 +459,7 @@ export const PortfolioInsights = ({ assets, displayCurrency, fxRates, onOpenAdvi
 
                         {/* Archetype identity */}
                         <div>
-                            <div className="inline-flex items-center bg-surface-2 border border-border rounded-full px-3 py-0.5 mb-3">
-                                <span className="text-[10px] font-normal text-text-3 uppercase tracking-widest">Investor Type</span>
-                            </div>
+                            <p className="text-[10px] font-normal text-text-3 uppercase tracking-widest mb-3">Investor Type</p>
 
                             <motion.h2
                                 key={archetype.title}

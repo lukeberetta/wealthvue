@@ -226,7 +226,7 @@ export function AppNav({
                                             animate={{ opacity: 1, y: 0, scale: 1 }}
                                             exit={{ opacity: 0, y: 8, scale: 0.96 }}
                                             transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-                                            className="absolute right-0 top-full mt-2 w-60 bg-surface border border-border rounded-2xl shadow-xl z-50 overflow-hidden"
+                                            className="absolute right-0 top-full mt-2 w-60 bg-surface border border-border rounded-xl shadow-xl z-50 overflow-hidden"
                                             role="menu"
                                         >
                                             {/* User info */}
